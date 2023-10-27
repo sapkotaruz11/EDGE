@@ -1,0 +1,14 @@
+{
+    "mutag": {
+        "ACC": 61.028999999999996,
+        "precision": 0,
+        "recall": 0.0,
+        "F1": 0
+    },
+    "lymphography": {
+        "ACC": 45.269999999999996,
+        "precision": 0,
+        "recall": 0.0,
+        "F1": 0
+    }
+}
