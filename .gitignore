@@ -166,3 +166,5 @@ cython_debug/
 *.pt
 *nt
 *n3
+
+/src/Log/*
