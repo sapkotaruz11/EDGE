@@ -5,11 +5,10 @@ import networkx as nx
 import numpy as np
 import torch
 import torch.nn as nn
-
 from dgl import to_heterogeneous, to_homogeneous
 from dgl.base import NID
 from dgl.convert import to_networkx
-from dgl.subgraph import node_subgraph, khop_in_subgraph
+from dgl.subgraph import khop_in_subgraph, node_subgraph
 from dgl.transforms.functional import remove_nodes
 
 __all__ = ["SubgraphX", "HeteroSubgraphX"]

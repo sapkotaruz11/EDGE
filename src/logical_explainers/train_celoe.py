@@ -1,15 +1,12 @@
+import json
+
 from ontolearn.concept_learner import CELOE
-from owlapy.model import OWLNamedIndividual, IRI
-from owlapy.model import IRI
-from owlapy.model import IRI
+from ontolearn.heuristics import CELOEHeuristic
 from ontolearn.knowledge_base import KnowledgeBase
 from ontolearn.learning_problem import PosNegLPStandard
-from owlapy.model import IRI, OWLNamedIndividual
 from ontolearn.metrics import Accuracy
-from ontolearn.heuristics import CELOEHeuristic
 from ontolearn.refinement_operators import ModifiedCELOERefinement
-
-import json
+from owlapy.model import IRI, OWLNamedIndividual
 
 
 def train_celoe(file_path=None):

@@ -1,7 +1,7 @@
+import dgl.nn as dglnn
 import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
-import dgl.nn as dglnn
 
 
 class RGCN(nn.Module):

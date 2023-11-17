@@ -1,9 +1,11 @@
+import numpy as np
 import torch
+import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
 from dgl.nn import HeteroEmbedding, HeteroLinear
-import numpy as np
-import torch as th
+
+
 class HeteroFeature(nn.Module):
     r"""
     This is a feature preprocessing component which is dealt with various heterogeneous feature situation.

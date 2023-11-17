@@ -1,13 +1,9 @@
+import json
+
 from ontolearn.concept_learner import EvoLearner
-from owlapy.model import OWLNamedIndividual, IRI
-from owlapy.model import IRI
-from owlapy.model import IRI
-from owlapy.model import OWLDeclarationAxiom
 from ontolearn.knowledge_base import KnowledgeBase
 from ontolearn.learning_problem import PosNegLPStandard
-from owlapy.model import IRI, OWLNamedIndividual
-
-import json
+from owlapy.model import IRI, OWLDeclarationAxiom, OWLNamedIndividual
 
 
 def train_evo(file_path=None):

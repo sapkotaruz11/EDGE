@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 from ontolearn.metrics import F1, Accuracy, Precision, Recall
 
 

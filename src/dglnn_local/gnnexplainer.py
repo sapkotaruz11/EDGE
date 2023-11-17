@@ -1,9 +1,9 @@
 """Torch Module for GNNExplainer"""
 # pylint: disable= no-member, arguments-differ, invalid-name
 from math import sqrt
-import torch
-from dgl import khop_in_subgraph, NID, EID
 
+import torch
+from dgl import EID, NID, khop_in_subgraph
 from torch import nn
 from tqdm import tqdm
 

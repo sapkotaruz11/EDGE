@@ -1,5 +1,6 @@
-import rdflib as rdf
 import gzip
+
+import rdflib as rdf
 
 g = rdf.Graph()
 

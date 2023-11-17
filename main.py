@@ -1,6 +1,5 @@
 import argparse
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Framework for training, evaluating, and printing results."
@@ -18,8 +17,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.train:
-        from src.train_evo import train_evo
         from src.train_celoe import train_celoe
+        from src.train_evo import train_evo
 
         train_evo()
         train_celoe()
