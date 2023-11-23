@@ -168,3 +168,4 @@ cython_debug/
 *n3
 
 /src/Log/*
+try.py

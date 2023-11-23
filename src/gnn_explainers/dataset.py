@@ -2,11 +2,9 @@
 
 import dgl
 import dgl.function as fn
-import numpy as np
 import torch as th
-
-from src.dglnn_local.RDFDataset import (AIFBDataset, AMDataset, BGSDataset,
-                                        MUTAGDataset)
+import numpy as np
+from src.dglnn_local.RDFDataset import AIFBDataset, MUTAGDataset, BGSDataset, AMDataset
 
 
 class RDFDatasets:
@@ -35,8 +33,7 @@ class RDFDatasets:
         self.g = kg_dataset[0]
         self.category = kg_dataset.predict_category
         self.num_classes = kg_dataset.num_classes
-        self.train_idx_map = kg_dataset.train_idx_map
-        self.test_idx_map = kg_dataset.test_idx_map
+        self.idx_map = kg_dataset.idx_map
 
         if "labels" in self.g.nodes[self.category].data:
             labels = self.g.nodes[self.category].data.pop("labels").long()

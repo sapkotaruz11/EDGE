@@ -1,14 +1,34 @@
 {
-    "mutag": {
-        "ACC": 61.028999999999996,
-        "precision": 0,
-        "recall": 0.0,
-        "F1": 0
+  "mutag": {
+    "macro_eval_fed": {
+      "Model": "EVO",
+      "macro_precision": 0.4999999999991071,
+      "macro_recall": 0.12903225806445667,
+      "macro_f1_score": 0.20512820509544472,
+      "macro_jaccard_similarity": 0.11428571428566764
     },
-    "lymphography": {
-        "ACC": 45.269999999999996,
-        "precision": 0,
-        "recall": 0.0,
-        "F1": 0
+    "macro_eval_pred": {
+      "Model": "EVO",
+      "macro_precision": 0.49999999999962125,
+      "macro_recall": 0.6226415094333748,
+      "macro_f1_score": 0.5546218486896265,
+      "macro_jaccard_similarity": 0.38372093023233506
     }
+  },
+  "aifb": {
+    "macro_eval_fed": {
+      "Model": "EVO",
+      "macro_precision": 1.4999999999866527,
+      "macro_recall": 1.9295238095200453,
+      "macro_f1_score": 3.874137236582801,
+      "macro_jaccard_similarity": 1.0652985074611532
+    },
+    "macro_eval_pred": {
+      "Model": "EVO",
+      "macro_precision": 0.0,
+      "macro_recall": 0.0,
+      "macro_f1_score": 0.0,
+      "macro_jaccard_similarity": 0.0
+    }
+  }
 }

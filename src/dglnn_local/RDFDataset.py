@@ -3,19 +3,20 @@ Datasets from "A Collection of Benchmark Datasets for
 Systematic Evaluations of Machine Learning on
 the Semantic Web"
 """
-import abc
-import itertools
 import os
-import re
 from collections import OrderedDict
+import itertools
+import abc
+import re
+
+import networkx as nx
+import numpy as np
 
 import dgl
 import dgl.backend as F
-import networkx as nx
-import numpy as np
 from dgl.data.dgl_dataset import DGLBuiltinDataset
-from dgl.data.utils import (_get_dgl_url, generate_mask_tensor, idx2mask,
-                            load_graphs, load_info, save_graphs, save_info)
+from dgl.data.utils import save_graphs, load_graphs, save_info, load_info, _get_dgl_url
+from dgl.data.utils import generate_mask_tensor, idx2mask
 
 __all__ = ["AIFBDataset", "MUTAGDataset", "BGSDataset", "AMDataset"]
 
@@ -252,8 +253,7 @@ class RDFGraphDataset(DGLBuiltinDataset):
             test_idx,
             labels,
             num_classes,
-            train_idx_map,
-            test_idx_map,
+            idx_map,
         ) = self.load_data_split(findidfn, root_path)
 
         train_mask = idx2mask(
@@ -270,8 +270,7 @@ class RDFGraphDataset(DGLBuiltinDataset):
         self._hg.nodes[self.predict_category].data["labels"] = labels
         self._hg.nodes[self.predict_category].data["label"] = labels
         self._num_classes = num_classes
-        self.train_idx_map = train_idx_map
-        self.test_idx_map = test_idx_map
+        self.idx_map = idx_map
 
     def build_graph(self, mg, src, dst, ntid, etid, ntypes, etypes):
         """Build the graphs
@@ -358,8 +357,9 @@ class RDFGraphDataset(DGLBuiltinDataset):
         test_idx = np.array(test_idx)
         labels = np.array(labels)
         num_classes = len(label_dict)
-        idx_map = train_idx_map.update(test_idx_map)
-        return train_idx, test_idx, labels, num_classes, train_idx_map, test_idx_map
+        idx_map = train_idx_map
+        idx_map.update(test_idx_map)
+        return train_idx, test_idx, labels, num_classes, idx_map
 
     def parse_idx_file(self, filename, ent2id, label_dict, labels):
         """Parse idx files
@@ -399,7 +399,7 @@ class RDFGraphDataset(DGLBuiltinDataset):
                     idx.append(entid)
                     lblid = _get_id(label_dict, label)
                     labels[entid] = lblid
-                    idx_to_ent[entid] = {"id": ent.id, "cls": ent.cls}
+                    idx_to_ent[entid] = {"id": ent.id, "cls": ent.cls, "IRI": sample}
         return idx, idx_to_ent
 
     def has_cache(self):
@@ -421,8 +421,7 @@ class RDFGraphDataset(DGLBuiltinDataset):
             {
                 "num_classes": self.num_classes,
                 "predict_category": self.predict_category,
-                "train_idx_map": self.train_idx_map,
-                "test_idx_map": self.test_idx_map,
+                "idx_map": self.idx_map,
             },
         )
 
@@ -435,8 +434,7 @@ class RDFGraphDataset(DGLBuiltinDataset):
         info = load_info(str(info_path))
         self._num_classes = info["num_classes"]
         self._predict_category = info["predict_category"]
-        self.train_idx_map = info["train_idx_map"]
-        self.test_idx_map = info["test_idx_map"]
+        self.idx_map = info["idx_map"]
         self._hg = graphs[0]
         # For backward compatibility
         if "label" not in self._hg.nodes[self.predict_category].data:

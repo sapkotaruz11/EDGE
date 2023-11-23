@@ -1,14 +1,34 @@
 {
-    "mutag": {
-        "ACC": 61.028999999999996,
-        "precision": 0,
-        "recall": 0.0,
-        "F1": 0
+  "mutag": {
+    "macro_eval_fed": {
+      "Model": "CELOE",
+      "macro_precision": 0.4999999999998848,
+      "macro_recall": 0.9999999999995393,
+      "macro_f1_score": 0.6666666666220175,
+      "macro_jaccard_similarity": 0.4999999999998848
     },
-    "lymphography": {
-        "ACC": 45.269999999999996,
-        "precision": 0,
-        "recall": 0.0,
-        "F1": 0
+    "macro_eval_pred": {
+      "Model": "CELOE",
+      "macro_precision": 0.49999999999959016,
+      "macro_recall": 0.5754716981126646,
+      "macro_f1_score": 0.5350877192480225,
+      "macro_jaccard_similarity": 0.3652694610776256
     }
+  },
+  "aifb": {
+    "macro_eval_fed": {
+      "Model": "CELOE",
+      "macro_precision": 1.4999999999619318,
+      "macro_recall": 0.8438579499578351,
+      "macro_f1_score": 1.3600186050836585,
+      "macro_jaccard_similarity": 0.5198251586592172
+    },
+    "macro_eval_pred": {
+      "Model": "CELOE",
+      "macro_precision": 0.0,
+      "macro_recall": 0.0,
+      "macro_f1_score": 0.0,
+      "macro_jaccard_similarity": 0.0
+    }
+  }
 }

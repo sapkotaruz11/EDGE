@@ -25,7 +25,7 @@ def get_lp_aifb(gnn_pred_dt, idx_map):
 
     # Creating news_dict
     multi_lp_dict = {
-        f"{key+1}instances": {
+        f"id{key+1}instance": {
             "positive_examples": [idx_map[val]["IRI"] for val in values],
             "negative_examples": [
                 idx_map[val]["IRI"]
@@ -49,8 +49,10 @@ def get_lp_mutag(gnn_pred_dt, idx_map):
     ]
 
     lp_dict = {
-        "positive_examples": positive_examples,
-        "negative_examples": negative_examples,
+        "carcino": {
+            "positive_examples": positive_examples,
+            "negative_examples": negative_examples,
+        }
     }
     return lp_dict
 
@@ -58,7 +60,8 @@ def get_lp_mutag(gnn_pred_dt, idx_map):
 def train_gnn(dataset="mutag", device=None, PATH=None):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataset = dataset
-    my_dataset = RDFDatasets(dataset)
+    root = f"data/{dataset}"
+    my_dataset = RDFDatasets(dataset, root)
     configs = get_configs(dataset)
     g = my_dataset.g.to(device)
     category = my_dataset.category
@@ -156,6 +159,3 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
         save_PATH,
     )
     print(f"Model RGCN trained with {dataset} Dataset and Stored at {save_PATH}.")
-
-
-train_gnn()

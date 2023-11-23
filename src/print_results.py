@@ -1,32 +1,62 @@
+import os
 import json
+from prettytable import PrettyTable
 
-from tabulate import tabulate
+
+def read_json_file(file_path):
+    with open(file_path, "r") as file:
+        data = json.load(file)
+    return data
 
 
-def print_results(results_base=None):
-    results_base = "results/evaluations"
-    classifiers = ["CELOE", "EVO"]
-    table_data = []
-    for classifier in classifiers:
-        results_path = f"{results_base}/{classifier}.json"
-        with open(results_path, "r") as json_file:
-            classifier_results = json.load(json_file)
+def print_data_as_table(data):
+    table = PrettyTable()
+    table.field_names = [
+        "Dataset",
+        "Evaluation",
+        "Model",
+        "Precision",
+        "Recall",
+        "F1 Score",
+        "Jaccard Similarity",
+    ]
 
-        # Prepare the data for tabulation
+    for dataset, evaluations in data.items():
+        for evaluation, metrics in evaluations.items():
+            is_macro = "macro" in evaluation.lower()
 
-        for kg, metrics in classifier_results.items():
-            table_data.append(
+            table.add_row(
                 [
-                    classifier,
-                    kg,
-                    f"{metrics['ACC']:.2f}%",
-                    f"{metrics['precision']:.2f}%",
-                    f"{metrics['recall']:.2f}%",
-                    f"{metrics['F1']:.2f}%",
+                    dataset,
+                    "macro" if is_macro else "micro",
+                    metrics["Model"],
+                    metrics["macro_precision"] if is_macro else metrics["precision"],
+                    metrics["macro_recall"] if is_macro else metrics["recall"],
+                    metrics["macro_f1_score"] if is_macro else metrics["f1_score"],
+                    metrics["macro_jaccard_similarity"]
+                    if is_macro
+                    else metrics["jaccard_similarity"],
                 ]
             )
-    headers = ["Classifier", "KG", "ACC", "Precision", "Recall", "F1 Score"]
 
-    # Print the results in a tabular format
-    table = tabulate(table_data, headers, tablefmt="grid")
     print(table)
+
+
+def process_files_in_directory(directory):
+    all_data = {}
+    for filename in os.listdir(directory):
+        if filename.endswith(".json"):
+            file_path = os.path.join(directory, filename)
+            data = read_json_file(file_path)
+            # Use filename as a prefix to avoid key conflicts
+            prefixed_data = {f"{filename}_{key}": value for key, value in data.items()}
+            all_data.update(prefixed_data)
+    return all_data
+
+
+def print_results():
+    directory_path = (
+        "results/evaluations/"  # Replace with the actual path to your directory
+    )
+    all_data = process_files_in_directory(directory_path)
+    print_data_as_table(all_data)

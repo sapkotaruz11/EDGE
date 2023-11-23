@@ -1,0 +1,32 @@
+{
+  "aifb": {
+    "eval_pred": {
+      "Model": "Hetero-RGCN",
+      "precision": 0.9999999999983871,
+      "recall": 0.9687499999984863,
+      "f1_score": 0.9841269840754346,
+      "jaccard_similarity": 0.9687499999984863
+    },
+    "macro_eval_pred": {
+      "Model": "Hetero-RGCN-macro",
+      "macro_precision": 0.9666666666572954,
+      "macro_recall": 0.9666666666572954,
+      "macro_f1_score": 0.9666666666072954,
+      "macro_jaccard_similarity": 0.9384164222784603
+    },
+    "eval_fid": {
+      "Model": "PGExplainer",
+      "precision": 0.9999999999982758,
+      "recall": 0.9062499999985839,
+      "f1_score": 0.9508196720797096,
+      "jaccard_similarity": 0.9062499999985839
+    },
+    "eval_macro_fid": {
+      "Model": "PGExplainer",
+      "macro_precision": 0.9495798319214018,
+      "macro_recall": 0.8605263157815324,
+      "macro_f1_score": 0.8974358973769666,
+      "macro_jaccard_similarity": 0.8142857142781021
+    }
+  }
+}

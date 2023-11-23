@@ -1,6 +1,7 @@
 import os
 import shutil
 import time
+import json
 
 import numpy as np
 import torch
@@ -8,21 +9,24 @@ import torch as th
 import torch.nn.functional as F
 from torch import nn
 
-from dglnn_local.pgexplainer import HeteroPGExplainer
+from dgl.data.utils import makedirs, save_info, load_info
+from src.dglnn_local.pgexplainer import HeteroPGExplainer
 from src.gnn_explainers.configs import get_configs
 from src.gnn_explainers.dataset import RDFDatasets
 from src.gnn_explainers.hetro_features import HeteroFeature
 from src.gnn_explainers.model import RGCN
 from src.gnn_explainers.utils import get_nodes_dict
+from src.gnn_explainers.trainer import train_gnn
 
 
-def explain(dataset="mutag"):
+def explain_PG(dataset="mutag", explainer_train_epoch=10, print_explainer_loss=False):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     root = f"data/{dataset}"
     my_dataset = RDFDatasets(dataset, root)
     configs = get_configs(dataset)
     g = my_dataset.g.to(device)
     category = my_dataset.category
+    idx_map = my_dataset.idx_map
 
     hidden_dim = configs["hidden_dim"]
     out_dim = my_dataset.num_classes
@@ -45,6 +49,9 @@ def explain(dataset="mutag"):
     optimizer.add_param_group({"params": input_feature.parameters()})
 
     PATH = f"trained_models/{dataset}_trained.pt"
+    if not os.path.isfile(PATH):
+        train_gnn(dataset=dataset, PATH=PATH)
+
     checkpoint = torch.load(PATH)
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
@@ -60,47 +67,62 @@ def explain(dataset="mutag"):
     pred_logit = model(g, feat)[category]
     gnn_preds = pred_logit[val_idx].argmax(dim=1).tolist()
 
-    explainer = HeteroPGExplainer(model, hidden_dim, num_hops=1, explain_graph=False)
-    feat_1 = {item: feat[item].data for item in feat}
-    # Train the explainer
-    # Define explainer temperature parameter
-    # define and train the model
-    # Train the explainer
-    # Define explainer temperature parameter
-    init_tmp, final_tmp = 5.0, 1.0
-    optimizer_exp = th.optim.Adam(explainer.parameters(), lr=0.01)
-    for epoch in range(20):
-        tmp = float(init_tmp * np.power(final_tmp / init_tmp, epoch / 20))
-        loss = explainer.train_step_node(
-            {ntype: g.nodes(ntype) for ntype in g.ntypes if ntype == category},
-            g,
-            feat_1,
-            tmp,
+    explainer_path = f"trained_explainers/{dataset}_PGExplainer.pkl"
+    if os.path.isfile(explainer_path):
+        print("Trained PG Explainer Exists. Loading Trained Checkpoints")
+        explainer = load_info(explainer_path)
+
+    else:
+        print("Trained PG Explainer Not found. Training Hetero PG Explainer")
+        explainer = HeteroPGExplainer(
+            model, hidden_dim, num_hops=1, explain_graph=False
         )
-        optimizer_exp.zero_grad()
-        loss.backward()
-        optimizer_exp.step()
-        print(epoch)
-        print(loss)
+        feat_1 = {item: feat[item].data for item in feat}
+        # Train the explainer
+        # Define explainer temperature parameter
+        # define and train the model
+        # Train the explainer
+        # Define explainer temperature parameter
+        init_tmp, final_tmp = 5.0, 1.0
+        optimizer_exp = th.optim.Adam(explainer.parameters(), lr=0.01)
+        for epoch in range(explainer_train_epoch):
+            tmp = float(init_tmp * np.power(final_tmp / init_tmp, epoch / 20))
+            loss = explainer.train_step_node(
+                {ntype: g.nodes(ntype) for ntype in g.ntypes if ntype == category},
+                g,
+                feat_1,
+                tmp,
+            )
+            optimizer_exp.zero_grad()
+            loss.backward()
+            optimizer_exp.step()
+            if print_explainer_loss:
+                print(f"Explainer trained for {epoch} epochs with loss {loss :3f}")
+        save_info(explainer_path, explainer)
+        print(f"Trained PG Explainer on Hetero {dataset} saved")
+
     exp_preds = {}
+    entity = {}
     for idx in val_idx.tolist():
         probs, edge_mask, bg, inverse_indices = explainer.explain_node(
             {category: [idx]}, g, feat, training=True
         )
         exp_preds[idx] = probs[category][inverse_indices[category]].argmax(dim=1).item()
+        entity[idx] = idx_map[idx]["IRI"]
     gnn_pred = dict(zip(exp_preds.keys(), gnn_preds))
     gts = dict(zip(exp_preds.keys(), gt))
-    import json
 
-    data = {
-        "explanation_predictions": exp_preds,
-        "gnn_preds": gnn_pred,
-        "ground_truth": gts,
+    dict_names = ["exp_preds", "gnn_pred", "gts", "entity"]
+    list_of_dicts = [exp_preds, gnn_pred, gts, entity]
+
+    nested_dict = {
+        key: {name: d[key] for name, d in zip(dict_names, list_of_dicts)}
+        for key in exp_preds
     }
-    file_path = f"evaluations/Hetero_PG_{dataset}_output.json"
+    file_path = f"results/predictions/PGExplainer/{dataset}.json"
 
     # Write the data to the JSON file with formatting (indentation)
     with open(file_path, "w") as json_file:
-        json.dump(data, json_file, indent=2)
+        json.dump(nested_dict, json_file, indent=2)
 
     print(f"Data has been written to {file_path}")

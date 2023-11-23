@@ -1,7 +1,8 @@
 {
     "data_path": "data/KGs/mutag.owl",
-    "target_concept": "carcino",
-     "positive_examples": [
+    "problems": {
+        "carcino": {
+            "positive_examples": [
                 "http://dl-learner.org/carcinogenesis#d187",
                 "http://dl-learner.org/carcinogenesis#d147",
                 "http://dl-learner.org/carcinogenesis#d313",
@@ -109,7 +110,7 @@
                 "http://dl-learner.org/carcinogenesis#d258",
                 "http://dl-learner.org/carcinogenesis#d145"
             ],
-    "negative_examples": [
+            "negative_examples": [
                 "http://dl-learner.org/carcinogenesis#d133",
                 "http://dl-learner.org/carcinogenesis#d23_2",
                 "http://dl-learner.org/carcinogenesis#d312",
@@ -278,3 +279,5 @@
                 "http://dl-learner.org/carcinogenesis#d114"
             ]
         }
+    }
+}

@@ -5,10 +5,11 @@ import networkx as nx
 import numpy as np
 import torch
 import torch.nn as nn
+
 from dgl import to_heterogeneous, to_homogeneous
 from dgl.base import NID
 from dgl.convert import to_networkx
-from dgl.subgraph import khop_in_subgraph, node_subgraph
+from dgl.subgraph import node_subgraph, khop_in_subgraph
 from dgl.transforms.functional import remove_nodes
 
 __all__ = ["SubgraphX", "HeteroSubgraphX"]
@@ -598,7 +599,9 @@ class HeteroSubgraphX(nn.Module):
                 chosen_ntype = np.random.choice(available_ntypes)
                 # backtrack from subgraph node ids to entire graph
                 chosen_node = subg.ndata[NID][chosen_ntype][
-                    np.random.choice(new_subg.nodes[chosen_ntype].data[NID])
+                    np.random.choice(
+                        new_subg.nodes[chosen_ntype].data[NID].cpu().numpy()
+                    )
                 ]
                 cc_nodes = {
                     chosen_ntype: torch.tensor(
@@ -813,4 +816,4 @@ class HeteroSubgraphX(nn.Module):
             inv_indecies[category]
         ].argmax()
 
-        return exp_as_graph, pred_logits
+        return exp_as_graph, pred_logits.item()

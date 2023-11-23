@@ -4,60 +4,264 @@ import os
 from ontolearn.metrics import F1, Accuracy, Precision, Recall
 
 
-def get_positive_negative_examples(kgs):
-    positive_examples_dict = {}  # Dictionary to store positive examples for each kg
-    negative_examples_dict = {}
-    for kg in kgs:
-        json_file_path = f"configs/{kg}.json"  # Replace with your JSON file path
+import json
+from collections import defaultdict
 
-        # Open and read the JSON file line by line
-        with open(json_file_path, "r") as json_file:
-            settings = json.load(json_file)
-
-        # Extract positive examples and add them to the dictionary
-        positive_examples_dict[kg] = set(settings["positive_examples"])
-        negative_examples_dict[kg] = set(settings["negative_examples"])
-
-    return positive_examples_dict, negative_examples_dict
+EPSILON = 1e-10  # Small constant to avoid division by zero
 
 
-def evaluate_logical_explainers(KGs=None, classifiers=None):
-    KGs = ["mutag", "lymphography"]
-    classifiers = ["CELOE", "EVO"]
-    f1 = F1().score2
-    accuracy = Accuracy().score2
-    precision = Precision().score2
-    recall = Recall().score2
-    actuals_pos, actuals_neg = get_positive_negative_examples(KGs)
-    preds_base_path = "results/predictions/"
-    evaluations_base_path = "results/evaluations"
-    for classifier in classifiers:
-        classifier_results = {}
-        classifier_base_path = os.path.join(preds_base_path, classifier)
-        for kg in KGs:
-            classifier_predictions_path = f"{classifier_base_path}/{kg}.json"
+def calculate_macro_metrics(dict1, dict2):
+    classes = set(dict1.values()) | set(dict2.values())
+    class_metrics = defaultdict(lambda: {"tp": 0, "fp": 0, "fn": 0})
+
+    for key in dict1.keys():
+        true_class = dict1[key]
+        if key in dict2:
+            predicted_class = dict2[key]
+            if true_class == predicted_class:
+                class_metrics[true_class]["tp"] += 1
+            else:
+                class_metrics[true_class]["fn"] += 1
+                class_metrics[predicted_class]["fp"] += 1
+        else:
+            class_metrics[true_class]["fn"] += 1
+
+    for key in dict2.keys():
+        if key not in dict1:
+            predicted_class = dict2[key]
+            class_metrics[predicted_class]["fp"] += 1
+
+    macro_precision = 0
+    macro_recall = 0
+    macro_f1_score = 0
+    macro_jaccard_similarity = 0
+
+    for cls in classes:
+        tp = class_metrics[cls]["tp"]
+        fp = class_metrics[cls]["fp"]
+        fn = class_metrics[cls]["fn"]
+
+        precision = tp / (tp + fp + EPSILON)
+        recall = tp / (tp + fn + EPSILON)
+        f1_score = 2 * (precision * recall) / (precision + recall + EPSILON)
+        jaccard_similarity = tp / (tp + fp + fn + EPSILON)
+
+        macro_precision += precision
+        macro_recall += recall
+        macro_f1_score += f1_score
+        macro_jaccard_similarity += jaccard_similarity
+
+    num_classes = len(classes)
+    macro_precision /= num_classes
+    macro_recall /= num_classes
+    macro_f1_score /= num_classes
+    macro_jaccard_similarity /= num_classes
+
+    return macro_precision, macro_recall, macro_f1_score, macro_jaccard_similarity
+
+
+def calculate_metrics(dict1, dict2):
+    true_positives = 0
+    false_positives = 0
+    false_negatives = 0
+
+    for key in dict1.keys():
+        if key in dict2:
+            if dict1[key] == dict2[key]:
+                true_positives += 1
+            else:
+                false_negatives += 1
+        else:
+            false_negatives += 1
+
+    for key in dict2.keys():
+        if key not in dict1:
+            false_positives += 1
+
+    precision = true_positives / (true_positives + false_positives + EPSILON)
+    recall = true_positives / (true_positives + false_negatives + EPSILON)
+    f1_score = 2 * (precision * recall) / (precision + recall + EPSILON)
+    jaccard_similarity = true_positives / (
+        true_positives + false_positives + false_negatives + EPSILON
+    )
+
+    return precision, recall, f1_score, jaccard_similarity
+
+
+def evaluate_gnn_explainers(datasets=["aifb"], explainers=["PGExplainer"], PATH=None):
+    if explainers is None:
+        explainers = ["PGExplainer", "SubGraphX"]
+    for explainer in explainers:
+        results = {}
+        if datasets is None:
+            datasets = ["aifb", "mutag"]
+        for dataset in datasets:
+            # Specify the path to your JSON file
+            file_path = f"results/predictions/{explainer}/{dataset}.json"
+
             # Open and read the JSON file
-            with open(classifier_predictions_path, "r") as json_file:
-                classifier_data = json.load(json_file)
-            # Assuming the JSON structure includes a key "key_concept_individuals"
-            concept_individuals = classifier_data.get("concept_individuals", [])
-            pos = actuals_pos[kg]
-            neg = actuals_neg[kg]
-            tp = len(pos.intersection(concept_individuals))
-            fn = len(pos.difference(concept_individuals))
-            fp = len(neg.intersection(concept_individuals))
-            tn = len(neg.difference(concept_individuals))
-            acc = 100 * accuracy(tp, fn, fp, tn)[-1]
-            prec = 100 * precision(tp, fn, fp, tn)[-1]
-            rec = 100 * recall(tp, fn, fp, tn)[-1]
-            f_1 = 100 * f1(tp, fn, fp, tn)[-1]
-            # Store the results in the classifier_results dictionary
-            classifier_results[kg] = {
-                "ACC": acc,
-                "precision": prec,
-                "recall": rec,
-                "F1": f_1,
+            with open(file_path, "r") as file:
+                predictions_data = json.load(file)
+
+            exp_preds_dict = {
+                key: value["exp_preds"] for key, value in predictions_data.items()
             }
-        evaluations_path = f"{evaluations_base_path}/{classifier}.json"
-        with open(evaluations_path, "w") as json_output:
-            json.dump(classifier_results, json_output, indent=4)
+            gnn_pred_dict = {
+                key: value["gnn_pred"] for key, value in predictions_data.items()
+            }
+            gts_dict = {key: value["gts"] for key, value in predictions_data.items()}
+            entity_dict = {
+                key: value["entity"] for key, value in predictions_data.items()
+            }
+
+            # Calculate macro scores for precision, recall, F1 score, and Jaccard similarity
+            (
+                macro_precision,
+                macro_recall,
+                macro_f1_score,
+                macro_jaccard_similarity,
+            ) = calculate_macro_metrics(gts_dict, gnn_pred_dict)
+            precision, recall, f1_score, jaccard_similarity = calculate_metrics(
+                gts_dict, gnn_pred_dict
+            )
+            dataset_evals_macro = {
+                "Model": "Hetero-RGCN-macro",
+                "macro_precision": macro_precision,
+                "macro_recall": macro_recall,
+                "macro_f1_score": macro_f1_score,
+                "macro_jaccard_similarity": macro_jaccard_similarity,
+            }
+            dataset_evals = {
+                "Model": "Hetero-RGCN",
+                "precision": precision,
+                "recall": recall,
+                "f1_score": f1_score,
+                "jaccard_similarity": jaccard_similarity,
+            }
+
+            (
+                macro_precision,
+                macro_recall,
+                macro_f1_score,
+                macro_jaccard_similarity,
+            ) = calculate_macro_metrics(gnn_pred_dict, exp_preds_dict)
+            precision, recall, f1_score, jaccard_similarity = calculate_metrics(
+                gnn_pred_dict, exp_preds_dict
+            )
+
+            dataset_evals_macro_fid = {
+                "Model": explainer,
+                "macro_precision": macro_precision,
+                "macro_recall": macro_recall,
+                "macro_f1_score": macro_f1_score,
+                "macro_jaccard_similarity": macro_jaccard_similarity,
+            }
+
+            dataset_evals_fid = {
+                "Model": explainer,
+                "precision": precision,
+                "recall": recall,
+                "f1_score": f1_score,
+                "jaccard_similarity": jaccard_similarity,
+            }
+
+            nested_dict = {
+                "eval_pred": dataset_evals,
+                "macro_eval_pred": dataset_evals_macro,
+                "eval_fid": dataset_evals_fid,
+                "eval_macro_fid": dataset_evals_macro_fid,
+            }
+            results[dataset] = nested_dict
+
+        file_path = f"results/evaluations/{explainer}.json"
+
+        with open(file_path, "w") as json_file:
+            json.dump(results, json_file, indent=2)
+
+
+def evalate_logical_explainers(explainers=["EVO", "CELOE"], KGs=["mutag", "aifb"]):
+    explainers = ["EVO", "CELOE"]
+    results = {}
+    for explainer in explainers:
+        KGs = ["mutag", "aifb"]
+
+        for kg in KGs:
+            file_path = f"results/predictions/{explainer}/{kg}.json"
+
+            with open(file_path, "r") as file:
+                predictions_data = json.load(file)
+            EPSILON = 1e-10  # Small constant to avoid division by zero
+            precision = 0
+            recall = 0
+            f1_score = 0
+            jaccard_similarity = 0
+
+            for learning_problem, examples in predictions_data.items():
+                concept_individuals = set(examples["concept_individuals"])
+                pos = set(examples["positive_examples"])
+                neg = set(examples["positive_examples"])
+
+                true_positives = len(pos.intersection(concept_individuals))
+                false_negatives = len(pos.difference(concept_individuals))
+                false_positives = len(neg.intersection(concept_individuals))
+                precision += true_positives / (
+                    true_positives + false_positives + EPSILON
+                )
+                recall += true_positives / (true_positives + false_negatives + EPSILON)
+                f1_score += 2 * (precision * recall) / (precision + recall + EPSILON)
+                jaccard_similarity += true_positives / (
+                    true_positives + false_positives + false_negatives + EPSILON
+                )
+
+            macro_eval_pred = {
+                "Model": explainer,
+                "macro_precision": precision,
+                "macro_recall": recall,
+                "macro_f1_score": f1_score,
+                "macro_jaccard_similarity": jaccard_similarity,
+            }
+
+            file_path = f"results/predictions/{explainer}/{kg}_gnn_preds.json"
+
+            with open(file_path, "r") as file:
+                predictions_data = json.load(file)
+            EPSILON = 1e-10  # Small constant to avoid division by zero
+            precision = 0
+            recall = 0
+            f1_score = 0
+            jaccard_similarity = 0
+
+            for learning_problem, examples in predictions_data.items():
+                concept_individuals = set(examples["concept_individuals"])
+                pos = set(examples["positive_examples"])
+                neg = set(examples["positive_examples"])
+
+                true_positives = len(pos.intersection(concept_individuals))
+                false_negatives = len(pos.difference(concept_individuals))
+                false_positives = len(neg.intersection(concept_individuals))
+                precision += true_positives / (
+                    true_positives + false_positives + EPSILON
+                )
+                recall += true_positives / (true_positives + false_negatives + EPSILON)
+                f1_score += 2 * (precision * recall) / (precision + recall + EPSILON)
+                jaccard_similarity += true_positives / (
+                    true_positives + false_positives + false_negatives + EPSILON
+                )
+
+            macro_eval_fed = {
+                "Model": explainer,
+                "macro_precision": precision,
+                "macro_recall": recall,
+                "macro_f1_score": f1_score,
+                "macro_jaccard_similarity": jaccard_similarity,
+            }
+
+            results[kg] = {
+                "macro_eval_fed": macro_eval_fed,
+                "macro_eval_pred": macro_eval_pred,
+            }
+
+        file_path = f"results/evaluations/{explainer}.json"
+
+        with open(file_path, "w") as json_file:
+            json.dump(results, json_file, indent=2)
