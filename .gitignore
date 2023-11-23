@@ -162,10 +162,10 @@ cython_debug/
 # Others
 *.pyc
 *.sw*
-*.owl
-*.pt
-*nt
-*n3
+# *.owl
+# *.pt
+# *nt
+# *n3
 
 /src/Log/*
 try.py
