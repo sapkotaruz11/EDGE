@@ -1,7 +1,7 @@
+import json
 import os
 import shutil
 import time
-import json
 
 import numpy as np
 import torch
@@ -14,8 +14,8 @@ from src.gnn_explainers.configs import get_configs
 from src.gnn_explainers.dataset import RDFDatasets
 from src.gnn_explainers.hetro_features import HeteroFeature
 from src.gnn_explainers.model import RGCN
-from src.gnn_explainers.utils import get_nodes_dict
 from src.gnn_explainers.trainer import train_gnn
+from src.gnn_explainers.utils import get_nodes_dict
 
 
 def explain_SGX(dataset="mutag"):

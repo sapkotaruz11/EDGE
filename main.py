@@ -17,10 +17,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.train:
-        from src.logical_explainers.train_celoe import train_celoe
-        from src.logical_explainers.train_evo import train_evo
         from src.gnn_explainers.HeteroPG_explainer import explain_PG
         from src.gnn_explainers.HeteroSubGraphX_explainer import explain_SGX
+        from src.logical_explainers.train_celoe import train_celoe
+        from src.logical_explainers.train_evo import train_evo
 
         train_evo()
         train_celoe()

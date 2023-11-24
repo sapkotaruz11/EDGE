@@ -2,9 +2,11 @@
 
 import dgl
 import dgl.function as fn
-import torch as th
 import numpy as np
-from src.dglnn_local.RDFDataset import AIFBDataset, MUTAGDataset, BGSDataset, AMDataset
+import torch as th
+
+from src.dglnn_local.RDFDataset import (AIFBDataset, AMDataset, BGSDataset,
+                                        MUTAGDataset)
 
 
 class RDFDatasets:

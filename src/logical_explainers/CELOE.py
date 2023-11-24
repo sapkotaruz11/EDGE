@@ -5,12 +5,13 @@ from ontolearn.heuristics import CELOEHeuristic
 from ontolearn.knowledge_base import KnowledgeBase
 from ontolearn.learning_problem import PosNegLPStandard
 from ontolearn.metrics import Accuracy
-from ontolearn.refinement_operators import ModifiedCELOERefinement
 from ontolearn.owlapy.model import IRI, OWLNamedIndividual
+from ontolearn.refinement_operators import ModifiedCELOERefinement
 
 
-def train_celoe(file_path=None):
-    kgs = ["mutag", "aifb"]
+def train_celoe(file_path=None, kgs=["aifb"]):
+    if kgs is None:
+        kgs = ["mutag", "aifb"]
 
     for kg in kgs:
         target_dict = {}
@@ -75,8 +76,9 @@ def train_celoe(file_path=None):
             json.dump(target_dict, json_file, indent=4)
 
 
-def train_celoe_fid(file_path=None):
-    kgs = ["mutag", "aifb"]
+def train_celoe_fid(file_path=None, kgs=["aifb"]):
+    if kgs is None:
+        kgs = ["mutag", "aifb"]
 
     for kg in kgs:
         target_dict = {}

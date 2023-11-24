@@ -3,20 +3,19 @@ Datasets from "A Collection of Benchmark Datasets for
 Systematic Evaluations of Machine Learning on
 the Semantic Web"
 """
-import os
-from collections import OrderedDict
-import itertools
 import abc
+import itertools
+import os
 import re
-
-import networkx as nx
-import numpy as np
+from collections import OrderedDict
 
 import dgl
 import dgl.backend as F
+import networkx as nx
+import numpy as np
 from dgl.data.dgl_dataset import DGLBuiltinDataset
-from dgl.data.utils import save_graphs, load_graphs, save_info, load_info, _get_dgl_url
-from dgl.data.utils import generate_mask_tensor, idx2mask
+from dgl.data.utils import (_get_dgl_url, generate_mask_tensor, idx2mask,
+                            load_graphs, load_info, save_graphs, save_info)
 
 __all__ = ["AIFBDataset", "MUTAGDataset", "BGSDataset", "AMDataset"]
 

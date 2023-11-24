@@ -6,8 +6,9 @@ from ontolearn.learning_problem import PosNegLPStandard
 from ontolearn.owlapy.model import IRI, OWLNamedIndividual
 
 
-def train_evo(file_path=None):
-    kgs = ["mutag", "aifb"]
+def train_evo(file_path=None, kgs=["aifb"]):
+    if kgs is None:
+        kgs = ["mutag", "aifb"]
 
     for kg in kgs:
         target_dict = {}

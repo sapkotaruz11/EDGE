@@ -1,11 +1,8 @@
 import json
 import os
+from collections import defaultdict
 
 from ontolearn.metrics import F1, Accuracy, Precision, Recall
-
-
-import json
-from collections import defaultdict
 
 EPSILON = 1e-10  # Small constant to avoid division by zero
 
