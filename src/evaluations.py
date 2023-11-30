@@ -85,7 +85,7 @@ def calculate_metrics(dict1, dict2):
     return precision, recall, f1_score, jaccard_similarity
 
 
-def evaluate_gnn_explainers(datasets=["aifb"], explainers=["PGExplainer"], PATH=None):
+def evaluate_gnn_explainers(datasets=["aifb"], explainers=["PGExplainer"]):
     if explainers is None:
         explainers = ["PGExplainer", "SubGraphX"]
     for explainer in explainers:
@@ -176,7 +176,7 @@ def evaluate_gnn_explainers(datasets=["aifb"], explainers=["PGExplainer"], PATH=
             json.dump(results, json_file, indent=2)
 
 
-def evalate_logical_explainers(explainers=["EVO", "CELOE"], KGs=["mutag", "aifb"]):
+def evaluate_logical_explainers(explainers=["EVO", "CELOE"], KGs=["mutag", "aifb"]):
     explainers = ["EVO", "CELOE"]
     results = {}
     for explainer in explainers:

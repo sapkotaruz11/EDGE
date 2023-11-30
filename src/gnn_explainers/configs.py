@@ -1,12 +1,6 @@
 BEST_CONFIGS = {
     "node_classification": {
         "RGCN": {
-            "general": {
-                "seed": 0,
-                "patience": 40,
-                "validation": True,
-                "evaluation_metric": "acc",
-            },
             "aifb": {
                 "lr": 0.005,
                 "weight_decay": 0,
@@ -17,7 +11,7 @@ BEST_CONFIGS = {
                 "batch_size": 126,
                 "dropout": 0,
                 "mini_batch_flag": False,
-                "validation": True,
+                "validation": False,
             },
             "mutag": {
                 "lr": 0.005,
@@ -30,7 +24,7 @@ BEST_CONFIGS = {
                 "fanout": 4,
                 "dropout": 0.5,
                 "mini_batch_flag": False,
-                "validation": True,
+                "validation": False,
             },
             "bgs": {
                 "lr": 0.005,
@@ -51,6 +45,5 @@ BEST_CONFIGS = {
 
 
 def get_configs(dataset, task="node_classification", model="RGCN"):
-    general = BEST_CONFIGS[task][model]["general"]
     data_config = BEST_CONFIGS[task][model][dataset]
     return data_config

@@ -6,7 +6,7 @@
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id13instance"
   },
   "18": {
-    "exp_preds": 0,
+    "exp_preds": 1,
     "gnn_pred": 1,
     "gts": 1,
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id32instance"
@@ -24,7 +24,7 @@
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id57instance"
   },
   "22": {
-    "exp_preds": 0,
+    "exp_preds": 1,
     "gnn_pred": 1,
     "gts": 1,
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id60instance"
@@ -96,7 +96,7 @@
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2118instance"
   },
   "90": {
-    "exp_preds": 0,
+    "exp_preds": 1,
     "gnn_pred": 2,
     "gts": 2,
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id48instance"
@@ -210,177 +210,9 @@
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id81instance"
   },
   "221": {
-    "exp_preds": 0,
+    "exp_preds": 1,
     "gnn_pred": 2,
     "gts": 0,
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id82instance"
-  },
-  "126": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1858instance"
-  },
-  "99": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
-    "gts": 1,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2133instance"
-  },
-  "53": {
-    "exp_preds": 0,
-    "gnn_pred": 1,
-    "gts": 1,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id53instance"
-  },
-  "46": {
-    "exp_preds": 2,
-    "gnn_pred": 2,
-    "gts": 2,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2008instance"
-  },
-  "16": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
-    "gts": 1,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2123instance"
-  },
-  "201": {
-    "exp_preds": 2,
-    "gnn_pred": 2,
-    "gts": 2,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id24instance"
-  },
-  "127": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1859instance"
-  },
-  "139": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1895instance"
-  },
-  "67": {
-    "exp_preds": 2,
-    "gnn_pred": 2,
-    "gts": 2,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id29instance"
-  },
-  "39": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id38instance"
-  },
-  "36": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2072instance"
-  },
-  "160": {
-    "exp_preds": 2,
-    "gnn_pred": 2,
-    "gts": 2,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2046instance"
-  },
-  "129": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1861instance"
-  },
-  "80": {
-    "exp_preds": 3,
-    "gnn_pred": 3,
-    "gts": 3,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2049instance"
-  },
-  "208": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id52instance"
-  },
-  "49": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2041instance"
-  },
-  "33": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1954instance"
-  },
-  "144": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1908instance"
-  },
-  "121": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1842instance"
-  },
-  "130": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1862instance"
-  },
-  "107": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
-    "gts": 1,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2132instance"
-  },
-  "141": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1900instance"
-  },
-  "11": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
-    "gts": 1,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id14instance"
-  },
-  "83": {
-    "exp_preds": 3,
-    "gnn_pred": 3,
-    "gts": 3,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id36instance"
-  },
-  "146": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1915instance"
-  },
-  "108": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
-    "gts": 1,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2146instance"
-  },
-  "13": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
-    "gts": 0,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2062instance"
-  },
-  "3": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
-    "gts": 1,
-    "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id20instance"
   }
 }
