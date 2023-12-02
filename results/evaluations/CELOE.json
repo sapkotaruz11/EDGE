@@ -1,34 +1,42 @@
 {
   "mutag": {
-    "macro_eval_fed": {
+    "eval_fid": {
       "Model": "CELOE",
-      "macro_precision": 0.4999999999998848,
-      "macro_recall": 0.9999999999995393,
-      "macro_f1_score": 0.6666666666220175,
-      "macro_jaccard_similarity": 0.4999999999998848
+      "Metric": "Explanation Fidelity",
+      "Evaluations": "micro",
+      "precision": 0.4999999999998848,
+      "recall": 0.9999999999995393,
+      "f1_score": 0.6666666666220175,
+      "jaccard_similarity": 0.4999999999998848
     },
-    "macro_eval_pred": {
+    "eval_expl_acc": {
       "Model": "CELOE",
-      "macro_precision": 0.49999999999375,
-      "macro_recall": 0.031007751937960463,
-      "macro_f1_score": 0.05839416057285951,
-      "macro_jaccard_similarity": 0.030075187969902203
+      "Metric": "Explanation Accuracy",
+      "Evaluations": "micro",
+      "precision": 0.49999999999375,
+      "recall": 0.031007751937960463,
+      "f1_score": 0.05839416057285951,
+      "jaccard_similarity": 0.030075187969902203
     }
   },
   "aifb": {
-    "macro_eval_fed": {
+    "eval_fid": {
       "Model": "CELOE",
-      "macro_precision": 1.4999999999619318,
-      "macro_recall": 0.8438579499578351,
-      "macro_f1_score": 1.3600186050836585,
-      "macro_jaccard_similarity": 0.5198251586592172
+      "Metric": "Explanation Fidelity",
+      "Evaluations": "macro",
+      "precision": 1.4999999999619318,
+      "recall": 0.8438579499578351,
+      "f1_score": 1.3600186050836585,
+      "jaccard_similarity": 0.5198251586592172
     },
-    "macro_eval_pred": {
+    "eval_expl_acc": {
       "Model": "CELOE",
-      "macro_precision": 0.0,
-      "macro_recall": 0.0,
-      "macro_f1_score": 0.0,
-      "macro_jaccard_similarity": 0.0
+      "Metric": "Explanation Accuracy",
+      "Evaluations": "macro",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "jaccard_similarity": 0.0
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-    "data_path": "data/KGs/mutag_processed.owl",
+    "data_path": "data/KGs/mutag.owl",
     "problems": {
         "carcino": {
             "positive_examples": [

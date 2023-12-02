@@ -1,34 +1,42 @@
 {
   "mutag": {
-    "macro_eval_fed": {
+    "eval_fid": {
       "Model": "EVO",
-      "macro_precision": 0.4999999999991071,
-      "macro_recall": 0.12903225806445667,
-      "macro_f1_score": 0.20512820509544472,
-      "macro_jaccard_similarity": 0.11428571428566764
+      "Metric": "Explanation Fidelity",
+      "Evaluations": "micro",
+      "precision": 0.4999999999991071,
+      "recall": 0.12903225806445667,
+      "f1_score": 0.20512820509544472,
+      "jaccard_similarity": 0.11428571428566764
     },
-    "macro_eval_pred": {
+    "eval_expl_acc": {
       "Model": "EVO",
-      "macro_precision": 0.4999999999995614,
-      "macro_recall": 0.5377358490560965,
-      "macro_f1_score": 0.5181818181314132,
-      "macro_jaccard_similarity": 0.3496932515335278
+      "Metric": "Explanation Accuracy",
+      "Evaluations": "micro",
+      "precision": 0.4999999999995614,
+      "recall": 0.5377358490560965,
+      "f1_score": 0.5181818181314132,
+      "jaccard_similarity": 0.3496932515335278
     }
   },
   "aifb": {
-    "macro_eval_fed": {
+    "eval_fid": {
       "Model": "EVO",
-      "macro_precision": 1.4999999999866527,
-      "macro_recall": 1.9295238095200453,
-      "macro_f1_score": 3.874137236582801,
-      "macro_jaccard_similarity": 1.0652985074611532
+      "Metric": "Explanation Fidelity",
+      "Evaluations": "macro",
+      "precision": 1.4999999999866527,
+      "recall": 1.9295238095200453,
+      "f1_score": 3.874137236582801,
+      "jaccard_similarity": 1.0652985074611532
     },
-    "macro_eval_pred": {
+    "eval_expl_acc": {
       "Model": "EVO",
-      "macro_precision": 0.0,
-      "macro_recall": 0.0,
-      "macro_f1_score": 0.0,
-      "macro_jaccard_similarity": 0.0
+      "Metric": "Explanation Accuracy",
+      "Evaluations": "macro",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "jaccard_similarity": 0.0
     }
   }
 }

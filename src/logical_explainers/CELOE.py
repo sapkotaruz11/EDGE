@@ -7,6 +7,7 @@ from ontolearn.learning_problem import PosNegLPStandard
 from ontolearn.metrics import Accuracy
 from owlapy.model import IRI, OWLNamedIndividual
 from ontolearn.refinement_operators import ModifiedCELOERefinement
+from ontolearn.metrics import F1
 
 
 def train_celoe(file_path=None, kgs=["aifb"]):
@@ -43,11 +44,12 @@ def train_celoe(file_path=None, kgs=["aifb"]):
                 knowledge_base=target_kb,
                 max_runtime=600,
                 refinement_operator=op,
-                quality_func=qual,
+                quality_func=F1(),
                 heuristic_func=heur,
                 max_num_of_concepts_tested=10_000_000_000,
                 iter_bound=10_000_000_000,
             )
+            # model = CELOE(knowledge_base=target_kb,quality_func=F1(), max_runtime=600)
 
             model.fit(lp, verbose=False)
 
@@ -59,7 +61,9 @@ def train_celoe(file_path=None, kgs=["aifb"]):
                 indv.get_iri().as_str()
                 for indv in target_kb.individuals_set(best_concept)
             ]
-            concept_ind = concept_ind.union(positive_examples | negative_examples)
+            concept_ind = concept_ind.intersection(
+                positive_examples | negative_examples
+            )
             concept_length = target_kb.concept_len(hypotheses[0].concept)
 
             target_dict[str_target_concept] = {
