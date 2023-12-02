@@ -14,8 +14,9 @@ def print_data_as_table(data):
     table = PrettyTable()
     table.field_names = [
         "Dataset",
-        "Evaluation",
         "Model",
+        "Metric",
+        "Evaluations",
         "Precision",
         "Recall",
         "F1 Score",
@@ -23,22 +24,20 @@ def print_data_as_table(data):
     ]
 
     for dataset, evaluations in data.items():
-        for evaluation, metrics in evaluations.items():
-            is_macro = "macro" in evaluation.lower()
-
+        for metric_name, metrics in evaluations.items():
             table.add_row(
                 [
-                    dataset,
-                    "macro" if is_macro else "micro",
+                    str.upper(dataset.split("_")[1]),
                     metrics["Model"],
-                    metrics["macro_precision"] if is_macro else metrics["precision"],
-                    metrics["macro_recall"] if is_macro else metrics["recall"],
-                    metrics["macro_f1_score"] if is_macro else metrics["f1_score"],
-                    metrics["macro_jaccard_similarity"]
-                    if is_macro
-                    else metrics["jaccard_similarity"],
+                    metrics["Metric"],
+                    metrics["Evaluations"],
+                    metrics["precision"],
+                    metrics["recall"],
+                    metrics["f1_score"],
+                    metrics["jaccard_similarity"],
                 ]
             )
+            table.add_row(["-------"] * len(table.field_names))
 
     print(table)
 

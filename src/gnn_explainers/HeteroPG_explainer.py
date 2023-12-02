@@ -69,7 +69,7 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
     if not os.path.isfile(PATH):
         train_gnn(dataset=dataset, PATH=PATH)
 
-    checkpoint = torch.load(PATH)
+    checkpoint = torch.load(PATH, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     epoch = checkpoint["epoch"]
@@ -82,12 +82,16 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
     pred_logit = model(g, feat)[category]
     gnn_preds = pred_logit[test_idx].argmax(dim=1).tolist()
 
-    explainer_path = f"trained_explainers/{dataset}_PGExplainer.pkl"
+    explainer_path = f"trained_explainers/{dataset}_PGExplainer_1.pkl"
     if os.path.isfile(explainer_path):
+        t0 = time.time()
+        print("Starting PGExplainer")
         print("Trained PG Explainer Exists. Loading Trained Checkpoints")
         explainer = load_info(explainer_path)
 
     else:
+        t0 = time.time()
+        print("Starting PGExplainer")
         print("Trained PG Explainer Not found. Training Hetero PG Explainer")
         explainer = HeteroPGExplainer(
             model, hidden_dim, num_hops=1, explain_graph=False
@@ -119,6 +123,7 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
     exp_preds = {}
     entity = {}
     for idx in test_idx.tolist():
+        print(idx)
         probs, edge_mask, bg, inverse_indices = explainer.explain_node(
             {category: [idx]}, g, feat, training=True
         )
@@ -141,3 +146,7 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
         json.dump(nested_dict, json_file, indent=2)
 
     print(f"Data has been written to {file_path}")
+    print("Ending PG_Explainer")
+    t1 = time.time()
+    dur = t1 - t0
+    print(f"Total time taken for SubGraphX : {dur:.2f}")

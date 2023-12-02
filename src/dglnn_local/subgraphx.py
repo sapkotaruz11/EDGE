@@ -10,6 +10,7 @@ from dgl.base import NID
 from dgl.convert import to_networkx
 from dgl.subgraph import khop_in_subgraph, node_subgraph
 from dgl.transforms.functional import remove_nodes
+from collections import Counter
 
 __all__ = ["SubgraphX", "HeteroSubgraphX"]
 
@@ -413,7 +414,7 @@ class HeteroSubgraphX(nn.Module):
         high2low=True,
         num_child=12,
         num_rollouts=10,
-        node_min=3,
+        node_min=1,
         shapley_steps=20,
         log=True,
     ):
@@ -670,6 +671,12 @@ class HeteroSubgraphX(nn.Module):
         exp_as_graph = node_subgraph(self.comp_graph, result)
         return exp_as_graph
 
+    def get_most_frequent(self, lst):
+        counts = Counter(lst)
+        sorted_list = sorted(lst, key=lambda x: counts[x], reverse=True)
+        most_frequent = sorted_list[0]
+        return most_frequent
+
     def explain_node(self, graph, feat, node_idx, category, **kwargs):
         r"""Find the most important subgraph from the original graph for the
         model to classify the graph into the target class.
@@ -797,7 +804,7 @@ class HeteroSubgraphX(nn.Module):
         best_leaf = None
         best_immediate_reward = float("-inf")
         for mcts_node in self.mcts_node_maps.values():
-            if len(mcts_node.nodes) < self.node_min:
+            if len(mcts_node.nodes) < self.node_min and len(mcts_node.nodes) > 15:
                 continue
 
             if mcts_node.immediate_reward > best_immediate_reward:
@@ -811,8 +818,15 @@ class HeteroSubgraphX(nn.Module):
         for node_type in sg_nodes.keys():
             sg_feat[node_type] = feat[node_type][sg_nodes[node_type].long()]
 
-        pred_logits = self.model(exp_as_graph, sg_feat)[category][
-            inv_indecies[category]
-        ].argmax()
+        pred_logits = self.model(exp_as_graph, sg_feat)
+        node_mapping = exp_as_graph.ndata[NID][category]
+        try:
+            index = (node_mapping == self.node_idx).nonzero().item()
+            predictions = pred_logits[category][index].argmax(dim=0).item()
+        except:
+            lst = pred_logits[category].argmax(dim=1).tolist()
+            if len(lst) == 0:
+                return exp_as_graph, -1
+            predictions = self.get_most_frequent(lst)
 
-        return exp_as_graph, pred_logits.item()
+        return exp_as_graph, predictions

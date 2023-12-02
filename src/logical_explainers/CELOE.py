@@ -5,7 +5,7 @@ from ontolearn.heuristics import CELOEHeuristic
 from ontolearn.knowledge_base import KnowledgeBase
 from ontolearn.learning_problem import PosNegLPStandard
 from ontolearn.metrics import Accuracy
-from ontolearn.owlapy.model import IRI, OWLNamedIndividual
+from owlapy.model import IRI, OWLNamedIndividual
 from ontolearn.refinement_operators import ModifiedCELOERefinement
 
 

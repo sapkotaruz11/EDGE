@@ -3,7 +3,7 @@ import json
 from ontolearn.concept_learner import EvoLearner
 from ontolearn.knowledge_base import KnowledgeBase
 from ontolearn.learning_problem import PosNegLPStandard
-from ontolearn.owlapy.model import IRI, OWLNamedIndividual
+from owlapy.model import IRI, OWLNamedIndividual
 
 
 def train_evo(file_path=None, kgs=["aifb"]):

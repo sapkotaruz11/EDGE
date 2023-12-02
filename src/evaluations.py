@@ -7,26 +7,33 @@ from ontolearn.metrics import F1, Accuracy, Precision, Recall
 EPSILON = 1e-10  # Small constant to avoid division by zero
 
 
-def calculate_macro_metrics(dict1, dict2):
-    classes = set(dict1.values()) | set(dict2.values())
+from collections import defaultdict
+
+
+def calculate_macro_metrics(dict1, dict2, no_result_value=-1, EPSILON=1e-10):
+    classes = set(filter(lambda x: x != no_result_value, dict1.values())) | set(
+        filter(lambda x: x != no_result_value, dict2.values())
+    )
     class_metrics = defaultdict(lambda: {"tp": 0, "fp": 0, "fn": 0})
 
     for key in dict1.keys():
         true_class = dict1[key]
         if key in dict2:
             predicted_class = dict2[key]
-            if true_class == predicted_class:
-                class_metrics[true_class]["tp"] += 1
-            else:
+            if true_class != no_result_value and predicted_class != no_result_value:
+                if true_class == predicted_class:
+                    class_metrics[true_class]["tp"] += 1
+                else:
+                    class_metrics[true_class]["fn"] += 1
+                    class_metrics[predicted_class]["fp"] += 1
+            elif true_class != no_result_value:
                 class_metrics[true_class]["fn"] += 1
-                class_metrics[predicted_class]["fp"] += 1
-        else:
-            class_metrics[true_class]["fn"] += 1
 
     for key in dict2.keys():
         if key not in dict1:
             predicted_class = dict2[key]
-            class_metrics[predicted_class]["fp"] += 1
+            if predicted_class != no_result_value:
+                class_metrics[predicted_class]["fp"] += 1
 
     macro_precision = 0
     macro_recall = 0
@@ -38,10 +45,25 @@ def calculate_macro_metrics(dict1, dict2):
         fp = class_metrics[cls]["fp"]
         fn = class_metrics[cls]["fn"]
 
-        precision = tp / (tp + fp + EPSILON)
-        recall = tp / (tp + fn + EPSILON)
-        f1_score = 2 * (precision * recall) / (precision + recall + EPSILON)
-        jaccard_similarity = tp / (tp + fp + fn + EPSILON)
+        if tp + fp + EPSILON > 0:
+            precision = tp / (tp + fp + EPSILON)
+        else:
+            precision = 0
+
+        if tp + fn + EPSILON > 0:
+            recall = tp / (tp + fn + EPSILON)
+        else:
+            recall = 0
+
+        if precision + recall + EPSILON > 0:
+            f1_score = 2 * (precision * recall) / (precision + recall + EPSILON)
+        else:
+            f1_score = 0
+
+        if tp + fp + fn + EPSILON > 0:
+            jaccard_similarity = tp / (tp + fp + fn + EPSILON)
+        else:
+            jaccard_similarity = 0
 
         macro_precision += precision
         macro_recall += recall
@@ -85,7 +107,9 @@ def calculate_metrics(dict1, dict2):
     return precision, recall, f1_score, jaccard_similarity
 
 
-def evaluate_gnn_explainers(datasets=["aifb"], explainers=["PGExplainer"]):
+def evaluate_gnn_explainers(
+    datasets=["aifb", "mutag"], explainers=["PGExplainer", "SubGraphX"]
+):
     if explainers is None:
         explainers = ["PGExplainer", "SubGraphX"]
     for explainer in explainers:
@@ -107,55 +131,75 @@ def evaluate_gnn_explainers(datasets=["aifb"], explainers=["PGExplainer"]):
                 key: value["gnn_pred"] for key, value in predictions_data.items()
             }
             gts_dict = {key: value["gts"] for key, value in predictions_data.items()}
-            entity_dict = {
-                key: value["entity"] for key, value in predictions_data.items()
-            }
 
             # Calculate macro scores for precision, recall, F1 score, and Jaccard similarity
-            (
-                macro_precision,
-                macro_recall,
-                macro_f1_score,
-                macro_jaccard_similarity,
-            ) = calculate_macro_metrics(gts_dict, gnn_pred_dict)
-            precision, recall, f1_score, jaccard_similarity = calculate_metrics(
-                gts_dict, gnn_pred_dict
-            )
-            dataset_evals_macro = {
-                "Model": "Hetero-RGCN-macro",
-                "macro_precision": macro_precision,
-                "macro_recall": macro_recall,
-                "macro_f1_score": macro_f1_score,
-                "macro_jaccard_similarity": macro_jaccard_similarity,
-            }
-            dataset_evals = {
+            if dataset == "aifb":
+                (
+                    precision,
+                    recall,
+                    f1_score,
+                    jaccard_similarity,
+                ) = calculate_macro_metrics(gts_dict, gnn_pred_dict)
+                evaluations = "macro"
+
+            else:
+                precision, recall, f1_score, jaccard_similarity = calculate_metrics(
+                    gts_dict, gnn_pred_dict
+                )
+                evaluations = "micro"
+
+            eval_preds = {
                 "Model": "Hetero-RGCN",
+                "Metric": "Prediction Accuracy",
+                "Evaluations": evaluations,
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
                 "jaccard_similarity": jaccard_similarity,
             }
+            if dataset == "aifb":
+                (
+                    precision,
+                    recall,
+                    f1_score,
+                    jaccard_similarity,
+                ) = calculate_macro_metrics(gnn_pred_dict, exp_preds_dict)
+                evaluations = "macro"
 
-            (
-                macro_precision,
-                macro_recall,
-                macro_f1_score,
-                macro_jaccard_similarity,
-            ) = calculate_macro_metrics(gnn_pred_dict, exp_preds_dict)
-            precision, recall, f1_score, jaccard_similarity = calculate_metrics(
-                gnn_pred_dict, exp_preds_dict
-            )
+            else:
+                precision, recall, f1_score, jaccard_similarity = calculate_metrics(
+                    gnn_pred_dict, exp_preds_dict
+                )
+                evaluations = "micro"
 
-            dataset_evals_macro_fid = {
+            eval_fids = {
                 "Model": explainer,
-                "macro_precision": macro_precision,
-                "macro_recall": macro_recall,
-                "macro_f1_score": macro_f1_score,
-                "macro_jaccard_similarity": macro_jaccard_similarity,
+                "Metric": " Explanation Fidelity",
+                "Evaluations": evaluations,
+                "precision": precision,
+                "recall": recall,
+                "f1_score": f1_score,
+                "jaccard_similarity": jaccard_similarity,
             }
+            if dataset == "aifb":
+                (
+                    precision,
+                    recall,
+                    f1_score,
+                    jaccard_similarity,
+                ) = calculate_macro_metrics(gts_dict, exp_preds_dict)
+                evaluations = "macro"
 
-            dataset_evals_fid = {
+            else:
+                precision, recall, f1_score, jaccard_similarity = calculate_metrics(
+                    gts_dict, exp_preds_dict
+                )
+                evaluations = "micro"
+
+            eval_exp_acc = {
                 "Model": explainer,
+                "Metric": " Explanation Accuracy",
+                "Evaluations": evaluations,
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
@@ -163,10 +207,9 @@ def evaluate_gnn_explainers(datasets=["aifb"], explainers=["PGExplainer"]):
             }
 
             nested_dict = {
-                "eval_pred": dataset_evals,
-                "macro_eval_pred": dataset_evals_macro,
-                "eval_fid": dataset_evals_fid,
-                "eval_macro_fid": dataset_evals_macro_fid,
+                "eval_pred": eval_preds,
+                "eval_fid": eval_fids,
+                "eval_expl_acc": eval_exp_acc,
             }
             results[dataset] = nested_dict
 

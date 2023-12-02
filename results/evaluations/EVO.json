@@ -9,10 +9,10 @@
     },
     "macro_eval_pred": {
       "Model": "EVO",
-      "macro_precision": 0.49999999999962125,
-      "macro_recall": 0.6226415094333748,
-      "macro_f1_score": 0.5546218486896265,
-      "macro_jaccard_similarity": 0.38372093023233506
+      "macro_precision": 0.4999999999995614,
+      "macro_recall": 0.5377358490560965,
+      "macro_f1_score": 0.5181818181314132,
+      "macro_jaccard_similarity": 0.3496932515335278
     }
   },
   "aifb": {

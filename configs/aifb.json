@@ -1,5 +1,5 @@
 {
-    "data_path": "data/KGs/aifb.owl",
+    "data_path": "data/KGs/aifb_op.owl",
     "problems": {
         "id1instance": {
             "positive_examples": [

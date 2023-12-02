@@ -81,10 +81,13 @@ def explain_SGX(dataset="mutag"):
     pred_logit = model(g, feat)[category]
     gnn_preds = pred_logit[test_idx].argmax(dim=1).tolist()
 
+    print("Starting SubGraphX")
+    t0 = time.time()
     explainer = HeteroSubgraphX(model, num_hops=1, num_rollouts=3, shapley_steps=10)
     exp_preds = {}
     entity = {}
     for idx in test_idx.tolist():
+        print(idx)
         explanation, logits = explainer.explain_node(g, feat, idx, category)
         exp_preds[idx] = logits
         entity[idx] = idx_map[idx]["IRI"]
@@ -99,11 +102,14 @@ def explain_SGX(dataset="mutag"):
         key: {name: d[key] for name, d in zip(dict_names, list_of_dicts)}
         for key in exp_preds
     }
-
-    file_path = f"results/predictions/SubgraphX/{dataset}.json"
+    file_path = f"results/predictions/SubGraphX/{dataset}.json"
 
     # Write the data to the JSON file with formatting (indentation)
     with open(file_path, "w") as json_file:
         json.dump(nested_dict, json_file, indent=2)
 
     print(f"Data has been written to {file_path}")
+    print("Ending SubGraphX")
+    t1 = time.time()
+    dur = t1 - t0
+    print(f"Total time taken for SubGraphX : {dur:.2f}")

@@ -9,10 +9,10 @@
     },
     "macro_eval_pred": {
       "Model": "CELOE",
-      "macro_precision": 0.49999999999959016,
-      "macro_recall": 0.5754716981126646,
-      "macro_f1_score": 0.5350877192480225,
-      "macro_jaccard_similarity": 0.3652694610776256
+      "macro_precision": 0.49999999999375,
+      "macro_recall": 0.031007751937960463,
+      "macro_f1_score": 0.05839416057285951,
+      "macro_jaccard_similarity": 0.030075187969902203
     }
   },
   "aifb": {
