@@ -33,10 +33,12 @@ def train_evo(file_path=None, kgs=["aifb"]):
             hypotheses = list(model.best_hypotheses(n=3))
             [print(_) for _ in hypotheses]
             best_concept = hypotheses[0].concept
-            concept_ind = [
-                indv.get_iri().as_str()
-                for indv in target_kb.individuals_set(best_concept)
-            ]
+            concept_ind = set(
+                [
+                    indv.get_iri().as_str()
+                    for indv in target_kb.individuals_set(best_concept)
+                ]
+            )
             concept_length = target_kb.concept_len(hypotheses[0].concept)
             concept_ind = concept_ind.intersection(
                 positive_examples | negative_examples
@@ -91,8 +93,11 @@ def train_evo_fid(file_path=None):
                 for indv in target_kb.individuals_set(best_concept)
             ]
             concept_length = target_kb.concept_len(best_concept)
-            concept_ind = concept_ind.intersection(
-                positive_examples | negative_examples
+            concept_ind = set(
+                [
+                    indv.get_iri().as_str()
+                    for indv in target_kb.individuals_set(best_concept)
+                ]
             )
 
             target_dict[str_target_concept] = {
