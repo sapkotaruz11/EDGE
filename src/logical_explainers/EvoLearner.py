@@ -91,6 +91,9 @@ def train_evo_fid(file_path=None):
                 for indv in target_kb.individuals_set(best_concept)
             ]
             concept_length = target_kb.concept_len(best_concept)
+            concept_ind = concept_ind.intersection(
+                positive_examples | negative_examples
+            )
 
             target_dict[str_target_concept] = {
                 "best_concept": str(best_concept),

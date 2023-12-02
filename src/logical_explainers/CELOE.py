@@ -118,7 +118,7 @@ def train_celoe_fid(file_path=None, kgs=["aifb"]):
                 knowledge_base=target_kb,
                 max_runtime=600,
                 refinement_operator=op,
-                quality_func=qual,
+                quality_func=F1(),
                 heuristic_func=heur,
                 max_num_of_concepts_tested=10_000_000_000,
                 iter_bound=10_000_000_000,
@@ -135,6 +135,9 @@ def train_celoe_fid(file_path=None, kgs=["aifb"]):
                 for indv in target_kb.individuals_set(best_concept)
             ]
             concept_length = target_kb.concept_len(best_concept)
+            concept_ind = concept_ind.intersection(
+                positive_examples | negative_examples
+            )
 
             target_dict[str_target_concept] = {
                 "best_concept": str(best_concept),
