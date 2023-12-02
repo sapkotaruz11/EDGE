@@ -59,6 +59,7 @@ def train_celoe(file_path=None, kgs=["aifb"]):
                 indv.get_iri().as_str()
                 for indv in target_kb.individuals_set(best_concept)
             ]
+            concept_ind = concept_ind.union(positive_examples | negative_examples)
             concept_length = target_kb.concept_len(hypotheses[0].concept)
 
             target_dict[str_target_concept] = {

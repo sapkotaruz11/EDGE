@@ -235,6 +235,8 @@ def evaluate_logical_explainers(explainers=["EVO", "CELOE"], KGs=["mutag", "aifb
             recall = 0
             f1_score = 0
             jaccard_similarity = 0
+            count = 0
+            evaluations = "micro" if kg == "mutag" else "macro"
 
             for learning_problem, examples in predictions_data.items():
                 concept_individuals = set(examples["concept_individuals"])
@@ -253,12 +255,14 @@ def evaluate_logical_explainers(explainers=["EVO", "CELOE"], KGs=["mutag", "aifb
                     true_positives + false_positives + false_negatives + EPSILON
                 )
 
-            macro_eval_pred = {
+            eval_expl_acc = {
                 "Model": explainer,
-                "macro_precision": precision,
-                "macro_recall": recall,
-                "macro_f1_score": f1_score,
-                "macro_jaccard_similarity": jaccard_similarity,
+                "Metric": "Explanation Accuracy",
+                "Evaluations": evaluations,
+                "precision": precision,
+                "recall": recall,
+                "f1_score": f1_score,
+                "jaccard_similarity": jaccard_similarity,
             }
 
             file_path = f"results/predictions/{explainer}/{kg}_gnn_preds.json"
@@ -288,17 +292,19 @@ def evaluate_logical_explainers(explainers=["EVO", "CELOE"], KGs=["mutag", "aifb
                     true_positives + false_positives + false_negatives + EPSILON
                 )
 
-            macro_eval_fed = {
+            eval_fid = {
                 "Model": explainer,
-                "macro_precision": precision,
-                "macro_recall": recall,
-                "macro_f1_score": f1_score,
-                "macro_jaccard_similarity": jaccard_similarity,
+                "Metric": "Explanation Fidelity",
+                "Evaluations": evaluations,
+                "precision": precision,
+                "recall": recall,
+                "f1_score": f1_score,
+                "jaccard_similarity": jaccard_similarity,
             }
 
             results[kg] = {
-                "macro_eval_fed": macro_eval_fed,
-                "macro_eval_pred": macro_eval_pred,
+                "eval_fid": eval_fid,
+                "eval_expl_acc": eval_expl_acc,
             }
 
         file_path = f"results/evaluations/{explainer}.json"

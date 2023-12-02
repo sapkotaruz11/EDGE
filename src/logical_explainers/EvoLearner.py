@@ -38,6 +38,7 @@ def train_evo(file_path=None, kgs=["aifb"]):
                 for indv in target_kb.individuals_set(best_concept)
             ]
             concept_length = target_kb.concept_len(hypotheses[0].concept)
+            concept_ind = concept_ind.union(positive_examples | negative_examples)
 
             target_dict[str_target_concept] = {
                 "best_concept": str(best_concept),
