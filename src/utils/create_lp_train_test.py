@@ -1,12 +1,9 @@
-import pandas as pd
-import json
 import csv
+import json
+import os
 from urllib.parse import urlparse
-import os
-import json
+
 import pandas as pd
-import json
-import os
 
 
 def create_lp_aifb_train_test(train_file_path=None, test_file_path=None):
@@ -88,10 +85,11 @@ def create_lp_aifb_train_test(train_file_path=None, test_file_path=None):
     )
 
 
+import json
+
 # Call the function with file paths if different from the default ones
 # create_lp_aifb(train_file_path="path/to/trainSet.tsv", test_file_path="path/to/testSet.tsv")
 import pandas as pd
-import json
 
 
 def create_lp_mutag_train_test(train_file_path=None, test_file_path=None):

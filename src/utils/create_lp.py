@@ -1,10 +1,9 @@
 import csv
+import json
+import os
 from urllib.parse import urlparse
-import os
-import json
+
 import pandas as pd
-import json
-import os
 
 
 def create_lp_aifb(file_path=None):

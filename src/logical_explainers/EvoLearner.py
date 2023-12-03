@@ -1,12 +1,13 @@
 import json
 import os
+import time
 
 EPSILON = 1e-10  # Small constant to avoid division by zero
 from ontolearn.concept_learner import EvoLearner
 from ontolearn.knowledge_base import KnowledgeBase
 from ontolearn.learning_problem import PosNegLPStandard
-from owlapy.model import IRI, OWLNamedIndividual
 from ontolearn.metrics import F1
+from owlapy.model import IRI, OWLNamedIndividual
 
 
 def train_evo(file_path=None, kgs=None):
@@ -14,6 +15,7 @@ def train_evo(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
+        t0 = time.time()
         target_dict = {}
         json_file_path = f"configs/{kg}.json"  # Replace with your JSON file path
 
@@ -72,6 +74,7 @@ def train_evo(file_path=None, kgs=None):
                 "negative_examples": neg,
             }
             # print(target_dict)
+
         # Define the filename where you want to save the JSON
         file_path = f"results/predictions/EVO/{kg}.json"
         # Check if the file exists
@@ -82,6 +85,9 @@ def train_evo(file_path=None, kgs=None):
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
             json.dump(target_dict, json_file, indent=4)
+        t1 = time.time()
+        dur = t1 - t0
+        print(f"Trained EvoLearner (prediction) on {kg} dataset on {dur : .2f}")
 
 
 def train_evo_fid(file_path=None, kgs=None):
@@ -89,6 +95,7 @@ def train_evo_fid(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
+        t0 = time.time()
         target_dict = {}
         kg_path = f"data/KGs/{kg}.owl"
         json_file_path = (
@@ -159,6 +166,9 @@ def train_evo_fid(file_path=None, kgs=None):
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
             json.dump(target_dict, json_file, indent=4)
+        t1 = time.time()
+        dur = t1 - t0
+        print(f"Trained EvoLearner (fidelity) on {kg} dataset on {dur : .2f}")
 
 
 def train_evo_train_test(file_path=None, kgs=None):
@@ -166,6 +176,7 @@ def train_evo_train_test(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
+        t0 = time.time()
         target_dict = {}
         json_file_path = (
             f"configs/{kg}_train_test.json"  # Replace with your JSON file path
@@ -243,6 +254,11 @@ def train_evo_train_test(file_path=None, kgs=None):
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
             json.dump(target_dict, json_file, indent=4)
+        t1 = time.time()
+        dur = t1 - t0
+        print(
+            f"Trained EvoLearner Train-test-split on (prediction) {kg} dataset on {dur : .2f}"
+        )
 
 
 def train_evo_train_test_fid(file_path=None, kgs=None):
@@ -250,6 +266,7 @@ def train_evo_train_test_fid(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
+        t0 = time.time()
         kg_path = f"data/KGs/{kg}.owl"
         target_dict = {}
         json_file_path = f"configs/{kg}_gnn_preds_train_test.json"  # Replace with your JSON file path
@@ -326,3 +343,8 @@ def train_evo_train_test_fid(file_path=None, kgs=None):
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
             json.dump(target_dict, json_file, indent=4)
+        t1 = time.time()
+        dur = t1 - t0
+        print(
+            f"Trained EvoLearner Train-test-split on  (fidelity) {kg} dataset on {dur : .2f}"
+        )

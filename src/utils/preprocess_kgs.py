@@ -1,7 +1,7 @@
 import os
 
 import rdflib as rdf
-from rdflib import Graph, URIRef, Literal, RDF, XSD
+from rdflib import RDF, XSD, Graph, Literal, URIRef
 
 
 def pre_process_mutag():

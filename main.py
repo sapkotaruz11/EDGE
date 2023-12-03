@@ -19,8 +19,8 @@ if __name__ == "__main__":
     if args.train:
         from src.gnn_explainers.HeteroPG_explainer import explain_PG
         from src.gnn_explainers.HeteroSubGraphX_explainer import explain_SGX
-        from src.logical_explainers.EvoLearner import train_evo, train_evo_fid
         from src.logical_explainers.CELOE import train_celoe, train_celoe_fid
+        from src.logical_explainers.EvoLearner import train_evo, train_evo_fid
 
         train_evo()
         train_celoe()
@@ -30,8 +30,8 @@ if __name__ == "__main__":
         explain_SGX()
 
     if args.evaluate:
-        from src.evaluations import evaluate_logical_explainers
-        from src.evaluations import evaluate_gnn_explainers
+        from src.evaluations import (evaluate_gnn_explainers,
+                                     evaluate_logical_explainers)
 
         evaluate_logical_explainers()
         evaluate_gnn_explainers()

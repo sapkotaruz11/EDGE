@@ -1,5 +1,6 @@
 """Torch Module for SubgraphX"""
 import math
+from collections import Counter
 
 import networkx as nx
 import numpy as np
@@ -10,7 +11,6 @@ from dgl.base import NID
 from dgl.convert import to_networkx
 from dgl.subgraph import khop_in_subgraph, node_subgraph
 from dgl.transforms.functional import remove_nodes
-from collections import Counter
 
 __all__ = ["SubgraphX", "HeteroSubgraphX"]
 

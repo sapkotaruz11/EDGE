@@ -1,15 +1,15 @@
 import json
 import os
+import time
 
 EPSILON = 1e-10  # Small constant to avoid division by zero
 from ontolearn.concept_learner import CELOE
 from ontolearn.heuristics import CELOEHeuristic
 from ontolearn.knowledge_base import KnowledgeBase
 from ontolearn.learning_problem import PosNegLPStandard
-from ontolearn.metrics import Accuracy
-from owlapy.model import IRI, OWLNamedIndividual
+from ontolearn.metrics import F1, Accuracy
 from ontolearn.refinement_operators import ModifiedCELOERefinement
-from ontolearn.metrics import F1
+from owlapy.model import IRI, OWLNamedIndividual
 
 
 def train_celoe(file_path=None, kgs=None):
@@ -17,6 +17,7 @@ def train_celoe(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
+        t0 = time()
         target_dict = {}
         json_file_path = f"configs/{kg}.json"  # Replace with your JSON file path
 
@@ -99,6 +100,9 @@ def train_celoe(file_path=None, kgs=None):
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
             json.dump(target_dict, json_file, indent=4)
+        t1 = time.time()
+        dur = t1 - t0
+        print(f"Trained CELOE  (predictions) on  {kg} dataset on {dur : .2f}")
 
 
 def train_celoe_fid(file_path=None, kgs=None):
@@ -106,6 +110,7 @@ def train_celoe_fid(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
+        t0 = time()
         target_dict = {}
         kg_path = f"data/KGs/{kg}.owl"
         json_file_path = (
@@ -190,6 +195,9 @@ def train_celoe_fid(file_path=None, kgs=None):
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
             json.dump(target_dict, json_file, indent=4)
+        t1 = time.time()
+        dur = t1 - t0
+        print(f"Trained CELOE  (fidelity) on  {kg} dataset on {dur : .2f}")
 
 
 def train_celoe_train_test(file_path=None, kgs=None):
@@ -197,6 +205,7 @@ def train_celoe_train_test(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
+        t0 = time()
         target_dict = {}
         json_file_path = (
             f"configs/{kg}_train_test.json"  # Replace with your JSON file path
@@ -289,6 +298,11 @@ def train_celoe_train_test(file_path=None, kgs=None):
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
             json.dump(target_dict, json_file, indent=4)
+        t1 = time.time()
+        dur = t1 - t0
+        print(
+            f"Trained CELOE  Train-Test-split (predictions) on  {kg} dataset on {dur : .2f}"
+        )
 
 
 def train_celoe_train_test_fid(file_path=None, kgs=None):
@@ -296,6 +310,7 @@ def train_celoe_train_test_fid(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
+        t0 = time()
         target_dict = {}
         kg_path = f"data/KGs/{kg}.owl"
         json_file_path = f"configs/{kg}_gnn_preds_train_test.json"  # Replace with your JSON file path
@@ -386,3 +401,8 @@ def train_celoe_train_test_fid(file_path=None, kgs=None):
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
             json.dump(target_dict, json_file, indent=4)
+        t1 = time.time()
+        dur = t1 - t0
+        print(
+            f"Trained CELOE  Train-Test-Split(fidelity) on  {kg} dataset on {dur : .2f}"
+        )
