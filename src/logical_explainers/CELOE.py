@@ -56,24 +56,38 @@ def train_celoe(file_path=None, kgs=["aifb"]):
             # Get Top n hypotheses
             hypotheses = list(model.best_hypotheses(n=3))
             [print(_) for _ in hypotheses]
+            predictions = model.predict(
+                individuals=list(typed_pos | typed_neg), hypotheses=hypotheses
+            )
             best_concept = hypotheses[0].concept
-            concept_ind = set(
-                [
-                    indv.get_iri().as_str()
-                    for indv in target_kb.individuals_set(best_concept)
-                ]
-            )
-            concept_ind = concept_ind.intersection(
-                positive_examples | negative_examples
-            )
+            # concept_ind = set(
+            #     [
+            #         indv.get_iri().as_str()
+            #         for indv in target_kb.individuals_set(best_concept)
+            #     ]
+            # )
             concept_length = target_kb.concept_len(hypotheses[0].concept)
+            # concept_ind = concept_ind.intersection(
+            #     positive_examples | negative_examples
+            # )
+            pos_preds = list(
+                predictions[predictions.columns[0]][
+                    predictions[predictions.columns[0]] == 1.0
+                ].index
+            )
+            if kg == "mutag":
+                pos = [item.split("#")[1] for item in positive_examples]
+                neg = [item.split("#")[1] for item in negative_examples]
+            if kg == "aifb":
+                pos = [item.split("/")[-1] for item in positive_examples]
+                neg = [item.split("/")[-1] for item in negative_examples]
 
             target_dict[str_target_concept] = {
                 "best_concept": str(best_concept),
                 "concept_length": concept_length,
-                "concept_individuals": concept_ind,
-                "positive_examples": list(positive_examples),
-                "negative_examples": list(negative_examples),
+                "concept_individuals": pos_preds,
+                "positive_examples": pos,
+                "negative_examples": neg,
             }
         # Define the filename where you want to save the JSON
         file_path = f"results/predictions/CELOE/{kg}.json"
@@ -131,24 +145,38 @@ def train_celoe_fid(file_path=None, kgs=["aifb"]):
             # Get Top n hypotheses
             hypotheses = list(model.best_hypotheses(n=3))
             [print(_) for _ in hypotheses]
+            predictions = model.predict(
+                individuals=list(typed_pos | typed_neg), hypotheses=hypotheses
+            )
             best_concept = hypotheses[0].concept
-            concept_ind = set(
-                [
-                    indv.get_iri().as_str()
-                    for indv in target_kb.individuals_set(best_concept)
-                ]
+            # concept_ind = set(
+            #     [
+            #         indv.get_iri().as_str()
+            #         for indv in target_kb.individuals_set(best_concept)
+            #     ]
+            # )
+            concept_length = target_kb.concept_len(hypotheses[0].concept)
+            # concept_ind = concept_ind.intersection(
+            #     positive_examples | negative_examples
+            # )
+            pos_preds = list(
+                predictions[predictions.columns[0]][
+                    predictions[predictions.columns[0]] == 1.0
+                ].index
             )
-            concept_length = target_kb.concept_len(best_concept)
-            concept_ind = concept_ind.intersection(
-                positive_examples | negative_examples
-            )
+            if kg == "mutag":
+                pos = [item.split("#")[1] for item in positive_examples]
+                neg = [item.split("#")[1] for item in negative_examples]
+            if kg == "aifb":
+                pos = [item.split("/")[-1] for item in positive_examples]
+                neg = [item.split("/")[-1] for item in negative_examples]
 
             target_dict[str_target_concept] = {
                 "best_concept": str(best_concept),
                 "concept_length": concept_length,
-                "concept_individuals": concept_ind,
-                "positive_examples": list(positive_examples),
-                "negative_examples": list(negative_examples),
+                "concept_individuals": pos_preds,
+                "positive_examples": pos,
+                "negative_examples": neg,
             }
         # Define the filename where you want to save the JSON
         file_path = f"results/predictions/CELOE/{kg}_gnn_preds.json"
