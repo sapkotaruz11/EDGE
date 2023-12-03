@@ -9,7 +9,7 @@ from owlapy.model import IRI, OWLNamedIndividual
 from ontolearn.metrics import F1
 
 
-def train_evo(file_path=None, kgs=["aifb"]):
+def train_evo(file_path=None, kgs=None):
     if kgs is None:
         kgs = ["mutag", "aifb"]
 
@@ -84,7 +84,7 @@ def train_evo(file_path=None, kgs=["aifb"]):
             json.dump(target_dict, json_file, indent=4)
 
 
-def train_evo_fid(file_path=None, kgs=["aifb"]):
+def train_evo_fid(file_path=None, kgs=None):
     if kgs is None:
         kgs = ["mutag", "aifb"]
 
