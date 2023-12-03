@@ -57,7 +57,6 @@ def train_evo(file_path=None, kgs=["aifb"]):
                     predictions[predictions.columns[0]] == 1.0
                 ].index
             )
-            print(pos_preds)
             if kg == "mutag":
                 pos = [item.split("#")[1] for item in positive_examples]
                 neg = [item.split("#")[1] for item in negative_examples]
@@ -133,7 +132,6 @@ def train_evo_fid(file_path=None, kgs=["aifb"]):
                     predictions[predictions.columns[0]] == 1.0
                 ].index
             )
-            print(pos_preds)
             if kg == "mutag":
                 pos = [item.split("#")[1] for item in positive_examples]
                 neg = [item.split("#")[1] for item in negative_examples]
