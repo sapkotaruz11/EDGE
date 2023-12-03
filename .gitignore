@@ -169,3 +169,4 @@ cython_debug/
 
 /src/Log/*
 try.py
+try.ipynb
