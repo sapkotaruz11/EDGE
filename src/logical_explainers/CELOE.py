@@ -17,7 +17,7 @@ def train_celoe(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
-        t0 = time()
+        t0 = time.time()
         target_dict = {}
         json_file_path = f"configs/{kg}.json"  # Replace with your JSON file path
 
@@ -110,7 +110,7 @@ def train_celoe_fid(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
-        t0 = time()
+        t0 = time.time()
         target_dict = {}
         kg_path = f"data/KGs/{kg}.owl"
         json_file_path = (
@@ -205,7 +205,7 @@ def train_celoe_train_test(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
-        t0 = time()
+        t0 = time.time()
         target_dict = {}
         json_file_path = (
             f"configs/{kg}_train_test.json"  # Replace with your JSON file path
@@ -310,7 +310,7 @@ def train_celoe_train_test_fid(file_path=None, kgs=None):
         kgs = ["mutag", "aifb"]
 
     for kg in kgs:
-        t0 = time()
+        t0 = time.time()
         target_dict = {}
         kg_path = f"data/KGs/{kg}.owl"
         json_file_path = f"configs/{kg}_gnn_preds_train_test.json"  # Replace with your JSON file path
