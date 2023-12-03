@@ -76,7 +76,7 @@ def get_lp_mutag(gnn_pred_dt, idx_map):
         idx_map[item]["IRI"] for item in gnn_pred_dt if gnn_pred_dt[item] == 1
     ]
     negative_examples = [
-        idx_map[item]["IRI"] for item in gnn_pred_dt if gnn_pred_dt[item] != 0
+        idx_map[item]["IRI"] for item in gnn_pred_dt if gnn_pred_dt[item] == 0
     ]
 
     lp_dict = {

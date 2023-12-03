@@ -10,46 +10,31 @@ import os
 def create_lp_aifb(file_path=None):
     if file_path is None:
         file_path = "data/aifb-hetero_82d021d8/completeDataset.tsv"
+
+    # Read the TSV file into a DataFrame
+    df = pd.read_csv(file_path, sep="\t")
+
+    person_label_dict = dict(zip(df["person"], df["label_affiliation"]))
+
+    reverse_dict = {values: [] for values in person_label_dict.values()}
+    for key, values in person_label_dict.items():
+        reverse_dict[values].append(key)
+
     classes_examples = {
-        "id1instance": {"positive_examples": [], "negative_examples": []},
-        "id2instance": {"positive_examples": [], "negative_examples": []},
-        "id3instance": {"positive_examples": [], "negative_examples": []},
-        "id4instance": {"positive_examples": [], "negative_examples": []},
+        key.split("/")[-1]: {"positive_examples": values, "negative_examples": []}
+        for key, values in reverse_dict.items()
     }
 
-    with open(file_path, "r", newline="", encoding="utf-8") as tsvfile:
-        reader = csv.DictReader(tsvfile, delimiter="\t")
-
-        for row in reader:
-            person = row["person"]
-
-            label = row["label_affiliation"]
-
-            # Assuming that the URL is present in the 'label' column
-
-            url = urlparse(label)
-
-            # Extracting the list item from the URL path
-
-            path_items = url.path.split("/")
-
-            # Checking if '/idXinstance' is in the path items for each X (1, 2, 3, 4)
-
-            for class_name in classes_examples.keys():
-                if class_name == path_items[-1]:
-                    # Positive example for the current class
-
-                    classes_examples[class_name]["positive_examples"].append(person)
-
-                else:
-                    # Negative example for other classes
-
-                    for other_class_name in classes_examples.keys():
-                        if other_class_name != class_name:
-                            classes_examples[other_class_name][
-                                "negative_examples"
-                            ].append(person)
-
+    for key, values in reverse_dict.items():
+        for other_key, other_values in reverse_dict.items():
+            if key != other_key:
+                classes_examples[key.split("/")[-1]]["negative_examples"].extend(
+                    other_values
+                )
+    for key, values in classes_examples.items():
+        positive_set = set(values["positive_examples"])
+        negative_set = set(values["negative_examples"])
+        assert len(positive_set.intersection(negative_set)) == 0
     data = {"data_path": "data/KGs/aifb.owl", "problems": classes_examples}
 
     json_file_path = "configs/aifb.json"
@@ -72,6 +57,7 @@ def create_lp_mutag(file_path=None):
     positive_examples = df["bond"][df["label_mutagenic"] == 1].to_list()
 
     negative_examples = df["bond"][df["label_mutagenic"] == 0].to_list()
+    assert len(set(positive_examples).intersection(set(negative_examples))) == 0
 
     example_dict = {
         "carcino": {

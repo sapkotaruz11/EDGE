@@ -243,17 +243,29 @@ def evaluate_logical_explainers(explainers=["EVO", "CELOE"], KGs=["mutag", "aifb
                 pos = set(examples["positive_examples"])
                 neg = set(examples["positive_examples"])
 
+                EPSILON = 1e-10  # or any small positive number
+
                 true_positives = len(pos.intersection(concept_individuals))
                 false_negatives = len(pos.difference(concept_individuals))
                 false_positives = len(neg.intersection(concept_individuals))
-                precision += true_positives / (
-                    true_positives + false_positives + EPSILON
-                )
-                recall += true_positives / (true_positives + false_negatives + EPSILON)
-                f1_score += 2 * (precision * recall) / (precision + recall + EPSILON)
-                jaccard_similarity += true_positives / (
-                    true_positives + false_positives + false_negatives + EPSILON
-                )
+
+                # Ensure non-zero denominators by checking for emptiness
+                precision_denominator = true_positives + false_positives
+                recall_denominator = true_positives + false_negatives
+
+                # Calculate precision
+                precision = true_positives / (precision_denominator + EPSILON) if precision_denominator > 0 else 0.0
+
+                # Calculate recall
+                recall = true_positives / (recall_denominator + EPSILON) if recall_denominator > 0 else 0.0
+
+                # Calculate F1 score
+                f1_denominator = precision + recall
+                f1_score = 2 * (precision * recall) / (f1_denominator + EPSILON) if f1_denominator > 0 else 0.0
+
+                # Calculate Jaccard similarity
+                jaccard_denominator = true_positives + false_positives + false_negatives
+                jaccard_similarity = true_positives / (jaccard_denominator + EPSILON) if jaccard_denominator > 0 else 0.0
 
             eval_expl_acc = {
                 "Model": explainer,
@@ -270,36 +282,47 @@ def evaluate_logical_explainers(explainers=["EVO", "CELOE"], KGs=["mutag", "aifb
             with open(file_path, "r") as file:
                 predictions_data = json.load(file)
             EPSILON = 1e-10  # Small constant to avoid division by zero
-            precision = 0
-            recall = 0
-            f1_score = 0
-            jaccard_similarity = 0
+            precision_fid = 0
+            recall_fid = 0
+            f1_score_fid = 0
+            jaccard_similarity_fid = 0
 
             for learning_problem, examples in predictions_data.items():
-                concept_individuals = set(examples["concept_individuals"])
-                pos = set(examples["positive_examples"])
-                neg = set(examples["positive_examples"])
+                concept_individuals_fid = set(examples["concept_individuals"])
+                pos_fid = set(examples["positive_examples"])
+                neg_fid = set(examples["positive_examples"])
 
-                true_positives = len(pos.intersection(concept_individuals))
-                false_negatives = len(pos.difference(concept_individuals))
-                false_positives = len(neg.intersection(concept_individuals))
-                precision += true_positives / (
-                    true_positives + false_positives + EPSILON
-                )
-                recall += true_positives / (true_positives + false_negatives + EPSILON)
-                f1_score += 2 * (precision * recall) / (precision + recall + EPSILON)
-                jaccard_similarity += true_positives / (
-                    true_positives + false_positives + false_negatives + EPSILON
-                )
+                EPSILON = 1e-10  # or any small positive number
 
+                true_positives_fid = len(pos_fid.intersection(concept_individuals_fid))
+                false_negatives_fid = len(pos_fid.difference(concept_individuals_fid))
+                false_positives_fid = len(neg_fid.intersection(concept_individuals_fid))
+
+                # Ensure non-zero denominators by checking for emptiness
+                precision_denominator_fid = true_positives_fid + false_positives_fid
+                recall_denominator_fid = true_positives_fid + false_negatives_fid
+
+                # Calculate precision
+                precision_fid = true_positives_fid / (precision_denominator_fid + EPSILON) if precision_denominator_fid > 0 else 0.0
+
+                # Calculate recall
+                recall_fid = true_positives_fid / (recall_denominator_fid + EPSILON) if recall_denominator_fid > 0 else 0.0
+
+                # Calculate F1 score
+                f1_denominator_fid = precision_fid + recall_fid
+                f1_score_fid = 2 * (precision_fid * recall_fid) / (f1_denominator_fid + EPSILON) if f1_denominator_fid > 0 else 0.0
+
+                # Calculate Jaccard similarity
+                jaccard_denominator_fid = true_positives_fid + false_positives_fid + false_negatives_fid
+                jaccard_similarity_fid = true_positives_fid / (jaccard_denominator_fid + EPSILON) if jaccard_denominator_fid > 0 else 0.0
             eval_fid = {
                 "Model": explainer,
                 "Metric": "Explanation Fidelity",
                 "Evaluations": evaluations,
-                "precision": precision,
-                "recall": recall,
-                "f1_score": f1_score,
-                "jaccard_similarity": jaccard_similarity,
+                "precision": precision_fid,
+                "recall": recall_fid,
+                "f1_score": f1_score_fid,
+                "jaccard_similarity": jaccard_similarity_fid,
             }
 
             results[kg] = {

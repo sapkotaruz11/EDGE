@@ -1,7 +1,7 @@
 import os
 
 import rdflib as rdf
-from rdflib import Graph
+from rdflib import Graph, URIRef, Literal, RDF, XSD
 
 
 def pre_process_mutag():
@@ -10,16 +10,22 @@ def pre_process_mutag():
 
     if os.path.isfile(raw_path):
         g_mutag = Graph().parse(path=raw_path)
+        g_mutag_new = Graph()
         is_mutagenic = rdf.term.URIRef(
             "http://dl-learner.org/carcinogenesis#isMutagenic"
         )
-
+        BT = Literal(True, datatype=XSD.boolean)
         for s, p, o in g_mutag:
             if p == is_mutagenic:
-                g_mutag.remove((s, p, o))
+                continue
             if isinstance(s, rdf.BNode) or isinstance(o, rdf.BNode):
-                g_mutag.remove((s, p, o))
-        g_mutag.serialize(destination=processed_path, encoding="utf-8")
+                continue
+            if isinstance(o, rdf.Literal):
+                if str(o.datatype) == "http://www.w3.org/2001/XMLSchema#string":
+                    g_mutag_new.add((s, p, BT))
+                    continue
+            g_mutag_new.add((s, p, o))
+        g_mutag_new.serialize(destination=processed_path, encoding="utf-8")
     else:
         print("Raw Dataset not Available")
 
@@ -32,14 +38,20 @@ def pre_process_aifb():
         g_aifb = Graph().parse(path=raw_path)
         employs = rdf.term.URIRef("http://swrc.ontoware.org/ontology#employs")
         affiliation = rdf.term.URIRef("http://swrc.ontoware.org/ontology#affiliation")
-        new = set()
+        BT = Literal(True, datatype=XSD.boolean)
+        new_g_aifb = Graph()
 
         for s, p, o in g_aifb:
             if p == employs or p == affiliation:
-                g_aifb.remove((s, p, o))
+                continue
             if isinstance(s, rdf.BNode) or isinstance(o, rdf.BNode):
-                g_aifb.remove((s, p, o))
-                g_aifb.serialize(destination=processed_path, encoding="utf-8")
+                continue
+            if isinstance(o, rdf.Literal):
+                if str(o.datatype) == "http://www.w3.org/2001/XMLSchema#string":
+                    new_g_aifb.add((s, p, BT))
+                    continue
+            new_g_aifb.add((s, p, o))
+        new_g_aifb.serialize(destination=processed_path, encoding="utf-8")
     else:
         print("Raw Dataset not Available")
 
