@@ -23,7 +23,7 @@ def train_evo(file_path=None, kgs=None):
             settings = json.load(json_file)
         target_kb = KnowledgeBase(path=settings["data_path"])
         for str_target_concept, examples in settings["problems"].items():
-            positive_examples = set(examples["positive_example"])
+            positive_examples = set(examples["positive_examples"])
             negative_examples = set(examples["negative_examples"])
             print("Target concept: ", str_target_concept)
 
