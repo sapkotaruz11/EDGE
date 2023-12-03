@@ -1,0 +1,22 @@
+{
+  "mutag": {
+    "eval_fid": {
+      "Model": "CELOE",
+      "Metric": "Explanation Fidelity-Train_test_split",
+      "Evaluations": "micro",
+      "precision": 0.7368421052618652,
+      "recall": 0.792452830187184,
+      "f1_score": 0.7636363635850414,
+      "jaccard_similarity": 0.617647058822621
+    },
+    "eval_expl_acc": {
+      "Model": "CELOE",
+      "Metric": "Explanation Accuracy - Train-Test-split",
+      "Evaluations": "micro",
+      "precision": 0.7727272727237604,
+      "recall": 0.7391304347793951,
+      "f1_score": 0.7555555555022223,
+      "jaccard_similarity": 0.6071428571406888
+    }
+  }
+}

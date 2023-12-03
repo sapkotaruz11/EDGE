@@ -9,7 +9,7 @@ import os
 
 def create_lp_aifb(file_path=None):
     if file_path is None:
-        file_path = "data/aifb-hetero_82d021d8/completeDataset.tsv"
+        file_path = "data/aifb-hetero_82d021d8/testSet.tsv"
 
     # Read the TSV file into a DataFrame
     df = pd.read_csv(file_path, sep="\t")
@@ -49,7 +49,7 @@ def create_lp_aifb(file_path=None):
 def create_lp_mutag(file_path=None):
     # Replace with the path to your CSV file
     if file_path is None:
-        file_path = "data/mutag-hetero_faec5b61/completeDataset.tsv"
+        file_path = "data/mutag-hetero_faec5b61/testSet.tsv"
     df = pd.read_csv(file_path, delimiter="\t")
 
     # Separate the DataFrame into positive and negative examples

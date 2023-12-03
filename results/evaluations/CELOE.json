@@ -4,19 +4,19 @@
       "Model": "CELOE",
       "Metric": "Explanation Fidelity",
       "Evaluations": "micro",
-      "precision": 0.49999999999988637,
-      "recall": 0.9734513274331976,
-      "f1_score": 0.6606606606156246,
-      "jaccard_similarity": 0.49327354260078626
+      "precision": 0.8928571428555484,
+      "recall": 0.9433962264133143,
+      "f1_score": 0.9174311926089049,
+      "jaccard_similarity": 0.8474576271172076
     },
     "eval_expl_acc": {
       "Model": "CELOE",
       "Metric": "Explanation Accuracy",
       "Evaluations": "micro",
-      "precision": 0.4999999999997423,
-      "recall": 0.7519379844955412,
-      "f1_score": 0.6006191949980927,
-      "jaccard_similarity": 0.42920353982281895
+      "precision": 0.7727272727237604,
+      "recall": 0.7391304347793951,
+      "f1_score": 0.7555555555022223,
+      "jaccard_similarity": 0.6071428571406888
     }
   },
   "aifb": {
@@ -24,19 +24,19 @@
       "Model": "CELOE",
       "Metric": "Explanation Fidelity",
       "Evaluations": "macro",
-      "precision": 0.4999999999986111,
+      "precision": 0.3157894736836565,
       "recall": 0.6923076923050296,
-      "f1_score": 0.5806451612397503,
-      "jaccard_similarity": 0.4090909090899793
+      "f1_score": 0.4337349397149659,
+      "jaccard_similarity": 0.2769230769226509
     },
     "eval_expl_acc": {
       "Model": "CELOE",
       "Metric": "Explanation Accuracy",
       "Evaluations": "macro",
-      "precision": 0.4999999999979167,
+      "precision": 0.9999999999916667,
       "recall": 0.7999999999946666,
-      "f1_score": 0.6153846153341224,
-      "jaccard_similarity": 0.4444444444427984
+      "f1_score": 0.8888888888329217,
+      "jaccard_similarity": 0.7999999999946666
     }
   }
 }
