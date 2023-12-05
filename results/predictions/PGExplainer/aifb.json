@@ -36,14 +36,14 @@
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id1876instance"
   },
   "38": {
-    "exp_preds": 0,
+    "exp_preds": 2,
     "gnn_pred": 0,
     "gts": 0,
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id31instance"
   },
   "51": {
     "exp_preds": 0,
-    "gnn_pred": 0,
+    "gnn_pred": 3,
     "gts": 0,
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2043instance"
   },
@@ -96,7 +96,7 @@
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2118instance"
   },
   "90": {
-    "exp_preds": 1,
+    "exp_preds": 2,
     "gnn_pred": 2,
     "gts": 2,
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id48instance"
@@ -210,8 +210,8 @@
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id81instance"
   },
   "221": {
-    "exp_preds": 1,
-    "gnn_pred": 2,
+    "exp_preds": 0,
+    "gnn_pred": 0,
     "gts": 0,
     "entity": "http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id82instance"
   }

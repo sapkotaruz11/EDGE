@@ -803,6 +803,7 @@ class HeteroSubgraphX(nn.Module):
 
         best_leaf = None
         best_immediate_reward = float("-inf")
+
         for mcts_node in self.mcts_node_maps.values():
             if len(mcts_node.nodes) < self.node_min and len(mcts_node.nodes) > 15:
                 continue
@@ -811,13 +812,14 @@ class HeteroSubgraphX(nn.Module):
                 best_leaf = mcts_node
                 best_immediate_reward = best_leaf.immediate_reward
 
-        exp_as_graph = self.get_exp_as_graph(best_leaf.nodes)
+        if best_leaf is None or best_leaf.immediate_reward == float("-inf"):
+            exp_as_graph = exp_graph
+        else:
+            exp_as_graph = self.get_exp_as_graph(best_leaf.nodes)
         sg_nodes = exp_as_graph.ndata[NID]
         sg_feat = {}
-
         for node_type in sg_nodes.keys():
             sg_feat[node_type] = feat[node_type][sg_nodes[node_type].long()]
-
         pred_logits = self.model(exp_as_graph, sg_feat)
         node_mapping = exp_as_graph.ndata[NID][category]
         try:

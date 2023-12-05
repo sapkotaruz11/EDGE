@@ -3,58 +3,52 @@
     "eval_pred": {
       "Model": "Hetero-RGCN",
       "Metric": "Prediction Accuracy",
-      "Evaluations": "macro",
-      "precision": 0.9416666666512222,
-      "recall": 0.9416666666512222,
-      "f1_score": 0.9416666666012222,
-      "jaccard_similarity": 0.8973214285570937
+      "precision": 0.944444444441821,
+      "recall": 0.944444444441821,
+      "f1_score": 0.944444444391821,
+      "jaccard_similarity": 0.8947368421029085
     },
     "eval_fid": {
       "Model": "SubGraphX",
-      "Metric": " Explanation Fidelity",
-      "Evaluations": "macro",
-      "precision": 0.6130952380863564,
-      "recall": 0.6124999999910903,
-      "f1_score": 0.6103479853017821,
-      "jaccard_similarity": 0.5249999999942083
+      "Metric": "Explanation Fidelity",
+      "precision": 0.8888888888864197,
+      "recall": 0.8888888888864197,
+      "f1_score": 0.8888888888364197,
+      "jaccard_similarity": 0.799999999998
     },
     "eval_expl_acc": {
       "Model": "SubGraphX",
-      "Metric": " Explanation Accuracy",
-      "Evaluations": "macro",
-      "precision": 0.5938644688557351,
-      "recall": 0.5958333333245347,
-      "f1_score": 0.5924908424447668,
-      "jaccard_similarity": 0.49583333332781426
+      "Metric": "Explanation Accuracy",
+      "precision": 0.8888888888864197,
+      "recall": 0.8888888888864197,
+      "f1_score": 0.8888888888364197,
+      "jaccard_similarity": 0.799999999998
     }
   },
   "mutag": {
     "eval_pred": {
       "Model": "Hetero-RGCN",
       "Metric": "Prediction Accuracy",
-      "Evaluations": "micro",
-      "precision": 0.9999999999978261,
-      "recall": 0.6764705882342993,
-      "f1_score": 0.8070175438100954,
-      "jaccard_similarity": 0.6764705882342993
+      "precision": 0.7826086956504725,
+      "recall": 0.7999999999982222,
+      "f1_score": 0.7912087911570583,
+      "jaccard_similarity": 0.6545454545442645
     },
     "eval_fid": {
       "Model": "SubGraphX",
-      "Metric": " Explanation Fidelity",
-      "Evaluations": "micro",
-      "precision": 0.9999999999980769,
-      "recall": 0.7647058823518166,
-      "f1_score": 0.8666666666161111,
-      "jaccard_similarity": 0.7647058823518166
+      "Metric": "Explanation Fidelity",
+      "precision": 0.7884615384600222,
+      "recall": 0.8913043478241494,
+      "f1_score": 0.8367346938260308,
+      "jaccard_similarity": 0.7192982456127731
     },
     "eval_expl_acc": {
       "Model": "SubGraphX",
-      "Metric": " Explanation Accuracy",
-      "Evaluations": "micro",
-      "precision": 0.9999999999972222,
-      "recall": 0.5294117647051038,
-      "f1_score": 0.6923076922610946,
-      "jaccard_similarity": 0.5294117647051038
+      "Metric": "Explanation Accuracy",
+      "precision": 0.7115384615370932,
+      "recall": 0.822222222220395,
+      "f1_score": 0.7628865978868317,
+      "jaccard_similarity": 0.6166666666656389
     }
   }
 }

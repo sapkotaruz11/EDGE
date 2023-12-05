@@ -2,7 +2,6 @@ import json
 import os
 import time
 
-EPSILON = 1e-10  # Small constant to avoid division by zero
 from ontolearn.concept_learner import CELOE
 from ontolearn.heuristics import CELOEHeuristic
 from ontolearn.knowledge_base import KnowledgeBase
@@ -12,7 +11,7 @@ from ontolearn.refinement_operators import ModifiedCELOERefinement
 from owlapy.model import IRI, OWLNamedIndividual
 
 
-def train_celoe(file_path=None, kgs=None):
+def train_celoe(file_path=None, kgs=None, use_heur=False):
     if kgs is None:
         kgs = ["mutag", "aifb"]
 
@@ -25,72 +24,66 @@ def train_celoe(file_path=None, kgs=None):
             settings = json.load(json_file)
         target_kb = KnowledgeBase(path=settings["data_path"])
         for str_target_concept, examples in settings["problems"].items():
-            positive_examples = set(examples["positive_examples"])
-            negative_examples = set(examples["negative_examples"])
+            positive_examples = set(examples["positive_examples_train"])
+            negative_examples = set(examples["negative_examples_train"])
             print("Target concept: ", str_target_concept)
 
             typed_pos = set(map(OWLNamedIndividual, map(IRI.create, positive_examples)))
             typed_neg = set(map(OWLNamedIndividual, map(IRI.create, negative_examples)))
             lp = PosNegLPStandard(pos=typed_pos, neg=typed_neg)
 
-            qual = Accuracy()
-            heur = CELOEHeuristic(
-                expansionPenaltyFactor=0.05,
-                startNodeBonus=1.0,
-                nodeRefinementPenalty=0.01,
-            )
-            op = ModifiedCELOERefinement(
-                knowledge_base=target_kb, use_negation=False, use_all_constructor=False
-            )
+            if use_heur:
+                qual = F1()
+                heur = CELOEHeuristic(
+                    expansionPenaltyFactor=0.05,
+                    startNodeBonus=1.0,
+                    nodeRefinementPenalty=0.01,
+                )
+                op = ModifiedCELOERefinement(
+                    knowledge_base=target_kb,
+                    use_negation=False,
+                    use_all_constructor=False,
+                )
 
-            model = CELOE(
-                knowledge_base=target_kb,
-                max_runtime=600,
-                refinement_operator=op,
-                quality_func=F1(),
-                heuristic_func=heur,
-                max_num_of_concepts_tested=10_000_000_000,
-                iter_bound=10_000_000_000,
-            )
-            # model = CELOE(knowledge_base=target_kb,quality_func=F1(), max_runtime=600)
+                model = CELOE(
+                    knowledge_base=target_kb,
+                    max_runtime=600,
+                    refinement_operator=op,
+                    quality_func=qual,
+                    heuristic_func=heur,
+                    max_num_of_concepts_tested=10_000_000_000,
+                    iter_bound=10_000_000_000,
+                )
+            else:
+                model = CELOE(
+                    knowledge_base=target_kb, quality_func=F1(), max_runtime=600
+                )
 
             model.fit(lp, verbose=False)
 
             # Get Top n hypotheses
             hypotheses = list(model.best_hypotheses(n=3))
             [print(_) for _ in hypotheses]
-            predictions = model.predict(
-                individuals=list(typed_pos | typed_neg), hypotheses=hypotheses
-            )
+            positive_examples_test = set(examples["positive_examples_test"])
+            negative_examples_test = set(examples["negative_examples_test"])
             best_concept = hypotheses[0].concept
-            # concept_ind = set(
-            #     [
-            #         indv.get_iri().as_str()
-            #         for indv in target_kb.individuals_set(best_concept)
-            #     ]
-            # )
-            concept_length = target_kb.concept_len(hypotheses[0].concept)
-            # concept_ind = concept_ind.intersection(
-            #     positive_examples | negative_examples
-            # )
-            pos_preds = list(
-                predictions[predictions.columns[0]][
-                    predictions[predictions.columns[0]] == 1.0
-                ].index
+            concept_ind = set(
+                [
+                    indv.get_iri().as_str()
+                    for indv in target_kb.individuals_set(best_concept)
+                ]
             )
-            if kg == "mutag":
-                pos = [item.split("#")[1] for item in positive_examples]
-                neg = [item.split("#")[1] for item in negative_examples]
-            if kg == "aifb":
-                pos = [item.split("/")[-1] for item in positive_examples]
-                neg = [item.split("/")[-1] for item in negative_examples]
+            concept_length = target_kb.concept_len(hypotheses[0].concept)
+            concept_inds = concept_ind.intersection(
+                positive_examples_test | negative_examples_test
+            )
 
             target_dict[str_target_concept] = {
                 "best_concept": str(best_concept),
                 "concept_length": concept_length,
-                "concept_individuals": pos_preds,
-                "positive_examples": pos,
-                "negative_examples": neg,
+                "concept_individuals": list(concept_inds),
+                "positive_examples": list(positive_examples_test),
+                "negative_examples": list(negative_examples_test),
             }
         # Define the filename where you want to save the JSON
         file_path = f"results/predictions/CELOE/{kg}.json"
@@ -105,7 +98,7 @@ def train_celoe(file_path=None, kgs=None):
         print(f"Trained CELOE  (predictions) on  {kg} dataset on {dur : .2f}")
 
 
-def train_celoe_fid(file_path=None, kgs=None):
+def train_celoe_fid(file_path=None, kgs=None, use_heur=False):
     if kgs is None:
         kgs = ["mutag", "aifb"]
 
@@ -121,71 +114,66 @@ def train_celoe_fid(file_path=None, kgs=None):
             settings = json.load(json_file)
         target_kb = KnowledgeBase(path=kg_path)
         for str_target_concept, examples in settings.items():
-            positive_examples = set(examples["positive_examples"])
-            negative_examples = set(examples["negative_examples"])
+            positive_examples = set(examples["positive_examples_train"])
+            negative_examples = set(examples["negative_examples_train"])
             print("Target concept: ", str_target_concept)
 
             typed_pos = set(map(OWLNamedIndividual, map(IRI.create, positive_examples)))
             typed_neg = set(map(OWLNamedIndividual, map(IRI.create, negative_examples)))
             lp = PosNegLPStandard(pos=typed_pos, neg=typed_neg)
 
-            qual = Accuracy()
-            heur = CELOEHeuristic(
-                expansionPenaltyFactor=0.05,
-                startNodeBonus=1.0,
-                nodeRefinementPenalty=0.01,
-            )
-            op = ModifiedCELOERefinement(
-                knowledge_base=target_kb, use_negation=False, use_all_constructor=False
-            )
+            if use_heur:
+                qual = F1()
+                heur = CELOEHeuristic(
+                    expansionPenaltyFactor=0.05,
+                    startNodeBonus=1.0,
+                    nodeRefinementPenalty=0.01,
+                )
+                op = ModifiedCELOERefinement(
+                    knowledge_base=target_kb,
+                    use_negation=False,
+                    use_all_constructor=False,
+                )
 
-            model = CELOE(
-                knowledge_base=target_kb,
-                max_runtime=600,
-                refinement_operator=op,
-                quality_func=F1(),
-                heuristic_func=heur,
-                max_num_of_concepts_tested=10_000_000_000,
-                iter_bound=10_000_000_000,
-            )
+                model = CELOE(
+                    knowledge_base=target_kb,
+                    max_runtime=600,
+                    refinement_operator=op,
+                    quality_func=qual,
+                    heuristic_func=heur,
+                    max_num_of_concepts_tested=10_000_000_000,
+                    iter_bound=10_000_000_000,
+                )
+            else:
+                model = CELOE(
+                    knowledge_base=target_kb, quality_func=F1(), max_runtime=600
+                )
 
             model.fit(lp, verbose=False)
 
             # Get Top n hypotheses
             hypotheses = list(model.best_hypotheses(n=3))
             [print(_) for _ in hypotheses]
-            predictions = model.predict(
-                individuals=list(typed_pos | typed_neg), hypotheses=hypotheses
-            )
+            positive_examples_test = set(examples["positive_examples_test"])
+            negative_examples_test = set(examples["negative_examples_test"])
             best_concept = hypotheses[0].concept
-            # concept_ind = set(
-            #     [
-            #         indv.get_iri().as_str()
-            #         for indv in target_kb.individuals_set(best_concept)
-            #     ]
-            # )
-            concept_length = target_kb.concept_len(hypotheses[0].concept)
-            # concept_ind = concept_ind.intersection(
-            #     positive_examples | negative_examples
-            # )
-            pos_preds = list(
-                predictions[predictions.columns[0]][
-                    predictions[predictions.columns[0]] == 1.0
-                ].index
+            concept_ind = set(
+                [
+                    indv.get_iri().as_str()
+                    for indv in target_kb.individuals_set(best_concept)
+                ]
             )
-            if kg == "mutag":
-                pos = [item.split("#")[1] for item in positive_examples]
-                neg = [item.split("#")[1] for item in negative_examples]
-            if kg == "aifb":
-                pos = [item.split("/")[-1] for item in positive_examples]
-                neg = [item.split("/")[-1] for item in negative_examples]
+            concept_length = target_kb.concept_len(hypotheses[0].concept)
+            concept_inds = concept_ind.intersection(
+                positive_examples_test | negative_examples_test
+            )
 
             target_dict[str_target_concept] = {
                 "best_concept": str(best_concept),
                 "concept_length": concept_length,
-                "concept_individuals": pos_preds,
-                "positive_examples": pos,
-                "negative_examples": neg,
+                "concept_individuals": list(concept_inds),
+                "positive_examples": list(positive_examples_test),
+                "negative_examples": list(negative_examples_test),
             }
         # Define the filename where you want to save the JSON
         file_path = f"results/predictions/CELOE/{kg}_gnn_preds.json"
@@ -198,211 +186,3 @@ def train_celoe_fid(file_path=None, kgs=None):
         t1 = time.time()
         dur = t1 - t0
         print(f"Trained CELOE  (fidelity) on  {kg} dataset on {dur : .2f}")
-
-
-def train_celoe_train_test(file_path=None, kgs=None):
-    if kgs is None:
-        kgs = ["mutag", "aifb"]
-
-    for kg in kgs:
-        t0 = time.time()
-        target_dict = {}
-        json_file_path = (
-            f"configs/{kg}_train_test.json"  # Replace with your JSON file path
-        )
-
-        with open(json_file_path, "r", encoding="utf-8") as json_file:
-            settings = json.load(json_file)
-        target_kb = KnowledgeBase(path=settings["data_path"])
-        for str_target_concept, examples in settings["problems"].items():
-            positive_examples = set(examples["positive_examples_train"])
-            negative_examples = set(examples["negative_examples_train"])
-            print("Target concept: ", str_target_concept)
-
-            typed_pos = set(map(OWLNamedIndividual, map(IRI.create, positive_examples)))
-            typed_neg = set(map(OWLNamedIndividual, map(IRI.create, negative_examples)))
-            lp = PosNegLPStandard(pos=typed_pos, neg=typed_neg)
-
-            qual = Accuracy()
-            heur = CELOEHeuristic(
-                expansionPenaltyFactor=0.05,
-                startNodeBonus=1.0,
-                nodeRefinementPenalty=0.01,
-            )
-            op = ModifiedCELOERefinement(
-                knowledge_base=target_kb, use_negation=False, use_all_constructor=False
-            )
-
-            model = CELOE(
-                knowledge_base=target_kb,
-                max_runtime=600,
-                refinement_operator=op,
-                quality_func=F1(),
-                heuristic_func=heur,
-                max_num_of_concepts_tested=10_000_000_000,
-                iter_bound=10_000_000_000,
-            )
-            # model = CELOE(knowledge_base=target_kb,quality_func=F1(), max_runtime=600)
-
-            model.fit(lp, verbose=False)
-
-            # Get Top n hypotheses
-            hypotheses = list(model.best_hypotheses(n=3))
-            [print(_) for _ in hypotheses]
-            positive_examples_test = set(examples["positive_examples_test"])
-            negative_examples_test = set(examples["negative_examples_test"])
-            typed_pos_test = set(
-                map(OWLNamedIndividual, map(IRI.create, positive_examples_test))
-            )
-            typed_neg_test = set(
-                map(OWLNamedIndividual, map(IRI.create, negative_examples_test))
-            )
-            predictions = model.predict(
-                individuals=list(typed_pos_test | typed_neg_test), hypotheses=hypotheses
-            )
-            best_concept = hypotheses[0].concept
-            # concept_ind = set(
-            #     [
-            #         indv.get_iri().as_str()
-            #         for indv in target_kb.individuals_set(best_concept)
-            #     ]
-            # )
-            concept_length = target_kb.concept_len(hypotheses[0].concept)
-            # concept_ind = concept_ind.intersection(
-            #     positive_examples | negative_examples
-            # )
-            pos_preds = list(
-                predictions[predictions.columns[0]][
-                    predictions[predictions.columns[0]] == 1.0
-                ].index
-            )
-            if kg == "mutag":
-                pos = [item.split("#")[1] for item in positive_examples_test]
-                neg = [item.split("#")[1] for item in negative_examples_test]
-            if kg == "aifb":
-                pos = [item.split("/")[-1] for item in positive_examples_test]
-                neg = [item.split("/")[-1] for item in negative_examples_test]
-
-            target_dict[str_target_concept] = {
-                "best_concept": str(best_concept),
-                "concept_length": concept_length,
-                "concept_individuals": pos_preds,
-                "positive_examples": pos,
-                "negative_examples": neg,
-            }
-        # Define the filename where you want to save the JSON
-        file_path = f"results/predictions/CELOE/{kg}_train_test.json"
-        if os.path.exists(file_path):
-            # Remove the file
-            os.remove(file_path)
-        # Save the dictionary to a JSON file with indentation
-        with open(file_path, "w") as json_file:
-            json.dump(target_dict, json_file, indent=4)
-        t1 = time.time()
-        dur = t1 - t0
-        print(
-            f"Trained CELOE  Train-Test-split (predictions) on  {kg} dataset on {dur : .2f}"
-        )
-
-
-def train_celoe_train_test_fid(file_path=None, kgs=None):
-    if kgs is None:
-        kgs = ["mutag", "aifb"]
-
-    for kg in kgs:
-        t0 = time.time()
-        target_dict = {}
-        kg_path = f"data/KGs/{kg}.owl"
-        json_file_path = f"configs/{kg}_gnn_preds_train_test.json"  # Replace with your JSON file path
-
-        with open(json_file_path, "r", encoding="utf-8") as json_file:
-            settings = json.load(json_file)
-        target_kb = KnowledgeBase(path=kg_path)
-        for str_target_concept, examples in settings.items():
-            positive_examples = set(examples["positive_examples_train"])
-            negative_examples = set(examples["negative_examples_train"])
-            print("Target concept: ", str_target_concept)
-
-            typed_pos = set(map(OWLNamedIndividual, map(IRI.create, positive_examples)))
-            typed_neg = set(map(OWLNamedIndividual, map(IRI.create, negative_examples)))
-            lp = PosNegLPStandard(pos=typed_pos, neg=typed_neg)
-
-            qual = Accuracy()
-            heur = CELOEHeuristic(
-                expansionPenaltyFactor=0.05,
-                startNodeBonus=1.0,
-                nodeRefinementPenalty=0.01,
-            )
-            op = ModifiedCELOERefinement(
-                knowledge_base=target_kb, use_negation=False, use_all_constructor=False
-            )
-
-            model = CELOE(
-                knowledge_base=target_kb,
-                max_runtime=600,
-                refinement_operator=op,
-                quality_func=F1(),
-                heuristic_func=heur,
-                max_num_of_concepts_tested=10_000_000_000,
-                iter_bound=10_000_000_000,
-            )
-
-            model.fit(lp, verbose=False)
-
-            # Get Top n hypotheses
-            hypotheses = list(model.best_hypotheses(n=3))
-            [print(_) for _ in hypotheses]
-            positive_examples_test = set(examples["positive_examples_test"])
-            negative_examples_test = set(examples["negative_examples_test"])
-            typed_pos_test = set(
-                map(OWLNamedIndividual, map(IRI.create, positive_examples_test))
-            )
-            typed_neg_test = set(
-                map(OWLNamedIndividual, map(IRI.create, negative_examples_test))
-            )
-            predictions = model.predict(
-                individuals=list(typed_pos_test | typed_neg_test), hypotheses=hypotheses
-            )
-            best_concept = hypotheses[0].concept
-            # concept_ind = set(
-            #     [
-            #         indv.get_iri().as_str()
-            #         for indv in target_kb.individuals_set(best_concept)
-            #     ]
-            # )
-            concept_length = target_kb.concept_len(hypotheses[0].concept)
-            # concept_ind = concept_ind.intersection(
-            #     positive_examples | negative_examples
-            # )
-            pos_preds = list(
-                predictions[predictions.columns[0]][
-                    predictions[predictions.columns[0]] == 1.0
-                ].index
-            )
-            if kg == "mutag":
-                pos = [item.split("#")[1] for item in positive_examples_test]
-                neg = [item.split("#")[1] for item in negative_examples_test]
-            if kg == "aifb":
-                pos = [item.split("/")[-1] for item in positive_examples_test]
-                neg = [item.split("/")[-1] for item in negative_examples_test]
-
-            target_dict[str_target_concept] = {
-                "best_concept": str(best_concept),
-                "concept_length": concept_length,
-                "concept_individuals": pos_preds,
-                "positive_examples": pos,
-                "negative_examples": neg,
-            }
-        # Define the filename where you want to save the JSON
-        file_path = f"results/predictions/CELOE/{kg}_gnn_preds_train_test.json"
-        if os.path.exists(file_path):
-            # Remove the file
-            os.remove(file_path)
-        # Save the dictionary to a JSON file with indentation
-        with open(file_path, "w") as json_file:
-            json.dump(target_dict, json_file, indent=4)
-        t1 = time.time()
-        dur = t1 - t0
-        print(
-            f"Trained CELOE  Train-Test-Split(fidelity) on  {kg} dataset on {dur : .2f}"
-        )

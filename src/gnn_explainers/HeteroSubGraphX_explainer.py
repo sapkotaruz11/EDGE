@@ -37,16 +37,8 @@ def explain_SGX(dataset="mutag"):
     out_dim = my_dataset.num_classes
     e_types = g.etypes
     category = my_dataset.category
-    train_idx = my_dataset.train_idx.to(device)
-    test_idx = my_dataset.test_idx.to(device)
-    labels = my_dataset.labels.to(device)
-
-    if validation:
-        valid_idx = my_dataset.valid_idx.to(device)
-        test_idx = torch.cat([test_idx, valid_idx], dim=0)
 
     idx_map = my_dataset.idx_map
-    pred_idx = torch.cat([train_idx, test_idx], dim=0)
     input_feature = HeteroFeature({}, get_nodes_dict(g), hidden_dim, act=act).to(device)
     model = RGCN(
         hidden_dim,
@@ -55,6 +47,7 @@ def explain_SGX(dataset="mutag"):
         e_types,
         num_bases,
         category,
+        num_hidden_layers=hidden_layers,
     ).to(device)
 
     # Define the optimizer
@@ -68,7 +61,7 @@ def explain_SGX(dataset="mutag"):
     if not os.path.isfile(PATH):
         train_gnn(dataset=dataset, PATH=PATH)
 
-    checkpoint = torch.load(PATH)
+    checkpoint = torch.load(PATH, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     epoch = checkpoint["epoch"]
@@ -112,4 +105,4 @@ def explain_SGX(dataset="mutag"):
     print("Ending SubGraphX")
     t1 = time.time()
     dur = t1 - t0
-    print(f"Total time taken for SubGraphX : {dur:.2f}")
+    print(f"Total time taken for SubGraphX  on {dataset}: {dur:.2f}")

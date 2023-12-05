@@ -3,58 +3,52 @@
     "eval_pred": {
       "Model": "Hetero-RGCN",
       "Metric": "Prediction Accuracy",
-      "Evaluations": "macro",
-      "precision": 0.9416666666512222,
-      "recall": 0.9416666666512222,
-      "f1_score": 0.9416666666012222,
-      "jaccard_similarity": 0.8973214285570937
+      "precision": 0.944444444441821,
+      "recall": 0.944444444441821,
+      "f1_score": 0.944444444391821,
+      "jaccard_similarity": 0.8947368421029085
     },
     "eval_fid": {
       "Model": "PGExplainer",
-      "Metric": " Explanation Fidelity",
-      "Evaluations": "macro",
-      "precision": 0.94999999997825,
-      "recall": 0.8333333333212499,
-      "f1_score": 0.8722222221580638,
-      "jaccard_similarity": 0.783333333322
+      "Metric": "Explanation Fidelity",
+      "precision": 0.9166666666641203,
+      "recall": 0.9166666666641203,
+      "f1_score": 0.9166666666141203,
+      "jaccard_similarity": 0.8461538461516764
     },
     "eval_expl_acc": {
       "Model": "PGExplainer",
-      "Metric": " Explanation Accuracy",
-      "Evaluations": "macro",
-      "precision": 0.9333333333116944,
-      "recall": 0.8166666666546943,
-      "f1_score": 0.8555555554915082,
-      "jaccard_similarity": 0.7520833333222995
+      "Metric": "Explanation Accuracy",
+      "precision": 0.9166666666641203,
+      "recall": 0.9166666666641203,
+      "f1_score": 0.9166666666141203,
+      "jaccard_similarity": 0.8461538461516764
     }
   },
   "mutag": {
     "eval_pred": {
       "Model": "Hetero-RGCN",
       "Metric": "Prediction Accuracy",
-      "Evaluations": "micro",
-      "precision": 0.9999999999978261,
-      "recall": 0.6764705882342993,
-      "f1_score": 0.8070175438100954,
-      "jaccard_similarity": 0.6764705882342993
+      "precision": 0.7826086956504725,
+      "recall": 0.7999999999982222,
+      "f1_score": 0.7912087911570583,
+      "jaccard_similarity": 0.6545454545442645
     },
     "eval_fid": {
       "Model": "PGExplainer",
-      "Metric": " Explanation Fidelity",
-      "Evaluations": "micro",
-      "precision": 0.9999999999981132,
-      "recall": 0.7794117647047362,
-      "f1_score": 0.8760330578005601,
-      "jaccard_similarity": 0.7794117647047362
+      "Metric": "Explanation Fidelity",
+      "precision": 0.7735849056589177,
+      "recall": 0.8913043478241494,
+      "f1_score": 0.828282828231405,
+      "jaccard_similarity": 0.7068965517229191
     },
     "eval_expl_acc": {
       "Model": "PGExplainer",
-      "Metric": " Explanation Accuracy",
-      "Evaluations": "micro",
-      "precision": 0.9999999999974358,
-      "recall": 0.5735294117638624,
-      "f1_score": 0.7289719625691327,
-      "jaccard_similarity": 0.5735294117638624
+      "Metric": "Explanation Accuracy",
+      "precision": 0.7169811320741188,
+      "recall": 0.8444444444425678,
+      "f1_score": 0.7755102040303831,
+      "jaccard_similarity": 0.6333333333322777
     }
   }
 }

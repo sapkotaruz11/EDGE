@@ -2,21 +2,41 @@
   "mutag": {
     "eval_fid": {
       "Model": "CELOE",
-      "Metric": "Explanation Fidelity-Train_test_split",
+      "Metric": "Fidelity-Train_test_split",
       "Evaluations": "micro",
-      "precision": 0.7368421052618652,
-      "recall": 0.792452830187184,
-      "f1_score": 0.7636363635850414,
-      "jaccard_similarity": 0.617647058822621
+      "precision": 0.7272727272714049,
+      "recall": 0.8333333333315972,
+      "f1_score": 0.7766990290749363,
+      "jaccard_similarity": 0.6349206349196271
     },
     "eval_expl_acc": {
       "Model": "CELOE",
-      "Metric": "Explanation Accuracy - Train-Test-split",
+      "Metric": "Prediction Accuracy - Train-Test-split",
       "Evaluations": "micro",
-      "precision": 0.7727272727237604,
-      "recall": 0.7391304347793951,
-      "f1_score": 0.7555555555022223,
-      "jaccard_similarity": 0.6071428571406888
+      "precision": 0.7499999999962501,
+      "recall": 0.6521739130406428,
+      "f1_score": 0.6976744185516496,
+      "jaccard_similarity": 0.5357142857123725
+    }
+  },
+  "aifb": {
+    "eval_fid": {
+      "Model": "CELOE",
+      "Metric": "Fidelity-Train_test_split",
+      "Evaluations": "macro",
+      "precision": 0.42857142856836733,
+      "recall": 0.49999999999583333,
+      "f1_score": 0.4615384614852071,
+      "jaccard_similarity": 0.2999999999985
+    },
+    "eval_expl_acc": {
+      "Model": "CELOE",
+      "Metric": "Prediction Accuracy - Train-Test-split",
+      "Evaluations": "macro",
+      "precision": 0.3919234360385978,
+      "recall": 0.5791666666604097,
+      "f1_score": 0.4491185897060639,
+      "jaccard_similarity": 0.3290947958113137
     }
   }
 }

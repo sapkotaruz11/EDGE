@@ -1,107 +1,114 @@
-import json
-import os
 from collections import defaultdict
-
-from ontolearn.metrics import F1, Accuracy, Precision, Recall
+import json
 
 EPSILON = 1e-10  # Small constant to avoid division by zero
 
 
-from collections import defaultdict
-
-
-def calculate_macro_metrics(dict1, dict2, no_result_value=-1, EPSILON=1e-10):
-    classes = set(filter(lambda x: x != no_result_value, dict1.values())) | set(
-        filter(lambda x: x != no_result_value, dict2.values())
-    )
+def calculate_micro_metrics(y_true, y_pred, no_result_value=-1, EPSILON=1e-10):
     class_metrics = defaultdict(lambda: {"tp": 0, "fp": 0, "fn": 0})
 
-    for key in dict1.keys():
-        true_class = dict1[key]
-        if key in dict2:
-            predicted_class = dict2[key]
-            if true_class != no_result_value and predicted_class != no_result_value:
-                if true_class == predicted_class:
-                    class_metrics[true_class]["tp"] += 1
-                else:
-                    class_metrics[true_class]["fn"] += 1
-                    class_metrics[predicted_class]["fp"] += 1
-            elif true_class != no_result_value:
-                class_metrics[true_class]["fn"] += 1
-
-    for key in dict2.keys():
-        if key not in dict1:
-            predicted_class = dict2[key]
-            if predicted_class != no_result_value:
-                class_metrics[predicted_class]["fp"] += 1
-
-    macro_precision = 0
-    macro_recall = 0
-    macro_f1_score = 0
-    macro_jaccard_similarity = 0
-
-    for cls in classes:
-        tp = class_metrics[cls]["tp"]
-        fp = class_metrics[cls]["fp"]
-        fn = class_metrics[cls]["fn"]
-
-        if tp + fp + EPSILON > 0:
-            precision = tp / (tp + fp + EPSILON)
-        else:
-            precision = 0
-
-        if tp + fn + EPSILON > 0:
-            recall = tp / (tp + fn + EPSILON)
-        else:
-            recall = 0
-
-        if precision + recall + EPSILON > 0:
-            f1_score = 2 * (precision * recall) / (precision + recall + EPSILON)
-        else:
-            f1_score = 0
-
-        if tp + fp + fn + EPSILON > 0:
-            jaccard_similarity = tp / (tp + fp + fn + EPSILON)
-        else:
-            jaccard_similarity = 0
-
-        macro_precision += precision
-        macro_recall += recall
-        macro_f1_score += f1_score
-        macro_jaccard_similarity += jaccard_similarity
-
-    num_classes = len(classes)
-    macro_precision /= num_classes
-    macro_recall /= num_classes
-    macro_f1_score /= num_classes
-    macro_jaccard_similarity /= num_classes
-
-    return macro_precision, macro_recall, macro_f1_score, macro_jaccard_similarity
-
-
-def calculate_metrics(dict1, dict2):
-    true_positives = 0
-    false_positives = 0
-    false_negatives = 0
-
-    for key in dict1.keys():
-        if key in dict2:
-            if dict1[key] == dict2[key]:
-                true_positives += 1
+    for true_class, predicted_class in zip(y_true, y_pred):
+        if true_class != no_result_value and predicted_class != no_result_value:
+            if true_class == predicted_class:
+                class_metrics[true_class]["tp"] += 1
             else:
-                false_negatives += 1
-        else:
-            false_negatives += 1
+                class_metrics[true_class]["fn"] += 1
+                class_metrics[predicted_class]["fp"] += 1
+        elif true_class != no_result_value:
+            # Consider "no result" as both false positive and false negative
+            class_metrics[true_class]["fn"] += 1
+            class_metrics[no_result_value]["fp"] += 1
 
-    for key in dict2.keys():
-        if key not in dict1:
-            false_positives += 1
+    for predicted_class in set(y_pred) - set(y_true):
+        if predicted_class != no_result_value:
+            class_metrics[predicted_class]["fp"] += 1
 
-    precision = true_positives / (true_positives + false_positives + EPSILON)
-    recall = true_positives / (true_positives + false_negatives + EPSILON)
-    f1_score = 2 * (precision * recall) / (precision + recall + EPSILON)
-    jaccard_similarity = true_positives / (
-        true_positives + false_positives + false_negatives + EPSILON
+    micro_true_positives = sum(cm["tp"] for cm in class_metrics.values())
+    micro_false_positives = sum(cm["fp"] for cm in class_metrics.values())
+    micro_false_negatives = sum(cm["fn"] for cm in class_metrics.values())
+
+    # Ensure non-zero denominators by checking for emptiness
+    precision_denominator = micro_true_positives + micro_false_positives
+    recall_denominator = micro_true_positives + micro_false_negatives
+
+    # Calculate precision
+    precision = (
+        micro_true_positives / (precision_denominator + EPSILON)
+        if precision_denominator > 0
+        else 0.0
+    )
+
+    # Calculate recall
+    recall = (
+        micro_true_positives / (recall_denominator + EPSILON)
+        if recall_denominator > 0
+        else 0.0
+    )
+
+    # Calculate F1 score
+    f1_denominator = precision + recall
+    f1_score = (
+        2 * (precision * recall) / (f1_denominator + EPSILON)
+        if f1_denominator > 0
+        else 0.0
+    )
+
+    # Calculate Jaccard similarity
+    jaccard_denominator = (
+        micro_true_positives + micro_false_positives + micro_false_negatives
+    )
+    jaccard_similarity = (
+        micro_true_positives / (jaccard_denominator + EPSILON)
+        if jaccard_denominator > 0
+        else 0.0
+    )
+
+    return precision, recall, f1_score, jaccard_similarity
+
+
+def calculate_metrics(y_true, y_pred):
+    true_positives = sum(
+        (true == 1 and pred == 1) for true, pred in zip(y_true, y_pred)
+    )
+    false_positives = sum(
+        (true == 0 and pred == 1) for true, pred in zip(y_true, y_pred)
+    )
+    false_negatives = sum(
+        (true == 1 and pred == 0) for true, pred in zip(y_true, y_pred)
+    )
+
+    epsilon = 1e-10  # Small value to avoid division by zero
+
+    # Calculate precision
+    precision_denominator = true_positives + false_positives
+    precision = (
+        true_positives / (precision_denominator + epsilon)
+        if precision_denominator > 0
+        else 0.0
+    )
+
+    # Calculate recall
+    recall_denominator = true_positives + false_negatives
+    recall = (
+        true_positives / (recall_denominator + epsilon)
+        if recall_denominator > 0
+        else 0.0
+    )
+
+    # Calculate F1 score
+    f1_denominator = precision + recall
+    f1_score = (
+        2 * (precision * recall) / (f1_denominator + epsilon)
+        if f1_denominator > 0
+        else 0.0
+    )
+
+    # Calculate Jaccard similarity
+    jaccard_denominator = true_positives + false_positives + false_negatives
+    jaccard_similarity = (
+        true_positives / (jaccard_denominator + epsilon)
+        if jaccard_denominator > 0
+        else 0.0
     )
 
     return precision, recall, f1_score, jaccard_similarity
@@ -124,13 +131,9 @@ def evaluate_gnn_explainers(
             with open(file_path, "r") as file:
                 predictions_data = json.load(file)
 
-            exp_preds_dict = {
-                key: value["exp_preds"] for key, value in predictions_data.items()
-            }
-            gnn_pred_dict = {
-                key: value["gnn_pred"] for key, value in predictions_data.items()
-            }
-            gts_dict = {key: value["gts"] for key, value in predictions_data.items()}
+            exp_preds_list = [value["exp_preds"] for value in predictions_data.values()]
+            gnn_pred_list = [value["gnn_pred"] for value in predictions_data.values()]
+            gts_list = [value["gts"] for value in predictions_data.values()]
 
             # Calculate macro scores for precision, recall, F1 score, and Jaccard similarity
             if dataset == "aifb":
@@ -139,19 +142,16 @@ def evaluate_gnn_explainers(
                     recall,
                     f1_score,
                     jaccard_similarity,
-                ) = calculate_macro_metrics(gts_dict, gnn_pred_dict)
-                evaluations = "macro"
+                ) = calculate_micro_metrics(gts_list, gnn_pred_list)
 
             else:
                 precision, recall, f1_score, jaccard_similarity = calculate_metrics(
-                    gts_dict, gnn_pred_dict
+                    gts_list, gnn_pred_list
                 )
-                evaluations = "micro"
 
             eval_preds = {
                 "Model": "Hetero-RGCN",
                 "Metric": "Prediction Accuracy",
-                "Evaluations": evaluations,
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
@@ -163,19 +163,16 @@ def evaluate_gnn_explainers(
                     recall,
                     f1_score,
                     jaccard_similarity,
-                ) = calculate_macro_metrics(gnn_pred_dict, exp_preds_dict)
-                evaluations = "macro"
+                ) = calculate_micro_metrics(gnn_pred_list, exp_preds_list)
 
             else:
                 precision, recall, f1_score, jaccard_similarity = calculate_metrics(
-                    gnn_pred_dict, exp_preds_dict
+                    gnn_pred_list, exp_preds_list
                 )
-                evaluations = "micro"
 
             eval_fids = {
                 "Model": explainer,
-                "Metric": " Explanation Fidelity",
-                "Evaluations": evaluations,
+                "Metric": "Explanation Fidelity",
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
@@ -187,19 +184,16 @@ def evaluate_gnn_explainers(
                     recall,
                     f1_score,
                     jaccard_similarity,
-                ) = calculate_macro_metrics(gts_dict, exp_preds_dict)
-                evaluations = "macro"
+                ) = calculate_micro_metrics(gts_list, exp_preds_list)
 
             else:
                 precision, recall, f1_score, jaccard_similarity = calculate_metrics(
-                    gts_dict, exp_preds_dict
+                    gts_list, exp_preds_list
                 )
-                evaluations = "micro"
 
             eval_exp_acc = {
                 "Model": explainer,
-                "Metric": " Explanation Accuracy",
-                "Evaluations": evaluations,
+                "Metric": "Explanation Accuracy",
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
@@ -219,301 +213,102 @@ def evaluate_gnn_explainers(
             json.dump(results, json_file, indent=2)
 
 
-def evaluate_logical_explainers(explainers=["EVO", "CELOE"], KGs=["mutag", "aifb"]):
-    explainers = ["EVO", "CELOE"]
-    results = {}
-    for explainer in explainers:
-        KGs = ["mutag", "aifb"]
+def calculate_metrics_logical(predictions_data):
+    micro_true_positives = 0
+    micro_false_positives = 0
+    micro_false_negatives = 0
 
-        for kg in KGs:
-            file_path = f"results/predictions/{explainer}/{kg}.json"
+    EPSILON = 1e-10  # or any small positive number
 
-            with open(file_path, "r") as file:
-                predictions_data = json.load(file)
-            EPSILON = 1e-10  # Small constant to avoid division by zero
-            precision = 0
-            recall = 0
-            f1_score = 0
-            jaccard_similarity = 0
-            count = 0
-            evaluations = "micro" if kg == "mutag" else "macro"
+    for learning_problem, examples in predictions_data.items():
+        concept_individuals = set(examples["concept_individuals"])
+        pos = set(examples["positive_examples"])
+        neg = set(examples["negative_examples"])
 
-            for learning_problem, examples in predictions_data.items():
-                concept_individuals = set(examples["concept_individuals"])
-                pos = set(examples["positive_examples"])
-                neg = set(examples["negative_examples"])
+        true_positives = len(pos.intersection(concept_individuals))
+        false_negatives = len(pos.difference(concept_individuals))
+        false_positives = len(neg.intersection(concept_individuals))
 
-                EPSILON = 1e-10  # or any small positive number
+        micro_true_positives += true_positives
+        micro_false_negatives += false_negatives
+        micro_false_positives += false_positives
 
-                true_positives = len(pos.intersection(concept_individuals))
-                false_negatives = len(pos.difference(concept_individuals))
-                false_positives = len(neg.intersection(concept_individuals))
+    # Ensure non-zero denominators by checking for emptiness
+    precision_denominator = micro_true_positives + micro_false_positives
+    recall_denominator = micro_true_positives + micro_false_negatives
 
-                # Ensure non-zero denominators by checking for emptiness
-                precision_denominator = true_positives + false_positives
-                recall_denominator = true_positives + false_negatives
+    # Calculate precision
+    precision = (
+        micro_true_positives / (precision_denominator + EPSILON)
+        if precision_denominator > 0
+        else 0.0
+    )
 
-                # Calculate precision
-                precision = (
-                    true_positives / (precision_denominator + EPSILON)
-                    if precision_denominator > 0
-                    else 0.0
-                )
+    # Calculate recall
+    recall = (
+        micro_true_positives / (recall_denominator + EPSILON)
+        if recall_denominator > 0
+        else 0.0
+    )
 
-                # Calculate recall
-                recall = (
-                    true_positives / (recall_denominator + EPSILON)
-                    if recall_denominator > 0
-                    else 0.0
-                )
+    # Calculate F1 score
+    f1_denominator = precision + recall
+    f1_score = (
+        2 * (precision * recall) / (f1_denominator + EPSILON)
+        if f1_denominator > 0
+        else 0.0
+    )
 
-                # Calculate F1 score
-                f1_denominator = precision + recall
-                f1_score = (
-                    2 * (precision * recall) / (f1_denominator + EPSILON)
-                    if f1_denominator > 0
-                    else 0.0
-                )
+    # Calculate Jaccard similarity
+    jaccard_denominator = (
+        micro_true_positives + micro_false_positives + micro_false_negatives
+    )
+    jaccard_similarity = (
+        micro_true_positives / (jaccard_denominator + EPSILON)
+        if jaccard_denominator > 0
+        else 0.0
+    )
 
-                # Calculate Jaccard similarity
-                jaccard_denominator = true_positives + false_positives + false_negatives
-                jaccard_similarity = (
-                    true_positives / (jaccard_denominator + EPSILON)
-                    if jaccard_denominator > 0
-                    else 0.0
-                )
-
-            eval_expl_acc = {
-                "Model": explainer,
-                "Metric": "Explanation Accuracy",
-                "Evaluations": evaluations,
-                "precision": precision,
-                "recall": recall,
-                "f1_score": f1_score,
-                "jaccard_similarity": jaccard_similarity,
-            }
-
-            file_path = f"results/predictions/{explainer}/{kg}_gnn_preds.json"
-
-            with open(file_path, "r") as file:
-                predictions_data = json.load(file)
-            EPSILON = 1e-10  # Small constant to avoid division by zero
-            precision_fid = 0
-            recall_fid = 0
-            f1_score_fid = 0
-            jaccard_similarity_fid = 0
-
-            for learning_problem, examples in predictions_data.items():
-                concept_individuals_fid = set(examples["concept_individuals"])
-                pos_fid = set(examples["positive_examples"])
-                neg_fid = set(examples["negative_examples"])
-
-                EPSILON = 1e-10  # or any small positive number
-
-                true_positives_fid = len(pos_fid.intersection(concept_individuals_fid))
-                false_negatives_fid = len(pos_fid.difference(concept_individuals_fid))
-                false_positives_fid = len(neg_fid.intersection(concept_individuals_fid))
-
-                # Ensure non-zero denominators by checking for emptiness
-                precision_denominator_fid = true_positives_fid + false_positives_fid
-                recall_denominator_fid = true_positives_fid + false_negatives_fid
-
-                # Calculate precision
-                precision_fid = (
-                    true_positives_fid / (precision_denominator_fid + EPSILON)
-                    if precision_denominator_fid > 0
-                    else 0.0
-                )
-
-                # Calculate recall
-                recall_fid = (
-                    true_positives_fid / (recall_denominator_fid + EPSILON)
-                    if recall_denominator_fid > 0
-                    else 0.0
-                )
-
-                # Calculate F1 score
-                f1_denominator_fid = precision_fid + recall_fid
-                f1_score_fid = (
-                    2 * (precision_fid * recall_fid) / (f1_denominator_fid + EPSILON)
-                    if f1_denominator_fid > 0
-                    else 0.0
-                )
-
-                # Calculate Jaccard similarity
-                jaccard_denominator_fid = (
-                    true_positives_fid + false_positives_fid + false_negatives_fid
-                )
-                jaccard_similarity_fid = (
-                    true_positives_fid / (jaccard_denominator_fid + EPSILON)
-                    if jaccard_denominator_fid > 0
-                    else 0.0
-                )
-            eval_fid = {
-                "Model": explainer,
-                "Metric": "Explanation Fidelity",
-                "Evaluations": evaluations,
-                "precision": precision_fid,
-                "recall": recall_fid,
-                "f1_score": f1_score_fid,
-                "jaccard_similarity": jaccard_similarity_fid,
-            }
-
-            results[kg] = {
-                "eval_fid": eval_fid,
-                "eval_expl_acc": eval_expl_acc,
-            }
-
-        file_path = f"results/evaluations/{explainer}.json"
-
-        with open(file_path, "w") as json_file:
-            json.dump(results, json_file, indent=2)
+    return precision, recall, f1_score, jaccard_similarity
 
 
-def evaluate_logical_explainers_train_test(
-    explainers=["EVO", "CELOE"], KGs=["mutag", "aifb"]
-):
+def evaluate_logical_explainers(explainers=None, KGs=None):
     if explainers is None:
         explainers = ["EVO", "CELOE"]
+
     results = {}
+
     for explainer in explainers:
         if KGs is None:
             KGs = ["mutag", "aifb"]
 
         for kg in KGs:
-            file_path = f"results/predictions/{explainer}/{kg}_train_test.json"
-
+            # Evaluate prediction accuracy
+            file_path = f"results/predictions/{explainer}/{kg}.json"
             with open(file_path, "r") as file:
                 predictions_data = json.load(file)
-            EPSILON = 1e-10  # Small constant to avoid division by zero
-            precision = 0
-            recall = 0
-            f1_score = 0
-            jaccard_similarity = 0
-            count = 0
-            evaluations = "micro" if kg == "mutag" else "macro"
-
-            for learning_problem, examples in predictions_data.items():
-                concept_individuals = set(examples["concept_individuals"])
-                pos = set(examples["positive_examples"])
-                neg = set(examples["negative_examples"])
-
-                EPSILON = 1e-10  # or any small positive number
-
-                true_positives = len(pos.intersection(concept_individuals))
-                false_negatives = len(pos.difference(concept_individuals))
-                false_positives = len(neg.intersection(concept_individuals))
-
-                # Ensure non-zero denominators by checking for emptiness
-                precision_denominator = true_positives + false_positives
-                recall_denominator = true_positives + false_negatives
-
-                # Calculate precision
-                precision = (
-                    true_positives / (precision_denominator + EPSILON)
-                    if precision_denominator > 0
-                    else 0.0
-                )
-
-                # Calculate recall
-                recall = (
-                    true_positives / (recall_denominator + EPSILON)
-                    if recall_denominator > 0
-                    else 0.0
-                )
-
-                # Calculate F1 score
-                f1_denominator = precision + recall
-                f1_score = (
-                    2 * (precision * recall) / (f1_denominator + EPSILON)
-                    if f1_denominator > 0
-                    else 0.0
-                )
-
-                # Calculate Jaccard similarity
-                jaccard_denominator = true_positives + false_positives + false_negatives
-                jaccard_similarity = (
-                    true_positives / (jaccard_denominator + EPSILON)
-                    if jaccard_denominator > 0
-                    else 0.0
-                )
-
+            micro_metrics = calculate_metrics_logical(predictions_data)
             eval_expl_acc = {
                 "Model": explainer,
-                "Metric": "Explanation Accuracy - Train-Test-split",
-                "Evaluations": evaluations,
-                "precision": precision,
-                "recall": recall,
-                "f1_score": f1_score,
-                "jaccard_similarity": jaccard_similarity,
+                "Metric": "Explanation Accuracy",
+                "precision": micro_metrics[0],
+                "recall": micro_metrics[1],
+                "f1_score": micro_metrics[2],
+                "jaccard_similarity": micro_metrics[3],
             }
 
-            file_path = (
-                f"results/predictions/{explainer}/{kg}_gnn_preds_train_test.json"
-            )
-
+            # Evaluate fidelity
+            file_path = f"results/predictions/{explainer}/{kg}_gnn_preds.json"
             with open(file_path, "r") as file:
                 predictions_data = json.load(file)
-            EPSILON = 1e-10  # Small constant to avoid division by zero
-            precision_fid = 0
-            recall_fid = 0
-            f1_score_fid = 0
-            jaccard_similarity_fid = 0
-
-            for learning_problem, examples in predictions_data.items():
-                concept_individuals_fid = set(examples["concept_individuals"])
-                pos_fid = set(examples["positive_examples"])
-                neg_fid = set(examples["negative_examples"])
-
-                EPSILON = 1e-10  # or any small positive number
-
-                true_positives_fid = len(pos_fid.intersection(concept_individuals_fid))
-                false_negatives_fid = len(pos_fid.difference(concept_individuals_fid))
-                false_positives_fid = len(neg_fid.intersection(concept_individuals_fid))
-
-                # Ensure non-zero denominators by checking for emptiness
-                precision_denominator_fid = true_positives_fid + false_positives_fid
-                recall_denominator_fid = true_positives_fid + false_negatives_fid
-
-                # Calculate precision
-                precision_fid = (
-                    true_positives_fid / (precision_denominator_fid + EPSILON)
-                    if precision_denominator_fid > 0
-                    else 0.0
-                )
-
-                # Calculate recall
-                recall_fid = (
-                    true_positives_fid / (recall_denominator_fid + EPSILON)
-                    if recall_denominator_fid > 0
-                    else 0.0
-                )
-
-                # Calculate F1 score
-                f1_denominator_fid = precision_fid + recall_fid
-                f1_score_fid = (
-                    2 * (precision_fid * recall_fid) / (f1_denominator_fid + EPSILON)
-                    if f1_denominator_fid > 0
-                    else 0.0
-                )
-
-                # Calculate Jaccard similarity
-                jaccard_denominator_fid = (
-                    true_positives_fid + false_positives_fid + false_negatives_fid
-                )
-                jaccard_similarity_fid = (
-                    true_positives_fid / (jaccard_denominator_fid + EPSILON)
-                    if jaccard_denominator_fid > 0
-                    else 0.0
-                )
+            micro_metrics = calculate_metrics_logical(predictions_data)
             eval_fid = {
                 "Model": explainer,
-                "Metric": "Explanation Fidelity-Train_test_split",
-                "Evaluations": evaluations,
-                "precision": precision_fid,
-                "recall": recall_fid,
-                "f1_score": f1_score_fid,
-                "jaccard_similarity": jaccard_similarity_fid,
+                "Metric": "Fidelity",
+                "precision": micro_metrics[0],
+                "recall": micro_metrics[1],
+                "f1_score": micro_metrics[2],
+                "jaccard_similarity": micro_metrics[3],
             }
 
             results[kg] = {
@@ -521,7 +316,7 @@ def evaluate_logical_explainers_train_test(
                 "eval_expl_acc": eval_expl_acc,
             }
 
-        file_path = f"results/evaluations/{explainer}traintestsplit.json"
-
+        # Save results to file
+        file_path = f"results/evaluations/{explainer}.json"
         with open(file_path, "w") as json_file:
             json.dump(results, json_file, indent=2)

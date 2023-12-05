@@ -38,16 +38,8 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
     out_dim = my_dataset.num_classes
     e_types = g.etypes
     category = my_dataset.category
-    train_idx = my_dataset.train_idx.to(device)
-    test_idx = my_dataset.test_idx.to(device)
-    labels = my_dataset.labels.to(device)
-
-    if validation:
-        valid_idx = my_dataset.valid_idx.to(device)
-        test_idx = torch.cat([test_idx, valid_idx], dim=0)
 
     idx_map = my_dataset.idx_map
-    pred_idx = torch.cat([train_idx, test_idx], dim=0)
     input_feature = HeteroFeature({}, get_nodes_dict(g), hidden_dim, act=act).to(device)
     model = RGCN(
         hidden_dim,
@@ -56,6 +48,7 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
         e_types,
         num_bases,
         category,
+        num_hidden_layers=hidden_layers,
     ).to(device)
 
     # Define the optimizer
@@ -67,8 +60,10 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
 
     PATH = f"trained_models/{dataset}_trained.pt"
     if not os.path.isfile(PATH):
+        print("Trained GNN Model not  found. Training GNN Model")
         train_gnn(dataset=dataset, PATH=PATH)
-
+    
+    print("Trained GNN Model found. Loading from Checkpoints")
     checkpoint = torch.load(PATH, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
@@ -82,17 +77,17 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
     pred_logit = model(g, feat)[category]
     gnn_preds = pred_logit[test_idx].argmax(dim=1).tolist()
 
-    explainer_path = f"trained_explainers/{dataset}_PGExplainer_1.pkl"
+    explainer_path = f"trained_explainers/{dataset}_PGExplainer.pkl"
     if os.path.isfile(explainer_path):
         t0 = time.time()
         print("Starting PGExplainer")
-        print("Trained PG Explainer Exists. Loading Trained Checkpoints")
+        print(f"Trained PG Explainer on {dataset} Exists. Loading Trained Checkpoints")
         explainer = load_info(explainer_path)
 
     else:
         t0 = time.time()
         print("Starting PGExplainer")
-        print("Trained PG Explainer Not found. Training Hetero PG Explainer")
+        print(f"Trained PG Explainer on {dataset} Not found. Training Hetero PG Explainer")
         explainer = HeteroPGExplainer(
             model, hidden_dim, num_hops=1, explain_graph=False
         )
@@ -120,17 +115,16 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
         save_info(explainer_path, explainer)
         print(f"Trained PG Explainer on Hetero {dataset} saved")
 
-    exp_preds = {}
     entity = {}
-    for idx in test_idx.tolist():
-        print(idx)
-        probs, edge_mask, bg, inverse_indices = explainer.explain_node(
-            {category: [idx]}, g, feat, training=True
-        )
-        exp_preds[idx] = probs[category][inverse_indices[category]].argmax(dim=1).item()
-        entity[idx] = idx_map[idx]["IRI"]
+    probs, edge_mask, bg, inverse_indices = explainer.explain_node(
+        {category: test_idx}, g, feat, training=True
+    )
+    exp_pred = probs[category][inverse_indices[category]].argmax(dim=1).tolist()
+    exp_preds = dict(zip(test_idx.tolist(), exp_pred))
     gnn_pred = dict(zip(exp_preds.keys(), gnn_preds))
     gts = dict(zip(exp_preds.keys(), gt))
+    for idx in test_idx.tolist():
+        entity[idx] = idx_map[idx]["IRI"]
 
     dict_names = ["exp_preds", "gnn_pred", "gts", "entity"]
     list_of_dicts = [exp_preds, gnn_pred, gts, entity]
@@ -149,4 +143,4 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
     print("Ending PG_Explainer")
     t1 = time.time()
     dur = t1 - t0
-    print(f"Total time taken for SubGraphX : {dur:.2f}")
+    print(f"Total time taken for Hetero-PG Explainer on {dataset} : {dur:.2f}")

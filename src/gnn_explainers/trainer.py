@@ -32,7 +32,7 @@ class EarlyStopping:
         if self.prev_score is not None:
             if loss < self.prev_score - self.delta:
                 # Loss decreased
-                self.counter_decrease = 0
+                self.counter_decrease += 0
             elif loss > self.prev_score + self.delta:
                 # Loss increased
                 self.counter_increase += 1
@@ -46,32 +46,43 @@ class EarlyStopping:
         self.prev_score = loss
 
 
-def get_lp_aifb(gnn_pred_dt, idx_map):
-    class_to_pred = {}
-    multi_lp_dict = {}
+def get_lp_mutag_fid(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
+    # Positive and negative examples for training set
+    train_positive_examples = [
+        idx_map[item]["IRI"]
+        for item in gnn_pred_dt_train
+        if gnn_pred_dt_train[item] == 1
+    ]
+    train_negative_examples = [
+        idx_map[item]["IRI"]
+        for item in gnn_pred_dt_train
+        if gnn_pred_dt_train[item] == 0
+    ]
 
-    # Creating new_dict
-    for key, value in gnn_pred_dt.items():
-        class_to_pred.setdefault(value, []).append(key)
+    # Positive and negative examples for test set
+    test_positive_examples = [
+        idx_map[item]["IRI"] for item in gnn_pred_dt_test if gnn_pred_dt_test[item] == 1
+    ]
+    test_negative_examples = [
+        idx_map[item]["IRI"] for item in gnn_pred_dt_test if gnn_pred_dt_test[item] == 0
+    ]
+    assert (
+        len(set(train_positive_examples).intersection(set(train_negative_examples)))
+        == 0
+    )
 
-    # Creating news_dict
-    multi_lp_dict = {
-        f"id{key+1}instance": {
-            "positive_examples": [idx_map[val]["IRI"] for val in values],
-            "negative_examples": [
-                idx_map[val]["IRI"]
-                for k, v in class_to_pred.items()
-                if k != key
-                for val in v
-            ],
+    lp_dict_test_train = {
+        "carcino": {
+            "positive_examples_train": train_positive_examples,
+            "negative_examples_train": train_negative_examples,
+            "positive_examples_test": test_positive_examples,
+            "negative_examples_test": test_negative_examples,
         }
-        for key, values in class_to_pred.items()
     }
+    return lp_dict_test_train
 
-    return multi_lp_dict
 
-
-def get_lp_aifb_train_test(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
+def get_lp_aifb_fid(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
     class_to_pred_train = {}
     class_to_pred_test = {}
 
@@ -86,7 +97,7 @@ def get_lp_aifb_train_test(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
     # Merge training and test dictionaries
     all_class_to_pred = {**class_to_pred_train, **class_to_pred_test}
 
-    multi_lp_dict_train_test = {
+    multi_lp_dict = {
         f"id{key+1}instance": {
             "positive_examples_train": [
                 idx_map[val]["IRI"] for val in class_to_pred_train.get(key, [])
@@ -109,57 +120,17 @@ def get_lp_aifb_train_test(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
         }
         for key in all_class_to_pred.keys()
     }
+    for _, data in multi_lp_dict.items():
+        positive_train_set = set(data["positive_examples_train"])
+        negative_train_set = set(data["negative_examples_train"])
+        positive_test_set = set(data["positive_examples_test"])
+        negative_test_set = set(data["negative_examples_test"])
 
-    return multi_lp_dict_train_test
+        # Assert no common elements between positive and negative sets for training and test set
+        assert len(positive_train_set.intersection(negative_train_set)) == 0
+        assert len(positive_test_set.intersection(negative_test_set)) == 0
 
-
-def get_lp_mutag(gnn_pred_dt, idx_map):
-    positive_examples = [
-        idx_map[item]["IRI"] for item in gnn_pred_dt if gnn_pred_dt[item] == 1
-    ]
-    negative_examples = [
-        idx_map[item]["IRI"] for item in gnn_pred_dt if gnn_pred_dt[item] == 0
-    ]
-
-    lp_dict = {
-        "carcino": {
-            "positive_examples": positive_examples,
-            "negative_examples": negative_examples,
-        }
-    }
-    return lp_dict
-
-
-def get_lp_mutag_train_test(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
-    # Positive and negative examples for training set
-    train_positive_examples = [
-        idx_map[item]["IRI"]
-        for item in gnn_pred_dt_train
-        if gnn_pred_dt_train[item] == 1
-    ]
-    train_negative_examples = [
-        idx_map[item]["IRI"]
-        for item in gnn_pred_dt_train
-        if gnn_pred_dt_train[item] == 0
-    ]
-
-    # Positive and negative examples for test set
-    test_positive_examples = [
-        idx_map[item]["IRI"] for item in gnn_pred_dt_test if gnn_pred_dt_test[item] == 1
-    ]
-    test_negative_examples = [
-        idx_map[item]["IRI"] for item in gnn_pred_dt_test if gnn_pred_dt_test[item] == 0
-    ]
-
-    lp_dict_test_train = {
-        "carcino": {
-            "positive_examples_train": train_positive_examples,
-            "negative_examples_train": train_negative_examples,
-            "positive_examples_test": test_positive_examples,
-            "negative_examples_test": test_negative_examples,
-        }
-    }
-    return lp_dict_test_train
+    return multi_lp_dict
 
 
 def train_gnn(dataset="mutag", device=None, PATH=None):
@@ -187,10 +158,10 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
 
     if validation:
         valid_idx = my_dataset.valid_idx.to(device)
-        test_idx = torch.cat([test_idx, valid_idx], dim=0)
+    else:
+        valid_idx = my_dataset.test_idx.to(device)
 
     idx_map = my_dataset.idx_map
-    pred_idx = torch.cat([train_idx, test_idx], dim=0)
     input_feature = HeteroFeature({}, get_nodes_dict(g), hidden_dim, act=act).to(device)
     model = RGCN(
         hidden_dim,
@@ -199,6 +170,7 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
         e_types,
         num_bases,
         category,
+        num_hidden_layers=hidden_layers,
     ).to(device)
 
     # Define the optimizer
@@ -232,10 +204,10 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
         ).item() / len(train_idx)
         train_accs.append(train_acc)
 
-        val_loss = F.cross_entropy(logits[test_idx], labels[test_idx])
+        val_loss = F.cross_entropy(logits[valid_idx], labels[valid_idx])
         val_acc = th.sum(
-            logits[test_idx].argmax(dim=1) == labels[test_idx]
-        ).item() / len(test_idx)
+            logits[valid_idx].argmax(dim=1) == labels[valid_idx]
+        ).item() / len(valid_idx)
         val_accs.append(val_acc)
         vald_loss.append(val_loss.item())
         print(
@@ -257,9 +229,14 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
         "Creating Learning Problems for Logical Explainers based on GNN Predictions to Calculate Fidelity"
     )
     pred_logit = model(g, h_dict)[category]
+    val_acc_final = th.sum(
+        logits[test_idx].argmax(dim=1) == labels[test_idx]
+    ).item() / len(test_idx)
     gnn_preds_test = pred_logit[test_idx].argmax(dim=1).tolist()
+    if validation:
+        train_idx = torch.cat([train_idx, valid_idx], dim=0)
     gnn_preds_train = pred_logit[train_idx].argmax(dim=1).tolist()
-
+    print(f"Final validation accuracy of the model R-GCN on dataset: {val_acc_final}")
     gnn_pred_dt_train = {
         tensor.item(): pred for tensor, pred in zip(train_idx, gnn_preds_train)
     }
@@ -267,13 +244,11 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
         tensor.item(): pred for tensor, pred in zip(train_idx, gnn_preds_test)
     }
     if dataset == "mutag":
-        lp_data = get_lp_mutag(gnn_pred_dt_test, idx_map)
-        lp_data_train_test = get_lp_mutag_train_test(
+        lp_data_train_test = get_lp_mutag_fid(
             gnn_pred_dt_train, gnn_pred_dt_test, idx_map
         )
     if dataset == "aifb":
-        lp_data = get_lp_aifb(gnn_pred_dt_test, idx_map)
-        lp_data_train_test = get_lp_mutag_train_test(
+        lp_data_train_test = get_lp_aifb_fid(
             gnn_pred_dt_train, gnn_pred_dt_test, idx_map
         )
 
@@ -286,14 +261,11 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
 
     # # File path where you want to store the JSON data
     file_path = f"configs/{dataset}_gnn_preds.json"
-    file_path_train_test = f"configs/{dataset}_gnn_preds_train_test.json"
 
     # # Writing the dictionary to a JSON file with indentation
     with open(file_path, "w") as json_file:
-        json.dump(lp_data, json_file, indent=4)
-
-    with open(file_path_train_test, "w") as json_file:
         json.dump(lp_data_train_test, json_file, indent=4)
+
     print("Saving Trained Model ....!!!!")
 
     save_PATH = f"trained_models/{dataset}_trained.pt"

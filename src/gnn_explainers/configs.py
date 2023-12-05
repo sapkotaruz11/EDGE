@@ -11,7 +11,7 @@ BEST_CONFIGS = {
                 "batch_size": 126,
                 "dropout": 0,
                 "mini_batch_flag": False,
-                "validation": False,
+                "validation": True,
             },
             "mutag": {
                 "lr": 0.005,
@@ -24,7 +24,7 @@ BEST_CONFIGS = {
                 "fanout": 4,
                 "dropout": 0.5,
                 "mini_batch_flag": False,
-                "validation": False,
+                "validation": True,
             },
             "bgs": {
                 "lr": 0.005,
