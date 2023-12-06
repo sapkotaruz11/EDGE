@@ -19,9 +19,9 @@
 # train_evo()
 # train_evo_fid()
 
-# from src.logical_explainers.CELOE import train_celoe, train_celoe_fid
-# train_celoe()
-# train_celoe_fid()
+from src.logical_explainers.CELOE import train_celoe, train_celoe_fid
+train_celoe(use_heur= False)
+train_celoe_fid(use_heur=False)
 
 from src.evaluations import evaluate_gnn_explainers,evaluate_logical_explainers
 evaluate_logical_explainers()

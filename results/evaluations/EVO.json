@@ -3,52 +3,36 @@
     "eval_fid": {
       "Model": "EVO",
       "Metric": "Fidelity",
-      "precision": 0.7272727272714049,
-      "recall": 0.8333333333315972,
-      "f1_score": 0.7766990290749363,
-      "jaccard_similarity": 0.6349206349196271
+      "precision": 0.7058823529397924,
+      "recall": 0.7499999999984375,
+      "f1_score": 0.7272727272213039,
+      "jaccard_similarity": 0.5714285714276643
     },
     "eval_expl_acc": {
       "Model": "EVO",
-      "Metric": "Explanation Accuracy",
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1_score": 0.0,
-      "jaccard_similarity": 0.0
-    },
-    "eval_pred_acc": {
-      "Model": "EVO",
       "Metric": "Prediction Accuracy",
-      "precision": 0.5135135135121256,
-      "recall": 0.8260869565181476,
-      "f1_score": 0.6333333332839444,
-      "jaccard_similarity": 0.46341463414521117
+      "precision": 0.5714285714265307,
+      "recall": 0.695652173910019,
+      "f1_score": 0.6274509803401769,
+      "jaccard_similarity": 0.457142857141551
     }
   },
   "aifb": {
     "eval_fid": {
       "Model": "EVO",
       "Metric": "Fidelity",
-      "precision": 0.4166666666657986,
-      "recall": 0.5555555555540124,
-      "f1_score": 0.4761904761403628,
-      "jaccard_similarity": 0.3124999999995117
+      "precision": 0.3333333333320988,
+      "recall": 0.24999999999930556,
+      "f1_score": 0.2857142856643991,
+      "jaccard_similarity": 0.16666666666635802
     },
     "eval_expl_acc": {
       "Model": "EVO",
-      "Metric": "Explanation Accuracy",
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1_score": 0.0,
-      "jaccard_similarity": 0.0
-    },
-    "eval_pred_acc": {
-      "Model": "EVO",
       "Metric": "Prediction Accuracy",
-      "precision": 0.5208333333322482,
-      "recall": 0.6944444444425154,
-      "f1_score": 0.5952380951876983,
-      "jaccard_similarity": 0.4237288135586038
+      "precision": 0.6176470588217128,
+      "recall": 0.5833333333317129,
+      "f1_score": 0.5999999999483264,
+      "jaccard_similarity": 0.4285714285705539
     }
   }
 }

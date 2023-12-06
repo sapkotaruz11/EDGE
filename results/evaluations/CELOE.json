@@ -10,14 +10,6 @@
     },
     "eval_expl_acc": {
       "Model": "CELOE",
-      "Metric": "Explanation Accuracy",
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1_score": 0.0,
-      "jaccard_similarity": 0.0
-    },
-    "eval_pred_acc": {
-      "Model": "CELOE",
       "Metric": "Prediction Accuracy",
       "precision": 0.7499999999962501,
       "recall": 0.6521739130406428,
@@ -35,14 +27,6 @@
       "jaccard_similarity": 0.21739130434751103
     },
     "eval_expl_acc": {
-      "Model": "CELOE",
-      "Metric": "Explanation Accuracy",
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1_score": 0.0,
-      "jaccard_similarity": 0.0
-    },
-    "eval_pred_acc": {
       "Model": "CELOE",
       "Metric": "Prediction Accuracy",
       "precision": 0.4807692307683062,
