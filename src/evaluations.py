@@ -1,5 +1,5 @@
-from collections import defaultdict
 import json
+from collections import defaultdict
 
 EPSILON = 1e-10  # Small constant to avoid division by zero
 
@@ -220,14 +220,13 @@ def calculate_metrics_logical(predictions_data):
 
     EPSILON = 1e-10  # or any small positive number
 
-    for learning_problem, examples in predictions_data.items():
+    for _, examples in predictions_data.items():
         concept_individuals = set(examples["concept_individuals"])
         pos = set(examples["positive_examples"])
-        neg = set(examples["negative_examples"])
 
         true_positives = len(pos.intersection(concept_individuals))
+        false_positives = len(concept_individuals.difference(pos))
         false_negatives = len(pos.difference(concept_individuals))
-        false_positives = len(neg.intersection(concept_individuals))
 
         micro_true_positives += true_positives
         micro_false_negatives += false_negatives
@@ -272,6 +271,119 @@ def calculate_metrics_logical(predictions_data):
     return precision, recall, f1_score, jaccard_similarity
 
 
+def calculate_metrics_logical_gts(predictions_data, ground_truth_data):
+    micro_true_positives_preds = 0
+    micro_false_positives_preds = 0
+    micro_false_negatives_preds = 0
+
+    micro_true_positives_gts = 0
+    micro_false_positives_gts = 0
+    micro_false_negatives_gts = 0
+
+    EPSILON = 1e-10  # or any small positive number
+
+    for learning_problem, pred_examples in predictions_data.items():
+        # Fetch ground truth data
+        ground_truth_examples = ground_truth_data["problems"][learning_problem]
+        concept_individuals = set(map(str, pred_examples.get("concept_individuals", [])))
+
+        pos_exs_preds = set(map(str, pred_examples.get("positive_examples", [])))
+        pos_exs_gts = set(map(str, ground_truth_examples.get("positive_examples_test", [])))
+    
+        # Calculate metrics for GNN predictions
+        true_positives_preds = len(pos_exs_preds.intersection(concept_individuals))
+        false_positives_preds = len(concept_individuals.difference(pos_exs_preds))
+        false_negatives_preds = len(pos_exs_preds.difference(concept_individuals))
+
+        micro_true_positives_preds += true_positives_preds
+        micro_false_negatives_preds += false_negatives_preds
+        micro_false_positives_preds += false_positives_preds
+
+        # Calculate metrics for ground truth
+        true_positives_gts = len(pos_exs_gts.intersection(concept_individuals))
+        false_positives_gts = len(concept_individuals.difference(pos_exs_gts))
+        false_negatives_gts = len(pos_exs_gts.difference(concept_individuals))
+
+        micro_true_positives_gts += true_positives_gts
+        micro_false_negatives_gts += false_negatives_gts
+        micro_false_positives_gts += false_positives_gts
+
+    
+    # Ensure non-zero denominators by checking for emptiness
+    precision_denominator_preds = (
+        micro_true_positives_preds + micro_false_positives_preds
+    )
+    recall_denominator_preds = micro_true_positives_preds + micro_false_negatives_preds
+
+    precision_denominator_gts = micro_true_positives_gts + micro_false_positives_gts
+    recall_denominator_gts = micro_true_positives_gts + micro_false_negatives_gts
+
+    # Calculate precision, recall, F1 score, and Jaccard similarity for GNN predictions
+    precision_preds = (
+        micro_true_positives_preds / (precision_denominator_preds + EPSILON)
+        if precision_denominator_preds > 0
+        else 0.0
+    )
+    recall_preds = (
+        micro_true_positives_preds / (recall_denominator_preds + EPSILON)
+        if recall_denominator_preds > 0
+        else 0.0
+    )
+    f1_denominator_preds = precision_preds + recall_preds
+    f1_score_preds = (
+        2 * (precision_preds * recall_preds) / (f1_denominator_preds + EPSILON)
+        if f1_denominator_preds > 0
+        else 0.0
+    )
+    jaccard_denominator_preds = (
+        micro_true_positives_preds
+        + micro_false_positives_preds
+        + micro_false_negatives_preds
+    )
+    jaccard_similarity_preds = (
+        micro_true_positives_preds / (jaccard_denominator_preds + EPSILON)
+        if jaccard_denominator_preds > 0
+        else 0.0
+    )
+
+    # Calculate precision, recall, F1 score, and Jaccard similarity for ground truth
+    precision_gts = (
+        micro_true_positives_gts / (precision_denominator_gts + EPSILON)
+        if precision_denominator_gts > 0
+        else 0.0
+    )
+    recall_gts = (
+        micro_true_positives_gts / (recall_denominator_gts + EPSILON)
+        if recall_denominator_gts > 0
+        else 0.0
+    )
+    f1_denominator_gts = precision_gts + recall_gts
+    f1_score_gts = (
+        2 * (precision_gts * recall_gts) / (f1_denominator_gts + EPSILON)
+        if f1_denominator_gts > 0
+        else 0.0
+    )
+    jaccard_denominator_gts = (
+        micro_true_positives_gts + micro_false_positives_gts + micro_false_negatives_gts
+    )
+    jaccard_similarity_gts = (
+        micro_true_positives_gts / (jaccard_denominator_gts + EPSILON)
+        if jaccard_denominator_gts > 0
+        else 0.0
+    )
+
+    return (
+        precision_preds,
+        recall_preds,
+        f1_score_preds,
+        jaccard_similarity_preds,
+        precision_gts,
+        recall_gts,
+        f1_score_gts,
+        jaccard_similarity_gts,
+    )
+
+
 def evaluate_logical_explainers(explainers=None, KGs=None):
     if explainers is None:
         explainers = ["EVO", "CELOE"]
@@ -285,12 +397,13 @@ def evaluate_logical_explainers(explainers=None, KGs=None):
         for kg in KGs:
             # Evaluate prediction accuracy
             file_path = f"results/predictions/{explainer}/{kg}.json"
+
             with open(file_path, "r") as file:
                 predictions_data = json.load(file)
             micro_metrics = calculate_metrics_logical(predictions_data)
-            eval_expl_acc = {
+            eval_pred_acc = {
                 "Model": explainer,
-                "Metric": "Explanation Accuracy",
+                "Metric": "Prediction Accuracy",
                 "precision": micro_metrics[0],
                 "recall": micro_metrics[1],
                 "f1_score": micro_metrics[2],
@@ -298,22 +411,40 @@ def evaluate_logical_explainers(explainers=None, KGs=None):
             }
 
             # Evaluate fidelity
-            file_path = f"results/predictions/{explainer}/{kg}_gnn_preds.json"
-            with open(file_path, "r") as file:
+            file_path_fid = (
+                f"results/predictions/{explainer}/{kg}_gnn_preds.json"
+            )
+            file_path_gts = f"configs/{kg}.json"
+
+            with open(file_path_fid, "r") as file:
                 predictions_data = json.load(file)
-            micro_metrics = calculate_metrics_logical(predictions_data)
+
+            with open(file_path_gts, "r") as file:
+                gts_data = json.load(file)
+            micro_metrics_gts = calculate_metrics_logical_gts(
+                predictions_data, gts_data
+            )
             eval_fid = {
                 "Model": explainer,
                 "Metric": "Fidelity",
-                "precision": micro_metrics[0],
-                "recall": micro_metrics[1],
-                "f1_score": micro_metrics[2],
-                "jaccard_similarity": micro_metrics[3],
+                "precision": micro_metrics_gts[0],
+                "recall": micro_metrics_gts[1],
+                "f1_score": micro_metrics_gts[2],
+                "jaccard_similarity": micro_metrics_gts[3],
+            }
+            eval_expl_acc = {
+                "Model": explainer,
+                "Metric": "Explanation Accuracy",
+                "precision": micro_metrics_gts[4],
+                "recall": micro_metrics_gts[5],
+                "f1_score": micro_metrics_gts[6],
+                "jaccard_similarity": micro_metrics_gts[7],
             }
 
             results[kg] = {
                 "eval_fid": eval_fid,
                 "eval_expl_acc": eval_expl_acc,
+                "eval_pred_acc": eval_pred_acc,
             }
 
         # Save results to file

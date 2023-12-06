@@ -11,44 +11,44 @@
     "eval_fid": {
       "Model": "SubGraphX",
       "Metric": "Explanation Fidelity",
-      "precision": 0.8888888888864197,
-      "recall": 0.8888888888864197,
-      "f1_score": 0.8888888888364197,
-      "jaccard_similarity": 0.799999999998
+      "precision": 0.6944444444425154,
+      "recall": 0.6944444444425154,
+      "f1_score": 0.6944444443925154,
+      "jaccard_similarity": 0.5319148936158895
     },
     "eval_expl_acc": {
       "Model": "SubGraphX",
       "Metric": "Explanation Accuracy",
-      "precision": 0.8888888888864197,
-      "recall": 0.8888888888864197,
-      "f1_score": 0.8888888888364197,
-      "jaccard_similarity": 0.799999999998
+      "precision": 0.6666666666648148,
+      "recall": 0.6666666666648148,
+      "f1_score": 0.6666666666148148,
+      "jaccard_similarity": 0.49999999999895833
     }
   },
   "mutag": {
     "eval_pred": {
       "Model": "Hetero-RGCN",
       "Metric": "Prediction Accuracy",
-      "precision": 0.7826086956504725,
+      "precision": 0.7499999999984375,
       "recall": 0.7999999999982222,
-      "f1_score": 0.7912087911570583,
-      "jaccard_similarity": 0.6545454545442645
+      "f1_score": 0.7741935483354838,
+      "jaccard_similarity": 0.631578947367313
     },
     "eval_fid": {
       "Model": "SubGraphX",
       "Metric": "Explanation Fidelity",
-      "precision": 0.7884615384600222,
-      "recall": 0.8913043478241494,
-      "f1_score": 0.8367346938260308,
-      "jaccard_similarity": 0.7192982456127731
+      "precision": 0.7499999999986607,
+      "recall": 0.8936170212746944,
+      "f1_score": 0.8155339805313224,
+      "jaccard_similarity": 0.6885245901628056
     },
     "eval_expl_acc": {
       "Model": "SubGraphX",
       "Metric": "Explanation Accuracy",
-      "precision": 0.7115384615370932,
-      "recall": 0.822222222220395,
-      "f1_score": 0.7628865978868317,
-      "jaccard_similarity": 0.6166666666656389
+      "precision": 0.6428571428559948,
+      "recall": 0.7999999999982222,
+      "f1_score": 0.7128712870778943,
+      "jaccard_similarity": 0.5538461538453018
     }
   }
 }

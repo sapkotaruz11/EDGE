@@ -11,44 +11,44 @@
     "eval_fid": {
       "Model": "PGExplainer",
       "Metric": "Explanation Fidelity",
-      "precision": 0.9166666666641203,
-      "recall": 0.9166666666641203,
-      "f1_score": 0.9166666666141203,
-      "jaccard_similarity": 0.8461538461516764
+      "precision": 0.944444444441821,
+      "recall": 0.944444444441821,
+      "f1_score": 0.944444444391821,
+      "jaccard_similarity": 0.8947368421029085
     },
     "eval_expl_acc": {
       "Model": "PGExplainer",
       "Metric": "Explanation Accuracy",
-      "precision": 0.9166666666641203,
-      "recall": 0.9166666666641203,
-      "f1_score": 0.9166666666141203,
-      "jaccard_similarity": 0.8461538461516764
+      "precision": 0.8888888888864197,
+      "recall": 0.8888888888864197,
+      "f1_score": 0.8888888888364197,
+      "jaccard_similarity": 0.799999999998
     }
   },
   "mutag": {
     "eval_pred": {
       "Model": "Hetero-RGCN",
       "Metric": "Prediction Accuracy",
-      "precision": 0.7826086956504725,
+      "precision": 0.7499999999984375,
       "recall": 0.7999999999982222,
-      "f1_score": 0.7912087911570583,
-      "jaccard_similarity": 0.6545454545442645
+      "f1_score": 0.7741935483354838,
+      "jaccard_similarity": 0.631578947367313
     },
     "eval_fid": {
       "Model": "PGExplainer",
       "Metric": "Explanation Fidelity",
-      "precision": 0.7735849056589177,
-      "recall": 0.8913043478241494,
-      "f1_score": 0.828282828231405,
-      "jaccard_similarity": 0.7068965517229191
+      "precision": 0.8478260869546786,
+      "recall": 0.8124999999983072,
+      "f1_score": 0.8297872339908103,
+      "jaccard_similarity": 0.7090909090896198
     },
     "eval_expl_acc": {
       "Model": "PGExplainer",
       "Metric": "Explanation Accuracy",
-      "precision": 0.7169811320741188,
-      "recall": 0.8444444444425678,
-      "f1_score": 0.7755102040303831,
-      "jaccard_similarity": 0.6333333333322777
+      "precision": 0.6739130434767958,
+      "recall": 0.688888888887358,
+      "f1_score": 0.68131868126719,
+      "jaccard_similarity": 0.5166666666658055
     }
   }
 }

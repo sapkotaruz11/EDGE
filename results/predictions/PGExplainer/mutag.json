@@ -1,31 +1,31 @@
 {
   "9193": {
-    "exp_preds": 1,
+    "exp_preds": 0,
     "gnn_pred": 0,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d103"
   },
   "9197": {
-    "exp_preds": 1,
+    "exp_preds": 0,
     "gnn_pred": 0,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d107"
   },
   "9198": {
     "exp_preds": 0,
-    "gnn_pred": 0,
+    "gnn_pred": 1,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d108"
   },
   "9200": {
-    "exp_preds": 1,
+    "exp_preds": 0,
     "gnn_pred": 1,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d11"
   },
   "9203": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
+    "exp_preds": 0,
+    "gnn_pred": 0,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d112"
   },
@@ -42,7 +42,7 @@
     "entity": "http://dl-learner.org/carcinogenesis#d123"
   },
   "9219": {
-    "exp_preds": 1,
+    "exp_preds": 0,
     "gnn_pred": 1,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d127"
@@ -109,18 +109,18 @@
   },
   "9276": {
     "exp_preds": 1,
-    "gnn_pred": 0,
+    "gnn_pred": 1,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d179"
   },
   "9278": {
     "exp_preds": 0,
-    "gnn_pred": 1,
+    "gnn_pred": 0,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d180"
   },
   "9292": {
-    "exp_preds": 1,
+    "exp_preds": 0,
     "gnn_pred": 0,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d193"
@@ -138,8 +138,8 @@
     "entity": "http://dl-learner.org/carcinogenesis#d207"
   },
   "9315": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
+    "exp_preds": 0,
+    "gnn_pred": 0,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d212"
   },
@@ -181,7 +181,7 @@
   },
   "9351": {
     "exp_preds": 1,
-    "gnn_pred": 1,
+    "gnn_pred": 0,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d244"
   },
@@ -193,7 +193,7 @@
   },
   "9361": {
     "exp_preds": 1,
-    "gnn_pred": 0,
+    "gnn_pred": 1,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d253"
   },
@@ -204,7 +204,7 @@
     "entity": "http://dl-learner.org/carcinogenesis#d260"
   },
   "9388": {
-    "exp_preds": 1,
+    "exp_preds": 0,
     "gnn_pred": 1,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d278"
@@ -234,20 +234,20 @@
     "entity": "http://dl-learner.org/carcinogenesis#d305"
   },
   "9430": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
+    "exp_preds": 0,
+    "gnn_pred": 0,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d315"
   },
   "9437": {
     "exp_preds": 1,
-    "gnn_pred": 0,
+    "gnn_pred": 1,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d321"
   },
   "9439": {
     "exp_preds": 0,
-    "gnn_pred": 0,
+    "gnn_pred": 1,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d323"
   },
@@ -258,20 +258,20 @@
     "entity": "http://dl-learner.org/carcinogenesis#d326"
   },
   "9443": {
-    "exp_preds": 0,
+    "exp_preds": 1,
     "gnn_pred": 1,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d327"
   },
   "9445": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
+    "exp_preds": 0,
+    "gnn_pred": 0,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d329"
   },
   "9447": {
-    "exp_preds": 1,
-    "gnn_pred": 1,
+    "exp_preds": 0,
+    "gnn_pred": 0,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d330"
   },
@@ -306,7 +306,7 @@
     "entity": "http://dl-learner.org/carcinogenesis#d38"
   },
   "9463": {
-    "exp_preds": 1,
+    "exp_preds": 0,
     "gnn_pred": 1,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d40"
@@ -330,13 +330,13 @@
     "entity": "http://dl-learner.org/carcinogenesis#d46"
   },
   "9471": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
+    "exp_preds": 1,
+    "gnn_pred": 1,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d48"
   },
   "9472": {
-    "exp_preds": 1,
+    "exp_preds": 0,
     "gnn_pred": 1,
     "gts": 1,
     "entity": "http://dl-learner.org/carcinogenesis#d49"
@@ -348,14 +348,14 @@
     "entity": "http://dl-learner.org/carcinogenesis#d52"
   },
   "9478": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
+    "exp_preds": 1,
+    "gnn_pred": 1,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d54"
   },
   "9486": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
+    "exp_preds": 1,
+    "gnn_pred": 1,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d61"
   },
@@ -378,14 +378,14 @@
     "entity": "http://dl-learner.org/carcinogenesis#d75"
   },
   "9502": {
-    "exp_preds": 0,
+    "exp_preds": 1,
     "gnn_pred": 1,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d76"
   },
   "9504": {
-    "exp_preds": 0,
-    "gnn_pred": 0,
+    "exp_preds": 1,
+    "gnn_pred": 1,
     "gts": 0,
     "entity": "http://dl-learner.org/carcinogenesis#d78"
   },

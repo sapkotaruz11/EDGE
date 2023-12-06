@@ -74,7 +74,7 @@ def train_evo(file_path=None, kgs=None):
         print(f"Trained EvoLearner  on (prediction) {kg} dataset on {dur : .2f}")
 
 
-def train_evo_train(file_path=None, kgs=None):
+def train_evo_fid(file_path=None, kgs=None):
     if kgs is None:
         kgs = ["mutag", "aifb"]
 
