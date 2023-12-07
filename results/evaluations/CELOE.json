@@ -3,24 +3,27 @@
     "eval_fid": {
       "Model": "CELOE",
       "Metric": "Fidelity",
-      "precision": 0.7213114754086536,
-      "recall": 0.9166666666647569,
-      "f1_score": 0.8073394494905143,
-      "jaccard_similarity": 0.6769230769220355
+      "evaluations": "micro",
+      "precision": 0.6911764705872189,
+      "recall": 0.6911764705872189,
+      "f1_score": 0.6911764705372189,
+      "jaccard_similarity": 0.5280898876398561
     },
     "eval_expl_acc": {
       "Model": "CELOE",
       "Metric": "Prediction Accuracy",
-      "precision": 0.7499999999962501,
-      "recall": 0.6521739130406428,
-      "f1_score": 0.6976744185516496,
-      "jaccard_similarity": 0.5357142857123725
+      "evaluations": "micro",
+      "precision": 0.8088235294105752,
+      "recall": 0.8088235294105752,
+      "f1_score": 0.8088235293605752,
+      "jaccard_similarity": 0.679012345678174
     }
   },
   "aifb": {
     "eval_fid": {
       "Model": "CELOE",
       "Metric": "Fidelity",
+      "evaluations": "micro",
       "precision": 0.31249999999934897,
       "recall": 0.4166666666655092,
       "f1_score": 0.35714285709302723,
@@ -29,6 +32,7 @@
     "eval_expl_acc": {
       "Model": "CELOE",
       "Metric": "Prediction Accuracy",
+      "evaluations": "micro",
       "precision": 0.4807692307683062,
       "recall": 0.6944444444425154,
       "f1_score": 0.5681818181321797,

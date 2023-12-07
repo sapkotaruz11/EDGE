@@ -145,13 +145,17 @@ def evaluate_gnn_explainers(
                 ) = calculate_micro_metrics(gts_list, gnn_pred_list)
 
             else:
-                precision, recall, f1_score, jaccard_similarity = calculate_metrics(
-                    gts_list, gnn_pred_list
-                )
+                (
+                    precision,
+                    recall,
+                    f1_score,
+                    jaccard_similarity,
+                ) = calculate_micro_metrics(gts_list, gnn_pred_list)
 
             eval_preds = {
                 "Model": "Hetero-RGCN",
                 "Metric": "Prediction Accuracy",
+                "evaluations" : "micro",
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
@@ -166,13 +170,17 @@ def evaluate_gnn_explainers(
                 ) = calculate_micro_metrics(gnn_pred_list, exp_preds_list)
 
             else:
-                precision, recall, f1_score, jaccard_similarity = calculate_metrics(
-                    gnn_pred_list, exp_preds_list
-                )
+                (
+                    precision,
+                    recall,
+                    f1_score,
+                    jaccard_similarity,
+                ) = calculate_micro_metrics(gnn_pred_list, exp_preds_list)
 
             eval_fids = {
                 "Model": explainer,
                 "Metric": "Explanation Fidelity",
+                "evaluations" : "micro",
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
@@ -187,13 +195,17 @@ def evaluate_gnn_explainers(
                 ) = calculate_micro_metrics(gts_list, exp_preds_list)
 
             else:
-                precision, recall, f1_score, jaccard_similarity = calculate_metrics(
-                    gts_list, exp_preds_list
-                )
+                (
+                    precision,
+                    recall,
+                    f1_score,
+                    jaccard_similarity,
+                ) = calculate_micro_metrics(gts_list, exp_preds_list)
 
             eval_exp_acc = {
                 "Model": explainer,
                 "Metric": "Explanation Accuracy",
+                "evaluations" : "micro",
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
@@ -214,6 +226,24 @@ def evaluate_gnn_explainers(
 
 
 def calculate_metrics_logical(predictions_data):
+    num_problems = len(predictions_data)
+
+    if num_problems == 1:
+        for _, examples in predictions_data.items():
+            concept_individuals = set(examples["concept_individuals"])
+            pos = set(examples["positive_examples"])
+            neg = set(examples["negative_examples"])
+
+            all_examples = pos.union(neg)
+
+            gts = [1 if item in pos else 0 for item in all_examples]
+            preds = [1 if item in concept_individuals else 0 for item in all_examples]
+            precision, recall, f1_score, jaccard_similarity = calculate_micro_metrics(
+                gts, preds
+            )
+
+            return precision, recall, f1_score, jaccard_similarity
+
     micro_true_positives = 0
     micro_false_positives = 0
     micro_false_negatives = 0
@@ -271,7 +301,6 @@ def calculate_metrics_logical(predictions_data):
     return precision, recall, f1_score, jaccard_similarity
 
 
-
 def evaluate_logical_explainers(explainers=None, KGs=None):
     if explainers is None:
         explainers = ["EVO", "CELOE"]
@@ -292,6 +321,7 @@ def evaluate_logical_explainers(explainers=None, KGs=None):
             eval_pred_acc = {
                 "Model": explainer,
                 "Metric": "Prediction Accuracy",
+                "evaluations" : "micro",
                 "precision": micro_metrics[0],
                 "recall": micro_metrics[1],
                 "f1_score": micro_metrics[2],
@@ -299,20 +329,17 @@ def evaluate_logical_explainers(explainers=None, KGs=None):
             }
 
             # Evaluate fidelity
-            file_path_fid = (
-                f"results/predictions/{explainer}/{kg}_gnn_preds.json"
-            )
+            file_path_fid = f"results/predictions/{explainer}/{kg}_gnn_preds.json"
             file_path_gts = f"configs/{kg}.json"
 
             with open(file_path_fid, "r") as file:
                 predictions_data_fid = json.load(file)
-                
-            micro_metrics_gts = calculate_metrics_logical(
-                predictions_data_fid
-            )
+
+            micro_metrics_gts = calculate_metrics_logical(predictions_data_fid)
             eval_fid = {
                 "Model": explainer,
                 "Metric": "Fidelity",
+                "evaluations" : "micro",
                 "precision": micro_metrics_gts[0],
                 "recall": micro_metrics_gts[1],
                 "f1_score": micro_metrics_gts[2],

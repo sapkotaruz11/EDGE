@@ -3,6 +3,7 @@
     "eval_pred": {
       "Model": "Hetero-RGCN",
       "Metric": "Prediction Accuracy",
+      "evaluations": "micro",
       "precision": 0.944444444441821,
       "recall": 0.944444444441821,
       "f1_score": 0.944444444391821,
@@ -11,6 +12,7 @@
     "eval_fid": {
       "Model": "SubGraphX",
       "Metric": "Explanation Fidelity",
+      "evaluations": "micro",
       "precision": 0.6944444444425154,
       "recall": 0.6944444444425154,
       "f1_score": 0.6944444443925154,
@@ -19,6 +21,7 @@
     "eval_expl_acc": {
       "Model": "SubGraphX",
       "Metric": "Explanation Accuracy",
+      "evaluations": "micro",
       "precision": 0.6666666666648148,
       "recall": 0.6666666666648148,
       "f1_score": 0.6666666666148148,
@@ -29,26 +32,29 @@
     "eval_pred": {
       "Model": "Hetero-RGCN",
       "Metric": "Prediction Accuracy",
-      "precision": 0.7499999999984375,
-      "recall": 0.7999999999982222,
-      "f1_score": 0.7741935483354838,
-      "jaccard_similarity": 0.631578947367313
+      "evaluations": "micro",
+      "precision": 0.6911764705872189,
+      "recall": 0.6911764705872189,
+      "f1_score": 0.6911764705372189,
+      "jaccard_similarity": 0.5280898876398561
     },
     "eval_fid": {
       "Model": "SubGraphX",
       "Metric": "Explanation Fidelity",
-      "precision": 0.7499999999986607,
-      "recall": 0.8936170212746944,
-      "f1_score": 0.8155339805313224,
-      "jaccard_similarity": 0.6885245901628056
+      "evaluations": "micro",
+      "precision": 0.7058823529401383,
+      "recall": 0.7058823529401383,
+      "f1_score": 0.7058823528901383,
+      "jaccard_similarity": 0.5454545454539256
     },
     "eval_expl_acc": {
       "Model": "SubGraphX",
       "Metric": "Explanation Accuracy",
-      "precision": 0.6428571428559948,
-      "recall": 0.7999999999982222,
-      "f1_score": 0.7128712870778943,
-      "jaccard_similarity": 0.5538461538453018
+      "evaluations": "micro",
+      "precision": 0.5588235294109429,
+      "recall": 0.5588235294109429,
+      "f1_score": 0.5588235293609429,
+      "jaccard_similarity": 0.38775510204042063
     }
   }
 }

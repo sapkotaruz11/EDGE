@@ -1,5 +1,6 @@
 import json
 import os
+import pandas as pd
 
 from prettytable import PrettyTable
 
@@ -10,34 +11,42 @@ def read_json_file(file_path):
     return data
 
 
-def print_data_as_table(data):
+def print_data_as_table(data, save_to_df=True):
     table = PrettyTable()
     table.field_names = [
         "Dataset",
         "Model",
         "Metric",
+        "Evaluations",
         "Precision",
         "Recall",
         "F1 Score",
         "Jaccard Similarity",
     ]
-
+    rows = []
     for dataset, evaluations in data.items():
         for metric_name, metrics in evaluations.items():
-            table.add_row(
-                [
-                    str.upper(dataset.split("_")[1]),
-                    metrics["Model"],
-                    metrics["Metric"],
-                    metrics["precision"],
-                    metrics["recall"],
-                    metrics["f1_score"],
-                    metrics["jaccard_similarity"],
-                ]
-            )
-            table.add_row(["-------"] * len(table.field_names))
+            row = [
+                str.upper(dataset.split("_")[1]),
+                metrics["Model"],
+                metrics["Metric"],
+                metrics["evaluations"],
+                metrics["precision"],
+                metrics["recall"],
+                metrics["f1_score"],
+                metrics["jaccard_similarity"],
+            ]
+            rows.append(row)
 
+    # Print the table
+    table.add_rows(rows)
     print(table)
+    # Create a DataFrame from the data
+    if save_to_df:
+        df = pd.DataFrame(rows, columns=table.field_names)
+
+        # Write the DataFrame to a CSV file
+        df.to_csv("eval_data.csv", index=False)
 
 
 def process_files_in_directory(directory):
@@ -52,9 +61,9 @@ def process_files_in_directory(directory):
     return all_data
 
 
-def print_results():
+def print_results(to_csv=True):
     directory_path = (
         "results/evaluations/"  # Replace with the actual path to your directory
     )
     all_data = process_files_in_directory(directory_path)
-    print_data_as_table(all_data)
+    print_data_as_table(all_data, to_csv)
