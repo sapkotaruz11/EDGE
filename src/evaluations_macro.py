@@ -1,5 +1,5 @@
-from collections import defaultdict
 import json
+from collections import defaultdict
 
 
 def calculate_macro_metrics(y_true, y_pred, no_result_value=-1, EPSILON=1e-10):

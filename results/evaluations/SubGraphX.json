@@ -11,7 +11,7 @@
     },
     "eval_fid": {
       "Model": "SubGraphX",
-      "Metric": "Explanation Fidelity",
+      "Metric": "Fidelity",
       "evaluations": "micro",
       "precision": 0.6944444444425154,
       "recall": 0.6944444444425154,
@@ -40,7 +40,7 @@
     },
     "eval_fid": {
       "Model": "SubGraphX",
-      "Metric": "Explanation Fidelity",
+      "Metric": "Fidelity",
       "evaluations": "micro",
       "precision": 0.7058823529401383,
       "recall": 0.7058823529401383,

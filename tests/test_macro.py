@@ -1,8 +1,10 @@
 # tests/test_your_module.py
 
-from src.evaluations_macro import calculate_macro_metrics
-from sklearn.metrics import precision_score, recall_score, f1_score, jaccard_score
 import numpy as np
+from sklearn.metrics import (f1_score, jaccard_score, precision_score,
+                             recall_score)
+
+from src.evaluations_macro import calculate_macro_metrics
 
 
 def test_calculate_macro_metrics_binary():

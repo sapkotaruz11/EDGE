@@ -1,8 +1,10 @@
 # tests/test_your_module.py
 
-from src.evaluations import calculate_micro_metrics
-from sklearn.metrics import precision_score, recall_score, f1_score, jaccard_score
 import numpy as np
+from sklearn.metrics import (f1_score, jaccard_score, precision_score,
+                             recall_score)
+
+from src.evaluations import calculate_micro_metrics
 
 
 def test_calculate_micro_metrics_binary():

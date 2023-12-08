@@ -93,14 +93,19 @@ def visualize_hd(
     except Exception as e:
         print(f"An exception occurred while clearing the plot: {e}")
     # create data for legend and caption
+    new_list_types = []
+    curent_nodetypes_to_all_nodetypes = []
+    for _ in range(len(hd_graph.ndata._ntype)):
+        # ntype = hd_graph.ntypes[_]
+        # if len(hd_graph.nodes(ntype)) < 1:
+        #     new_list_types.append(ntype)
+        all_nodetypes_index = list_all_nodetypes.index(hd_graph.ntypes[_])
+        curent_nodetypes_to_all_nodetypes.append([_, all_nodetypes_index])
+    # list_all_nodetypes = new_list_types
     number_of_node_types_for_colors = len(list_all_nodetypes)
     colors = generate_colors(number_of_node_types_for_colors)
     if number_of_node_types_for_colors == 4:
         colors = ["#59a14f", "#f28e2b", "#4e79a7", "#e15759"]
-    curent_nodetypes_to_all_nodetypes = []
-    for _ in range(len(hd_graph.ndata._ntype)):
-        all_nodetypes_index = list_all_nodetypes.index(hd_graph.ntypes[_])
-        curent_nodetypes_to_all_nodetypes.append([_, all_nodetypes_index])
     # create nx graph to visualize
     Gnew = nx.Graph()
     homdata = dgl.to_homogeneous(hd_graph)
@@ -173,26 +178,49 @@ def visualize_hd(
         )
         name_list.append(hd_graph.ntypes[i])
     # create caption
+    # Special node type to explain
+    special_node_color = "#76b7b2"  # Example color for the special node type
+    special_node_label = "Target Node"
+    from matplotlib.patches import Patch
+
+    # Add the special node type to the legend
+    patch_list.append(Patch(color=special_node_color))
+    name_list.append(special_node_label)
     caption_text = add_info
     caption_size = adjust_caption_size_exp(
         caption_length=len(add_info), max_size=18, min_size=8, rate=0.1
     )
-    caption_position = (0.5, 0.1)
+    caption_position = (0.5, -0.1)
     # folder to save in:
-    folder = remove_integers_at_end(addname_for_save)
-    number_ce = get_last_number(addname_for_save)
-    if name_folder == "":
-        name_plot_save = "content/plots/" + "/" + folder + str(number_ce)
-    else:
-        name_plot_save = (
-            name_folder + "HeteroBAShapes" + "/ce_" + str(number_ce) + "_graph_"
-        )
-    name_plot_save = uniquify(name_plot_save, "_wo_text.pdf")
+    name_plot_save = f"results/exp_visualizations/{addname_for_save}"
     directory = os.path.dirname(name_plot_save)
     if not os.path.exists(directory):
         os.makedirs(directory)
-    plt.savefig(name_plot_save + "_wo_text.pdf", bbox_inches="tight", format="pdf")
-    plt.legend(patch_list, name_list)
+
+    # Define the file paths
+    file_path_wo_legend = f"{name_plot_save}_wo.png"
+    file_path_with_legend = f"{name_plot_save}.png"
+
+    # Remove the existing files if they exist
+    if os.path.exists(file_path_wo_legend):
+        os.remove(file_path_wo_legend)
+
+    if os.path.exists(file_path_with_legend):
+        os.remove(file_path_with_legend)
+
+    # Save the figure without legend and caption
+    plt.savefig(file_path_wo_legend, bbox_inches="tight")
+
+    # Create legend and caption separately to avoid overlapping
+    plt.legend(
+        patch_list,
+        name_list,
+        loc="lower left",
+    )
+
+    # Save the figure with legend and caption
     plt.figtext(*caption_position, caption_text, ha="center", size=caption_size)
-    name_plot_save = uniquify(name_plot_save)
-    plt.savefig(name_plot_save + ".pdf", bbox_inches="tight", format="pdf")
+    plt.savefig(file_path_with_legend, bbox_inches="tight")
+
+    # Show the plot
+    plt.show()

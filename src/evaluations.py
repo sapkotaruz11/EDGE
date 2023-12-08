@@ -179,7 +179,7 @@ def evaluate_gnn_explainers(
 
             eval_fids = {
                 "Model": explainer,
-                "Metric": "Explanation Fidelity",
+                "Metric": "Fidelity",
                 "evaluations" : "micro",
                 "precision": precision,
                 "recall": recall,

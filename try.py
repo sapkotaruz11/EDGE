@@ -23,18 +23,24 @@
 # train_celoe(use_heur= False)
 # train_celoe_fid(use_heur=False)
 
-from src.evaluations_macro import evaluate_gnn_explainers,evaluate_logical_explainers
+from src.evaluations_macro import (evaluate_gnn_explainers,
+                                   evaluate_logical_explainers)
+
 evaluate_logical_explainers()
 evaluate_gnn_explainers()
 from src.print_results import print_results
+
 print_results()
 print("_____________________________")
 print("_____________________________")
-from src.evaluations import evaluate_gnn_explainers,evaluate_logical_explainers
+from src.evaluations import (evaluate_gnn_explainers,
+                             evaluate_logical_explainers)
+
 evaluate_logical_explainers()
 evaluate_gnn_explainers()
 
 from src.print_results import print_results
+
 print_results()
 
 # from src.gnn_explainers.trainer import train_gnn

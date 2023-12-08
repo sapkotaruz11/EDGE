@@ -11,7 +11,7 @@
     },
     "eval_fid": {
       "Model": "PGExplainer",
-      "Metric": "Explanation Fidelity",
+      "Metric": "Fidelity",
       "evaluations": "micro",
       "precision": 0.944444444441821,
       "recall": 0.944444444441821,
@@ -40,7 +40,7 @@
     },
     "eval_fid": {
       "Model": "PGExplainer",
-      "Metric": "Explanation Fidelity",
+      "Metric": "Fidelity",
       "evaluations": "micro",
       "precision": 0.7647058823518166,
       "recall": 0.7647058823518166,

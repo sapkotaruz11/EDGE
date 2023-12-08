@@ -1,8 +1,10 @@
 # tests/test_your_module.py
 
-from src.evaluations import calculate_metrics_logical
-from sklearn.metrics import precision_recall_fscore_support, jaccard_score
 import math
+
+from sklearn.metrics import jaccard_score, precision_recall_fscore_support
+
+from src.evaluations import calculate_metrics_logical
 
 
 def assert_almost_equal(actual, expected, rel_tol=1e-9, abs_tol=0.0):
