@@ -10,39 +10,11 @@ import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import networkx as nx
 import torch
+from matplotlib.patches import Patch
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("matplotlib")
 logger.setLevel(logging.WARNING)
-
-
-# ---------------- utils
-def uniquify(path, extension=".pdf"):
-    if path.endswith("_"):
-        path += "1"
-        counter = 1
-    while os.path.exists(path + extension):
-        counter += 1
-        while path and path[-1].isdigit():
-            path = path[:-1]
-        path += str(counter)
-    return path
-
-
-def remove_integers_at_end(string):
-    pattern = r"\d+$"  # Matches one or more digits at the end of the string
-    result = re.sub(pattern, "", string)
-    return result
-
-
-def get_last_number(string):
-    pattern = r"\d+$"  # Matches one or more digits at the end of the string
-    match = re.search(pattern, string)
-    if match:
-        last_number = match.group()
-        return int(last_number)
-    else:
-        return None
 
 
 def generate_colors(num_colors):
@@ -79,45 +51,38 @@ def adjust_caption_size_exp(caption_length, max_size=18, min_size=8, rate=0.1):
     return max(min_size, min(font_size, max_size))
 
 
-def visualize_hd(
+def visualize_hetero_graph(
     hd_graph,
     inverse_indices,
-    addname_for_save,
-    list_all_nodetypes,
-    label_to_explain=None,
-    add_info="",
-    name_folder="",
+    file_name,
+    target_dir=None,
+    caption=None,
+    with_labels=True,
 ):
     try:
         plt.clf()
     except Exception as e:
         print(f"An exception occurred while clearing the plot: {e}")
+
+    list_all_nodetypes = [
+        ntype for ntype in hd_graph.ntypes if len(hd_graph.nodes(ntype)) > 0
+    ]
     # create data for legend and caption
-    new_list_types = []
-    curent_nodetypes_to_all_nodetypes = []
-    for _ in range(len(hd_graph.ndata._ntype)):
-        # ntype = hd_graph.ntypes[_]
-        # if len(hd_graph.nodes(ntype)) < 1:
-        #     new_list_types.append(ntype)
-        all_nodetypes_index = list_all_nodetypes.index(hd_graph.ntypes[_])
-        curent_nodetypes_to_all_nodetypes.append([_, all_nodetypes_index])
-    # list_all_nodetypes = new_list_types
-    number_of_node_types_for_colors = len(list_all_nodetypes)
+    curent_nodetypes_to_all_nodetypes = [
+        [count, hd_graph.ntypes.index(_)] for count, _ in enumerate(list_all_nodetypes)
+    ]
+
+    number_of_node_types_for_colors = len(curent_nodetypes_to_all_nodetypes)
     colors = generate_colors(number_of_node_types_for_colors)
-    if number_of_node_types_for_colors == 4:
-        colors = ["#59a14f", "#f28e2b", "#4e79a7", "#e15759"]
+
     # create nx graph to visualize
     Gnew = nx.Graph()
     homdata = dgl.to_homogeneous(hd_graph)
     homdata.edge_index = torch.stack(homdata.edges(), dim=0)
-    # num_nodes_of_graph = len(homdata.ndata["_TYPE"].tolist())
     Gnew.add_nodes_from(list(range(homdata.num_nodes())))
-    # add edges
-    list_edges_start, list_edges_end = (
-        homdata.edge_index.tolist()[0],
-        homdata.edge_index.tolist()[1],
-    )
 
+    # add edges
+    list_edges_start, list_edges_end = homdata.edge_index.tolist()
     nodes_to_explain = [
         count
         for item, tensors in inverse_indices.items()
@@ -127,100 +92,68 @@ def visualize_hd(
         for item_count, _ in enumerate(tensors)
         if item_count in [tensor.item() for tensor in tensors]
     ]
+
     label_dict = {}
     node_color = []
-    for count, _ in enumerate(homdata.ndata["_ID"].tolist()):
-        label_dict[count] = list_all_nodetypes[homdata.ndata["_TYPE"][count].tolist()][
-            :2
-        ]
+    ntypes_list = homdata.ndata["_TYPE"].tolist()
+    for count, item in enumerate(ntypes_list):
+        node_label_to_index = list_all_nodetypes.index(hd_graph.ntypes[item])
+        label_dict[count] = list_all_nodetypes[node_label_to_index][:3]
         if count in nodes_to_explain:
             node_color.append("#76b7b2")
         else:
-            node_color.append(colors[homdata.ndata["_TYPE"][count].tolist()])
+            node_color.append(colors[node_label_to_index])
 
     list_edges_for_networkx = list(zip(list_edges_start, list_edges_end))
-
     Gnew.add_edges_from(list_edges_for_networkx)
-    # color nodes
-    list_node_types = list(set([tensor.item() for tensor in homdata.ndata["_TYPE"]]))
-    node_labels_to_indices = dict()
-    index = 0
-    stop = False  # the prediction is always done for the first node
-    for nodekey in list_node_types:
-        if label_to_explain != None:
-            if (
-                str(curent_nodetypes_to_all_nodetypes[nodekey][1]) == label_to_explain
-                and stop == False
-            ):
-                node_labels_to_indices.update({index: "*"})
-                stop = True
-            else:
-                node_labels_to_indices.update({index: ""})
-        else:
-            node_labels_to_indices.update(
-                {index: curent_nodetypes_to_all_nodetypes[nodekey][1]}
-            )
-        index += 1
-    color_map_of_nodes = []
-    for typeindex in list_node_types:
-        color_map_of_nodes.append(
-            colors[curent_nodetypes_to_all_nodetypes[typeindex][1]]
-        )
     # plt
     options = {"with_labels": "True", "node_size": 500}
     nx.draw(Gnew, node_color=node_color, **options, labels=label_dict)
     # create legend
     patch_list = []
     name_list = []
-    for i in range(len(hd_graph.ntypes)):
-        patch_list.append(
-            plt.Circle((0, 0), 0.1, fc=colors[curent_nodetypes_to_all_nodetypes[i][1]])
-        )
-        name_list.append(hd_graph.ntypes[i])
-    # create caption
-    # Special node type to explain
-    special_node_color = "#76b7b2"  # Example color for the special node type
-    special_node_label = "Target Node"
-    from matplotlib.patches import Patch
+    for i in range(len(list_all_nodetypes)):
+        cc = curent_nodetypes_to_all_nodetypes[i][1]
+        patch_list.append(plt.Circle((0, 0), 0.1, fc=colors[i]))
+        name_list.append(list_all_nodetypes[i])
 
-    # Add the special node type to the legend
+    # create caption
+    special_node_color = "#76b7b2"
+    special_node_label = "Target Node"
     patch_list.append(Patch(color=special_node_color))
     name_list.append(special_node_label)
-    caption_text = add_info
-    caption_size = adjust_caption_size_exp(
-        caption_length=len(add_info), max_size=18, min_size=8, rate=0.1
-    )
-    caption_position = (0.5, -0.1)
-    # folder to save in:
-    name_plot_save = f"results/exp_visualizations/{addname_for_save}"
+    if caption:
+        caption_text = caption
+        caption_size = adjust_caption_size_exp(
+            caption_length=len(caption), max_size=18, min_size=8, rate=0.1
+        )
+        caption_position = (0.5, -0.1)
+
+    # folder to save in
+    if target_dir:
+        name_plot_save = f"{target_dir}/{file_name}"
+    else:
+        name_plot_save = f"results/exp_visualizations/{file_name}"
     directory = os.path.dirname(name_plot_save)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    os.makedirs(directory, exist_ok=True)
 
-    # Define the file paths
-    file_path_wo_legend = f"{name_plot_save}_wo.png"
-    file_path_with_legend = f"{name_plot_save}.png"
+    if with_labels:
+        # Define the file paths
+        file_path_with_legend = f"{name_plot_save}.png"
+        # Create legend and caption separately to avoid overlapping
+        plt.legend(patch_list, name_list, loc="lower left")
+        if caption:
+            # Save the figure with legend and caption
+            plt.figtext(*caption_position, caption_text, ha="center", size=caption_size)
+        plt.savefig(file_path_with_legend, bbox_inches="tight")
 
-    # Remove the existing files if they exist
-    if os.path.exists(file_path_wo_legend):
-        os.remove(file_path_wo_legend)
+        # Show the plot
+        plt.show()
+    else:
+        # Define the file paths
+        file_path_wo_legend = f"{name_plot_save}_wo.png"
+        # Save the figure without legend and caption
+        plt.savefig(file_path_wo_legend, bbox_inches="tight")
 
-    if os.path.exists(file_path_with_legend):
-        os.remove(file_path_with_legend)
-
-    # Save the figure without legend and caption
-    plt.savefig(file_path_wo_legend, bbox_inches="tight")
-
-    # Create legend and caption separately to avoid overlapping
-    plt.legend(
-        patch_list,
-        name_list,
-        loc="lower left",
-    )
-
-    # Save the figure with legend and caption
-    plt.figtext(*caption_position, caption_text, ha="center", size=caption_size)
-    plt.savefig(file_path_with_legend, bbox_inches="tight")
-
-    # Show the plot
-    plt.show()
+        # Show the plot
+        plt.show()
