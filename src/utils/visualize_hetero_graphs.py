@@ -7,10 +7,10 @@ import re
 
 import dgl
 import matplotlib.patches as patches
+from matplotlib.patches import Patch
 import matplotlib.pyplot as plt
 import networkx as nx
 import torch
-from matplotlib.patches import Patch
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("matplotlib")
@@ -51,7 +51,7 @@ def adjust_caption_size_exp(caption_length, max_size=18, min_size=8, rate=0.1):
     return max(min_size, min(font_size, max_size))
 
 
-def visualize_hetero_graph(
+def visualize_hd(
     hd_graph,
     inverse_indices,
     file_name,
@@ -83,15 +83,16 @@ def visualize_hetero_graph(
 
     # add edges
     list_edges_start, list_edges_end = homdata.edge_index.tolist()
-    nodes_to_explain = [
-        count
-        for item, tensors in inverse_indices.items()
-        if tensors.numel() > 0
-        for count, nitem in enumerate(homdata.ndata["_TYPE"])
-        if nitem.item() == hd_graph.ntypes.index(item)
-        for item_count, _ in enumerate(tensors)
-        if item_count in [tensor.item() for tensor in tensors]
-    ]
+    nodes_to_explain = []
+    item_count = 0
+    for item, tensors in inverse_indices.items():
+        target_node_ids = tensors.tolist()
+        if tensors.numel() > 0:
+            for count, nitem in enumerate(homdata.ndata["_TYPE"]):
+                if nitem.item() == hd_graph.ntypes.index(item):
+                    item_count += 1
+                    if item_count in target_node_ids:
+                        nodes_to_explain.append(count + 1)
 
     label_dict = {}
     node_color = []
@@ -100,7 +101,7 @@ def visualize_hetero_graph(
         node_label_to_index = list_all_nodetypes.index(hd_graph.ntypes[item])
         label_dict[count] = list_all_nodetypes[node_label_to_index][:3]
         if count in nodes_to_explain:
-            node_color.append("#76b7b2")
+            node_color.append("#6E4B4B")
         else:
             node_color.append(colors[node_label_to_index])
 
@@ -118,10 +119,11 @@ def visualize_hetero_graph(
         name_list.append(list_all_nodetypes[i])
 
     # create caption
-    special_node_color = "#76b7b2"
+    special_node_color = "#6E4B4B"
     special_node_label = "Target Node"
     patch_list.append(Patch(color=special_node_color))
     name_list.append(special_node_label)
+    name_list = [name[1:] if name[0] == "_" else name for name in name_list]
     if caption:
         caption_text = caption
         caption_size = adjust_caption_size_exp(
