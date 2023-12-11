@@ -13,19 +13,19 @@
       "Model": "SubGraphX",
       "Metric": "Fidelity",
       "evaluations": "micro",
-      "precision": 0.6944444444425154,
+      "precision": 0.8064516129006244,
       "recall": 0.6944444444425154,
-      "f1_score": 0.6944444443925154,
-      "jaccard_similarity": 0.5319148936158895
+      "f1_score": 0.7462686566644687,
+      "jaccard_similarity": 0.595238095236678
     },
     "eval_expl_acc": {
       "Model": "SubGraphX",
       "Metric": "Explanation Accuracy",
       "evaluations": "micro",
-      "precision": 0.6666666666648148,
+      "precision": 0.7741935483845994,
       "recall": 0.6666666666648148,
-      "f1_score": 0.6666666666148148,
-      "jaccard_similarity": 0.49999999999895833
+      "f1_score": 0.7164179103959011,
+      "jaccard_similarity": 0.558139534882423
     }
   },
   "mutag": {
@@ -42,19 +42,19 @@
       "Model": "SubGraphX",
       "Metric": "Fidelity",
       "evaluations": "micro",
-      "precision": 0.7058823529401383,
+      "precision": 0.7164179104466919,
       "recall": 0.7058823529401383,
-      "f1_score": 0.7058823528901383,
-      "jaccard_similarity": 0.5454545454539256
+      "f1_score": 0.7111111110600603,
+      "jaccard_similarity": 0.5517241379304003
     },
     "eval_expl_acc": {
       "Model": "SubGraphX",
       "Metric": "Explanation Accuracy",
       "evaluations": "micro",
-      "precision": 0.5588235294109429,
+      "precision": 0.567164179103631,
       "recall": 0.5588235294109429,
-      "f1_score": 0.5588235293609429,
-      "jaccard_similarity": 0.38775510204042063
+      "f1_score": 0.5629629629121317,
+      "jaccard_similarity": 0.3917525773191837
     }
   }
 }

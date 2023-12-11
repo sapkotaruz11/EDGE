@@ -7,10 +7,10 @@ import re
 
 import dgl
 import matplotlib.patches as patches
-from matplotlib.patches import Patch
 import matplotlib.pyplot as plt
 import networkx as nx
 import torch
+from matplotlib.patches import Patch
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("matplotlib")

@@ -17,7 +17,7 @@ def calculate_micro_metrics(y_true, y_pred, no_result_value=-1, EPSILON=1e-10):
         elif true_class != no_result_value:
             # Consider "no result" as both false positive and false negative
             class_metrics[true_class]["fn"] += 1
-            class_metrics[no_result_value]["fp"] += 1
+            # class_metrics[no_result_value]["fp"] += 1
 
     for predicted_class in set(y_pred) - set(y_true):
         if predicted_class != no_result_value:
