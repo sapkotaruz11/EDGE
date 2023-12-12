@@ -5,11 +5,12 @@ from rdflib import RDF, XSD, Graph, Literal, URIRef
 
 
 def pre_process_mutag():
-    raw_path = "data/mutag/mutag-hetero_faec5b61/mutag_stripped.nt"
-    processed_path = "data/mutag/mutag-hetero_faec5b61/mutag_stripped_processed.nt"
+    raw_path = "data/mutag-hetero_faec5b61/mutag_stripped.nt"
+    processed_path = "data/mutag-hetero_faec5b61/mutag_stripped_processed.nt"
 
     if os.path.isfile(raw_path):
-        g_mutag = Graph().parse(path=raw_path)
+        g_mutag = Graph().parse(raw_path)
+
         g_mutag_new = Graph()
         is_mutagenic = rdf.term.URIRef(
             "http://dl-learner.org/carcinogenesis#isMutagenic"
@@ -25,17 +26,17 @@ def pre_process_mutag():
                     g_mutag_new.add((s, p, BT))
                     continue
             g_mutag_new.add((s, p, o))
-        g_mutag_new.serialize(destination=processed_path, encoding="utf-8")
+        g_mutag_new.serialize(destination=processed_path, encoding="utf-8", format="nt")
     else:
         print("Raw Dataset not Available")
 
 
 def pre_process_aifb():
-    raw_path = "data/aifb/aifb-hetero_82d021d8/aifbfixed_complete.n3"
-    processed_path = "data/aifb/aifb-hetero_82d021d8/aifbfixed_complete_processed.n3"
+    raw_path = "data/aifb-hetero_82d021d8/aifbfixed_complete.n3"
+    processed_path = "data/aifb-hetero_82d021d8/aifbfixed_complete_processed.n3"
 
     if os.path.isfile(raw_path):
-        g_aifb = Graph().parse(path=raw_path)
+        g_aifb = Graph().parse(raw_path)
         employs = rdf.term.URIRef("http://swrc.ontoware.org/ontology#employs")
         affiliation = rdf.term.URIRef("http://swrc.ontoware.org/ontology#affiliation")
         BT = Literal(True, datatype=XSD.boolean)
@@ -51,7 +52,7 @@ def pre_process_aifb():
                     new_g_aifb.add((s, p, BT))
                     continue
             new_g_aifb.add((s, p, o))
-        new_g_aifb.serialize(destination=processed_path, encoding="utf-8")
+        new_g_aifb.serialize(destination=processed_path, encoding="utf-8", format="n3")
     else:
         print("Raw Dataset not Available")
 

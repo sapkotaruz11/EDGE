@@ -33,17 +33,21 @@
 # print_results()
 # print("_____________________________")
 # print("_____________________________")
-from src.evaluations import (evaluate_gnn_explainers,
-                             evaluate_logical_explainers)
+# from src.evaluations import (evaluate_gnn_explainers,
+#                              evaluate_logical_explainers)
 
-evaluate_logical_explainers()
-evaluate_gnn_explainers()
+# evaluate_logical_explainers()
+# evaluate_gnn_explainers()
 
-from src.print_results import print_results
+# from src.print_results import print_results
 
-print_results(micro = True)
+# print_results(micro = True)
 
 # from src.gnn_explainers.trainer import train_gnn
 # train_gnn(dataset="aifb")
 #train_gnn(dataset="mutag")
 
+from src.utils.preprocess_kgs import pre_process_aifb, pre_process_mutag
+
+pre_process_mutag()
+pre_process_aifb()
