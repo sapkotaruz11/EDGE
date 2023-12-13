@@ -11,7 +11,7 @@ def read_json_file(file_path):
     return data
 
 
-def print_data_as_table(data, save_to_df=True, micro = True):
+def print_data_as_table(data, save_to_df=True):
     table = PrettyTable()
     table.field_names = [
         "Dataset",
@@ -41,15 +41,21 @@ def print_data_as_table(data, save_to_df=True, micro = True):
     # Print the table
     table.add_rows(rows)
     print(table)
+
+    # Determine the type of evaluation (micro or macro) from the Metric field
+    evaluation_type = "macro"
+    if any("micro" in metric["evaluations"].lower() for metric in evaluations.values()):
+        evaluation_type = "micro"
+
     # Create a DataFrame from the data
     if save_to_df:
         df = pd.DataFrame(rows, columns=table.field_names)
 
         # Write the DataFrame to a CSV file
-        if micro:
-            df.to_csv("results/dataframes/eval_data_micro.csv", index=False)
-        else:
-            df.to_csv("results/dataframes/eval_data_macro.csv", index=False)
+        filename = f"results/dataframes/eval_data_{evaluation_type}.csv"
+        df.to_csv(filename, index=False)
+
+    return filename
 
 
 def process_files_in_directory(directory):
@@ -64,9 +70,9 @@ def process_files_in_directory(directory):
     return all_data
 
 
-def print_results(to_csv=True, micro = True):
+def print_results(to_csv=True):
     directory_path = (
         "results/evaluations/"  # Replace with the actual path to your directory
     )
     all_data = process_files_in_directory(directory_path)
-    print_data_as_table(all_data, to_csv, micro)
+    print_data_as_table(all_data, to_csv)

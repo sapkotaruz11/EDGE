@@ -112,7 +112,7 @@ def evaluate_gnn_explainers(
             eval_preds = {
                 "Model": "Hetero-RGCN",
                 "Metric": "Prediction Accuracy",
-                "evaluations" : "macro",
+                "evaluations": "macro",
                 "precision": precision_gnn,
                 "recall": recall_gnn,
                 "f1_score": f1_score_gnn,
@@ -122,8 +122,8 @@ def evaluate_gnn_explainers(
             # Evaluation metrics for Explanation Fidelity
             eval_fids = {
                 "Model": explainer,
-                "Metric": "Explanation Fidelity",
-                "evaluations" : "macro",
+                "Metric": "Fidelity",
+                "evaluations": "macro",
                 "precision": precision_fid,
                 "recall": recall_fid,
                 "f1_score": f1_score_fid,
@@ -133,8 +133,8 @@ def evaluate_gnn_explainers(
             # Evaluation metrics for Explanation Accuracy
             eval_exp_acc = {
                 "Model": explainer,
-                "Metric": "Explanation Accuracy",
-                "evaluations" : "macro",
+                "Metric": "Prediction Accuracy",
+                "evaluations": "macro",
                 "precision": precision_exp,
                 "recall": recall_exp,
                 "f1_score": f1_score_exp,
@@ -259,7 +259,7 @@ def evaluate_logical_explainers(explainers=None, KGs=None):
             eval_pred_acc = {
                 "Model": explainer,
                 "Metric": "Prediction Accuracy",
-                "evaluations" : "macro",
+                "evaluations": "macro",
                 "precision": micro_metrics[0],
                 "recall": micro_metrics[1],
                 "f1_score": micro_metrics[2],
@@ -277,7 +277,7 @@ def evaluate_logical_explainers(explainers=None, KGs=None):
             eval_fid = {
                 "Model": explainer,
                 "Metric": "Fidelity",
-                "evaluations" : "macro",
+                "evaluations": "macro",
                 "precision": micro_metrics_gts[0],
                 "recall": micro_metrics_gts[1],
                 "f1_score": micro_metrics_gts[2],

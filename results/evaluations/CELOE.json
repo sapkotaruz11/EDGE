@@ -3,40 +3,40 @@
     "eval_fid": {
       "Model": "CELOE",
       "Metric": "Fidelity",
-      "evaluations": "micro",
-      "precision": 0.6911764705872189,
-      "recall": 0.6911764705872189,
-      "f1_score": 0.6911764705372189,
-      "jaccard_similarity": 0.5280898876398561
+      "evaluations": "macro",
+      "precision": 0.5749414519869799,
+      "recall": 0.5333333333320035,
+      "f1_score": 0.5147808358363408,
+      "jaccard_similarity": 0.4009615384607573
     },
     "eval_expl_acc": {
       "Model": "CELOE",
       "Metric": "Prediction Accuracy",
-      "evaluations": "micro",
-      "precision": 0.8088235294105752,
-      "recall": 0.8088235294105752,
-      "f1_score": 0.8088235293605752,
-      "jaccard_similarity": 0.679012345678174
+      "evaluations": "macro",
+      "precision": 0.7916666666639236,
+      "recall": 0.7705314009637781,
+      "f1_score": 0.7789447361316463,
+      "jaccard_similarity": 0.645215633421512
     }
   },
   "aifb": {
     "eval_fid": {
       "Model": "CELOE",
       "Metric": "Fidelity",
-      "evaluations": "micro",
-      "precision": 0.31249999999934897,
-      "recall": 0.4166666666655092,
-      "f1_score": 0.35714285709302723,
-      "jaccard_similarity": 0.21739130434751103
+      "evaluations": "macro",
+      "precision": 0.23595063025060564,
+      "recall": 0.33333333332977433,
+      "f1_score": 0.26631701628023824,
+      "jaccard_similarity": 0.1649282296643374
     },
     "eval_expl_acc": {
       "Model": "CELOE",
       "Metric": "Prediction Accuracy",
-      "evaluations": "micro",
-      "precision": 0.4807692307683062,
-      "recall": 0.6944444444425154,
-      "f1_score": 0.5681818181321797,
-      "jaccard_similarity": 0.3968253968247669
+      "evaluations": "macro",
+      "precision": 0.3919234360385978,
+      "recall": 0.5791666666604097,
+      "f1_score": 0.4491185897060639,
+      "jaccard_similarity": 0.3290947958113137
     }
   }
 }

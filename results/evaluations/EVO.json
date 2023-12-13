@@ -3,40 +3,40 @@
     "eval_fid": {
       "Model": "EVO",
       "Metric": "Fidelity",
-      "evaluations": "micro",
-      "precision": 0.6029411764697016,
-      "recall": 0.6029411764697016,
-      "f1_score": 0.6029411764197016,
-      "jaccard_similarity": 0.43157894736796676
+      "evaluations": "macro",
+      "precision": 0.4999999999984429,
+      "recall": 0.49999999999859374,
+      "f1_score": 0.498771498720221,
+      "jaccard_similarity": 0.36383928571358803
     },
     "eval_expl_acc": {
       "Model": "EVO",
       "Metric": "Prediction Accuracy",
-      "evaluations": "micro",
-      "precision": 0.7205882352930579,
-      "recall": 0.7205882352930579,
-      "f1_score": 0.7205882352430579,
-      "jaccard_similarity": 0.5632183908039503
+      "evaluations": "macro",
+      "precision": 0.6982142857122341,
+      "recall": 0.7144927536208614,
+      "f1_score": 0.7019607842619084,
+      "jaccard_similarity": 0.5458791208778576
     }
   },
   "aifb": {
     "eval_fid": {
       "Model": "EVO",
       "Metric": "Fidelity",
-      "evaluations": "micro",
-      "precision": 0.3333333333320988,
-      "recall": 0.24999999999930556,
-      "f1_score": 0.2857142856643991,
-      "jaccard_similarity": 0.16666666666635802
+      "evaluations": "macro",
+      "precision": 0.18923611110938826,
+      "recall": 0.1614583333321506,
+      "f1_score": 0.17336309521195503,
+      "jaccard_similarity": 0.10511982570754352
     },
     "eval_expl_acc": {
       "Model": "EVO",
       "Metric": "Prediction Accuracy",
-      "evaluations": "micro",
-      "precision": 0.6176470588217128,
-      "recall": 0.5833333333317129,
-      "f1_score": 0.5999999999483264,
-      "jaccard_similarity": 0.4285714285705539
+      "evaluations": "macro",
+      "precision": 0.46695906432225454,
+      "recall": 0.43333333332933327,
+      "f1_score": 0.4431499872262472,
+      "jaccard_similarity": 0.32896692679069317
     }
   }
 }

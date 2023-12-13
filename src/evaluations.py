@@ -155,7 +155,7 @@ def evaluate_gnn_explainers(
             eval_preds = {
                 "Model": "Hetero-RGCN",
                 "Metric": "Prediction Accuracy",
-                "evaluations" : "micro",
+                "evaluations": "micro",
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
@@ -180,7 +180,7 @@ def evaluate_gnn_explainers(
             eval_fids = {
                 "Model": explainer,
                 "Metric": "Fidelity",
-                "evaluations" : "micro",
+                "evaluations": "micro",
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
@@ -204,8 +204,8 @@ def evaluate_gnn_explainers(
 
             eval_exp_acc = {
                 "Model": explainer,
-                "Metric": "Explanation Accuracy",
-                "evaluations" : "micro",
+                "Metric": "Prediction Accuracy",
+                "evaluations": "micro",
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1_score,
@@ -321,7 +321,7 @@ def evaluate_logical_explainers(explainers=None, KGs=None):
             eval_pred_acc = {
                 "Model": explainer,
                 "Metric": "Prediction Accuracy",
-                "evaluations" : "micro",
+                "evaluations": "micro",
                 "precision": micro_metrics[0],
                 "recall": micro_metrics[1],
                 "f1_score": micro_metrics[2],
@@ -339,7 +339,7 @@ def evaluate_logical_explainers(explainers=None, KGs=None):
             eval_fid = {
                 "Model": explainer,
                 "Metric": "Fidelity",
-                "evaluations" : "micro",
+                "evaluations": "micro",
                 "precision": micro_metrics_gts[0],
                 "recall": micro_metrics_gts[1],
                 "f1_score": micro_metrics_gts[2],
