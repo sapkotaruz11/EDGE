@@ -7,10 +7,10 @@ import re
 
 import dgl
 import matplotlib.patches as patches
+from matplotlib.patches import Patch
 import matplotlib.pyplot as plt
 import networkx as nx
 import torch
-from matplotlib.patches import Patch
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("matplotlib")
@@ -53,11 +53,12 @@ def adjust_caption_size_exp(caption_length, max_size=18, min_size=8, rate=0.1):
 
 def visualize_hd(
     hd_graph,
-    inverse_indices,
-    file_name,
+    node_id=None,
+    file_name=None,
     target_dir=None,
     caption=None,
     with_labels=True,
+    edge_label_flag=False,
 ):
     try:
         plt.clf()
@@ -83,16 +84,15 @@ def visualize_hd(
 
     # add edges
     list_edges_start, list_edges_end = homdata.edge_index.tolist()
-    nodes_to_explain = []
-    item_count = 0
-    for item, tensors in inverse_indices.items():
-        target_node_ids = tensors.tolist()
-        if tensors.numel() > 0:
-            for count, nitem in enumerate(homdata.ndata["_TYPE"]):
-                if nitem.item() == hd_graph.ntypes.index(item):
-                    item_count += 1
-                    if item_count in target_node_ids:
-                        nodes_to_explain.append(count + 1)
+    try:
+        nodes_to_explain = [
+            item
+            for sublist in hd_graph.ndata[dgl.NID].values()
+            for item in sublist.tolist()
+        ].index(node_id)
+    except:
+        nodes_to_explain = -1
+        edge_label_flag = False
 
     label_dict = {}
     node_color = []
@@ -100,16 +100,49 @@ def visualize_hd(
     for count, item in enumerate(ntypes_list):
         node_label_to_index = list_all_nodetypes.index(hd_graph.ntypes[item])
         label_dict[count] = list_all_nodetypes[node_label_to_index][:3]
-        if count in nodes_to_explain:
+        if count == nodes_to_explain:
             node_color.append("#6E4B4B")
         else:
             node_color.append(colors[node_label_to_index])
-
+    edge_types = [hd_graph.etypes[item] for item in homdata.edata["_TYPE"].tolist()]
     list_edges_for_networkx = list(zip(list_edges_start, list_edges_end))
+    edge_labels = {
+        edge: etype
+        for edge, etype in zip(list_edges_for_networkx, edge_types)
+        if edge[0] == nodes_to_explain
+    }
+    unique_edge_types = set(edge_labels.values())
+
+    # Generate a color palette
+    color_palette = plt.cm.get_cmap(
+        "hsv", len(unique_edge_types)
+    )  # Using HSV colormap for variety
+    edge_type_color = {
+        etype: color_palette(i) for i, etype in enumerate(unique_edge_types)
+    }
+
+    # Apply colors to edges based on type
+    edge_colors = [edge_type_color[etype] for etype in unique_edge_types]
+
+    # Create a list of colors for each edge in the graph
     Gnew.add_edges_from(list_edges_for_networkx)
     # plt
     options = {"with_labels": "True", "node_size": 500}
-    nx.draw(Gnew, node_color=node_color, **options, labels=label_dict)
+    if edge_label_flag:
+        nx.draw(
+            Gnew,
+            node_color=node_color,
+            edge_color=edge_colors,
+            **options,
+            labels=label_dict,
+        )
+    else:
+        nx.draw(
+            Gnew,
+            node_color=node_color,
+            **options,
+            labels=label_dict,
+        )
     # create legend
     patch_list = []
     name_list = []
@@ -118,12 +151,15 @@ def visualize_hd(
         patch_list.append(plt.Circle((0, 0), 0.1, fc=colors[i]))
         name_list.append(list_all_nodetypes[i])
 
-    # create caption
-    special_node_color = "#6E4B4B"
-    special_node_label = "Target Node"
-    patch_list.append(Patch(color=special_node_color))
-    name_list.append(special_node_label)
+    # create target node label
+    if node_id is not None:
+        special_node_color = "#6E4B4B"
+        special_node_label = "Target Node"
+        patch_list.append(Patch(color=special_node_color))
+        name_list.append(special_node_label)
     name_list = [name[1:] if name[0] == "_" else name for name in name_list]
+
+    # create caption
     if caption:
         caption_text = caption
         caption_size = adjust_caption_size_exp(
@@ -140,15 +176,43 @@ def visualize_hd(
     os.makedirs(directory, exist_ok=True)
 
     if with_labels:
+        # Create a legend for edge colors
+        # Create and place the legend for node colors
+
+        node_legend = plt.legend(
+            patch_list,
+            name_list,
+            title="Node Types",
+            loc="upper left",
+            bbox_to_anchor=(-0.01, 0),  # Adjust these values
+            borderaxespad=0.0,
+        )
+        if edge_label_flag:
+            # Create and place the legend for edge colors
+            edge_patch_list = [
+                plt.Line2D([0], [0], color=color, label=etype, linewidth=2)
+                for etype, color in edge_type_color.items()
+            ]
+            edge_legend = plt.legend(
+                handles=edge_patch_list,
+                title="Edge Types",
+                loc="upper right",
+                bbox_to_anchor=(1.05, 0),
+                borderaxespad=0.0,
+            )
+            # Add the node legend back to the plot
+            plt.gca().add_artist(node_legend)
+
         # Define the file paths
-        file_path_with_legend = f"{name_plot_save}.png"
-        # Create legend and caption separately to avoid overlapping
-        plt.legend(patch_list, name_list, loc="lower left")
+        if node_id > 0:
+            file_path_with_legend = f"{name_plot_save}_{node_id}.png"
+        else:
+            file_path_with_legend = f"{name_plot_save}.png"
         if caption:
             # Save the figure with legend and caption
             plt.figtext(*caption_position, caption_text, ha="center", size=caption_size)
         plt.savefig(file_path_with_legend, bbox_inches="tight")
-
+        plt.tight_layout()
         # Show the plot
         plt.show()
     else:
