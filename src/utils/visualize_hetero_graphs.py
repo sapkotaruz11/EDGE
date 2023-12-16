@@ -1,4 +1,4 @@
-# Code adapted from https://github.com/mathematiger/ExplwCE/blob/master/visualization.py
+# Some part of Code adapted from https://github.com/mathematiger/ExplwCE/blob/master/visualization.py
 import colorsys
 import logging
 import math
@@ -78,12 +78,9 @@ def visualize_hd(
 
     # create nx graph to visualize
     Gnew = nx.Graph()
-    homdata = dgl.to_homogeneous(hd_graph)
-    homdata.edge_index = torch.stack(homdata.edges(), dim=0)
+    homdata = dgl.to_homogeneous(hd_graph, edata=hd_graph.edata["_TPYE"])
     Gnew.add_nodes_from(list(range(homdata.num_nodes())))
 
-    # add edges
-    list_edges_start, list_edges_end = homdata.edge_index.tolist()
     try:
         nodes_to_explain = [
             item
@@ -92,6 +89,7 @@ def visualize_hd(
         ].index(node_id)
     except:
         nodes_to_explain = -1
+    if nodes_to_explain == -1:
         edge_label_flag = False
 
     label_dict = {}
@@ -104,68 +102,100 @@ def visualize_hd(
             node_color.append("#6E4B4B")
         else:
             node_color.append(colors[node_label_to_index])
-    edge_types = [hd_graph.etypes[item] for item in homdata.edata["_TYPE"].tolist()]
-    list_edges_for_networkx = list(zip(list_edges_start, list_edges_end))
-    edge_labels = {
-        edge: etype
-        for edge, etype in zip(list_edges_for_networkx, edge_types)
-        if edge[0] == nodes_to_explain
-    }
-    unique_edge_types = set(edge_labels.values())
 
-    # Generate a color palette
+    # remove reverse edges as we plot a homogenous graph
+    edge_types_ = [
+        hd_graph.etypes[item].replace("rev-", "")
+        if hd_graph.etypes[item].startswith("rev-")
+        else hd_graph.etypes[item]
+        for item in homdata.edata["_TYPE"].tolist()
+    ]
+
+    # creating edges with manual iteration to ensure original ordering of edges
+    # torch.stack somehows changes the order in the edge list
+    list_edges_for_networkx_ = [
+        (a.item(), b.item()) for a, b in zip(homdata.edges()[0], homdata.edges()[1])
+    ]
+
+    list_edges_for_networkx = []
+    edge_types = []
+    seen = set()
+    # filter reduntant edge types to map colors properly  as nx does that randomly
+    for i, item in enumerate(list_edges_for_networkx_):
+        if item not in seen:
+            seen.add(item)
+            list_edges_for_networkx.append(item)
+            edge_types.append(edge_types_[i])
+    edge_labels = [
+        etype if nodes_to_explain in edge else "others"
+        for edge, etype in zip(list_edges_for_networkx, edge_types)
+    ]
+
+    # if edge[0] == nodes_to_explain else "others"
+    unique_edge_types = set(edge_labels)
+    unique_edge_types_list = list(unique_edge_types)
+
     color_palette = plt.cm.get_cmap(
         "hsv", len(unique_edge_types)
     )  # Using HSV colormap for variety
-    edge_type_color = {
-        etype: color_palette(i) for i, etype in enumerate(unique_edge_types)
-    }
 
     # Apply colors to edges based on type
-    edge_colors = [edge_type_color[etype] for etype in unique_edge_types]
-
+    edge_type_color = {
+        etype: "black"
+        if etype == "others"
+        else color_palette(unique_edge_types_list.index(etype))
+        for etype in edge_labels
+    }
+    edge_color = [
+        "black"
+        if etype == "others"
+        else color_palette(unique_edge_types_list.index(etype))
+        for etype in edge_labels
+    ]
+    edges_with_colour = dict(zip(list_edges_for_networkx, edge_color))
     # Create a list of colors for each edge in the graph
-    Gnew.add_edges_from(list_edges_for_networkx)
+    for edge, color in edges_with_colour.items():
+        Gnew.add_edge(edge[0], edge[1], color=color)
+
     # plt
+    pos = nx.kamada_kawai_layout(Gnew)
     options = {"with_labels": "True", "node_size": 500}
+    nx.draw_networkx(
+        Gnew,
+        pos,
+        node_color=node_color,
+        **options,
+        labels=label_dict,
+    )
+
     if edge_label_flag:
-        nx.draw(
-            Gnew,
-            node_color=node_color,
-            edge_color=edge_colors,
-            **options,
-            labels=label_dict,
-        )
-    else:
-        nx.draw(
-            Gnew,
-            node_color=node_color,
-            **options,
-            labels=label_dict,
-        )
+        for edge, color in edges_with_colour.items():
+            nx.draw_networkx_edges(Gnew, pos, edgelist=[edge], edge_color=[color])
+
     # create legend
     patch_list = []
     name_list = []
     for i in range(len(list_all_nodetypes)):
-        cc = curent_nodetypes_to_all_nodetypes[i][1]
         patch_list.append(plt.Circle((0, 0), 0.1, fc=colors[i]))
         name_list.append(list_all_nodetypes[i])
 
-    # create target node label
-    if node_id is not None:
+    if nodes_to_explain != -1:
         special_node_color = "#6E4B4B"
         special_node_label = "Target Node"
         patch_list.append(Patch(color=special_node_color))
         name_list.append(special_node_label)
+
     name_list = [name[1:] if name[0] == "_" else name for name in name_list]
 
     # create caption
     if caption:
+        if nodes_to_explain != -1:
+            caption = "Explanation for Node ID : " + str(node_id) + "---> " + caption
         caption_text = caption
         caption_size = adjust_caption_size_exp(
             caption_length=len(caption), max_size=18, min_size=8, rate=0.1
         )
-        caption_position = (0.5, -0.1)
+        caption_position = (0.5, 1.005)
 
     # folder to save in
     if target_dir:
@@ -176,7 +206,6 @@ def visualize_hd(
     os.makedirs(directory, exist_ok=True)
 
     if with_labels:
-        # Create a legend for edge colors
         # Create and place the legend for node colors
 
         node_legend = plt.legend(
@@ -184,7 +213,7 @@ def visualize_hd(
             name_list,
             title="Node Types",
             loc="upper left",
-            bbox_to_anchor=(-0.01, 0),  # Adjust these values
+            bbox_to_anchor=(-0.01, -0.01),  # Adjust these values
             borderaxespad=0.0,
         )
         if edge_label_flag:
@@ -193,14 +222,14 @@ def visualize_hd(
                 plt.Line2D([0], [0], color=color, label=etype, linewidth=2)
                 for etype, color in edge_type_color.items()
             ]
+            # can use w/o assigning to the edge_legend variable
             edge_legend = plt.legend(
                 handles=edge_patch_list,
                 title="Edge Types",
                 loc="upper right",
-                bbox_to_anchor=(1.05, 0),
+                bbox_to_anchor=(1.05, -0.01),
                 borderaxespad=0.0,
             )
-            # Add the node legend back to the plot
             plt.gca().add_artist(node_legend)
 
         # Define the file paths
@@ -208,11 +237,13 @@ def visualize_hd(
             file_path_with_legend = f"{name_plot_save}_{node_id}.png"
         else:
             file_path_with_legend = f"{name_plot_save}.png"
+
         if caption:
             # Save the figure with legend and caption
             plt.figtext(*caption_position, caption_text, ha="center", size=caption_size)
-        plt.savefig(file_path_with_legend, bbox_inches="tight")
         plt.tight_layout()
+        plt.savefig(file_path_with_legend, bbox_inches="tight", dpi=200, format="png")
+
         # Show the plot
         plt.show()
     else:
@@ -220,6 +251,6 @@ def visualize_hd(
         file_path_wo_legend = f"{name_plot_save}_wo.png"
         # Save the figure without legend and caption
         plt.savefig(file_path_wo_legend, bbox_inches="tight")
-
+        # plt.tight_layout()
         # Show the plot
         plt.show()

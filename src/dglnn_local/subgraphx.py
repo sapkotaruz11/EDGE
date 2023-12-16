@@ -769,7 +769,7 @@ class HeteroSubgraphX(nn.Module):
         self.category = category
         self.node_idx = node_idx
         self.comp_graph = graph
-        exp_graph, inv_indecies = khop_in_subgraph(
+        exp_graph,_ = khop_in_subgraph(
             graph, {self.category: self.node_idx}, 1
         )
         assert (
@@ -788,7 +788,6 @@ class HeteroSubgraphX(nn.Module):
 
         # book all nodes in MCTS
         self.mcts_node_maps = dict()
-
         root_dict = {ntype: self.graph.nodes(ntype) for ntype in self.graph.ntypes}
         root = MCTSNode(root_dict)
         self.mcts_node_maps[str(root)] = root
@@ -802,33 +801,48 @@ class HeteroSubgraphX(nn.Module):
             self.mcts_rollout(root)
 
         best_leaf = None
+        best_leaf_with_index = None
         best_immediate_reward = float("-inf")
 
         for mcts_node in self.mcts_node_maps.values():
-            if len(mcts_node.nodes) < self.node_min and len(mcts_node.nodes) > 15:
+            total_nodes = sum(tensor.numel() for tensor in mcts_node.nodes.values())
+            if total_nodes < self.node_min:
                 continue
 
             if mcts_node.immediate_reward > best_immediate_reward:
                 best_leaf = mcts_node
-                best_immediate_reward = best_leaf.immediate_reward
+                best_immediate_reward = mcts_node.immediate_reward
+
+                # Check for index condition
+                temp = self.get_exp_as_graph(best_leaf.nodes)
+                node_mapping = temp.ndata[NID][category]
+                index = self.node_idx in node_mapping
+                if index:
+                    best_leaf_with_index = mcts_node
+                    best_immediate_reward = mcts_node.immediate_reward
 
         if best_leaf is None or best_leaf.immediate_reward == float("-inf"):
-            exp_as_graph = exp_graph
-        else:
-            exp_as_graph = self.get_exp_as_graph(best_leaf.nodes)
-        sg_nodes = exp_as_graph.ndata[NID]
-        sg_feat = {}
-        for node_type in sg_nodes.keys():
-            sg_feat[node_type] = feat[node_type][sg_nodes[node_type].long()]
-        pred_logits = self.model(exp_as_graph, sg_feat)
-        node_mapping = exp_as_graph.ndata[NID][category]
-        try:
-            index = (node_mapping == self.node_idx).nonzero().item()
-            predictions = pred_logits[category][index].argmax(dim=0).item()
-        except:
+            return None, -1
+
+        if best_leaf_with_index is None:
+            exp_as_graph = temp
+            sg_nodes = exp_as_graph.ndata[NID]
+            sg_feat = {}
+            for node_type in sg_nodes.keys():
+                sg_feat[node_type] = feat[node_type][sg_nodes[node_type].long()]
+            pred_logits = self.model(exp_as_graph, sg_feat)
             lst = pred_logits[category].argmax(dim=1).tolist()
             if len(lst) == 0:
                 return exp_as_graph, -1
             predictions = self.get_most_frequent(lst)
-
+        else:
+            exp_as_graph = self.get_exp_as_graph(best_leaf_with_index.nodes)
+            sg_nodes = exp_as_graph.ndata[NID]
+            sg_feat = {}
+            for node_type in sg_nodes.keys():
+                sg_feat[node_type] = feat[node_type][sg_nodes[node_type].long()]
+            pred_logits = self.model(exp_as_graph, sg_feat)
+            node_mapping = exp_as_graph.ndata[NID][category]
+            index = (node_mapping == self.node_idx).nonzero().item()
+            predictions = pred_logits[category][index].argmax(dim=0).item()
         return exp_as_graph, predictions
