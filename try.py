@@ -4,13 +4,13 @@
 # create_lp_mutag()
 
 # from src.gnn_explainers.HeteroPG_explainer import explain_PG
-#from src.gnn_explainers.HeteroSubGraphX_explainer import explain_SGX
+# from src.gnn_explainers.HeteroSubGraphX_explainer import explain_SGX
 
 
 # explain_PG(dataset="aifb", print_explainer_loss=True)
 # explain_PG(dataset="mutag", print_explainer_loss=True)
 
-#explain_SGX(dataset="aifb")
+# explain_SGX(dataset="aifb")
 # explain_SGX(dataset="mutag")
 
 
@@ -22,7 +22,7 @@
 # train_celoe(use_heur= False)
 # train_celoe_fid(use_heur=False)
 
-#from src.evaluations_macro import evaluate_gnn_explainers, evaluate_logical_explainers
+# from src.evaluations_macro import evaluate_gnn_explainers, evaluate_logical_explainers
 
 # evaluate_logical_explainers()
 # evaluate_gnn_explainers()
