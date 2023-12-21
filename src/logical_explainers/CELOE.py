@@ -18,7 +18,13 @@ def train_celoe(file_path=None, kgs=None, use_heur=False):
     for kg in kgs:
         t0 = time.time()
         target_dict = {}
-        json_file_path = f"configs/{kg}.json"  # Replace with your JSON file path
+        json_file_path = f"configs/{kg}.json"
+        # Replace with your JSON file path
+        if not os.path.exists(json_file_path):
+            print(
+                f"JSON file not found: {json_file_path}. Please Create the learning problem for the dataset {kg}"
+            )
+            continue  # Skip this dataset/model combination
 
         with open(json_file_path, "r", encoding="utf-8") as json_file:
             settings = json.load(json_file)
@@ -87,9 +93,6 @@ def train_celoe(file_path=None, kgs=None, use_heur=False):
             }
         # Define the filename where you want to save the JSON
         file_path = f"results/predictions/CELOE/{kg}.json"
-        if os.path.exists(file_path):
-            # Remove the file
-            os.remove(file_path)
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
             json.dump(target_dict, json_file, indent=4)
@@ -109,6 +112,11 @@ def train_celoe_fid(file_path=None, kgs=None, use_heur=False):
         json_file_path = (
             f"configs/{kg}_gnn_preds.json"  # Replace with your JSON file path
         )
+        if not os.path.exists(json_file_path):
+            print(
+                f"JSON file not found: {json_file_path}. Please Create the learning problem for the dataset {kg}"
+            )
+            continue  # Skip this dataset/model combination
 
         with open(json_file_path, "r", encoding="utf-8") as json_file:
             settings = json.load(json_file)
@@ -177,9 +185,6 @@ def train_celoe_fid(file_path=None, kgs=None, use_heur=False):
             }
         # Define the filename where you want to save the JSON
         file_path = f"results/predictions/CELOE/{kg}_gnn_preds.json"
-        if os.path.exists(file_path):
-            # Remove the file
-            os.remove(file_path)
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
             json.dump(target_dict, json_file, indent=4)

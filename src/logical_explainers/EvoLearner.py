@@ -16,7 +16,13 @@ def train_evo(file_path=None, kgs=None):
     for kg in kgs:
         t0 = time.time()
         target_dict = {}
-        json_file_path = f"configs/{kg}.json"  # Replace with your JSON file path
+        json_file_path = f"configs/{kg}.json"
+        # Replace with your JSON file path
+        if not os.path.exists(json_file_path):
+            print(
+                f"JSON file not found: {json_file_path}. Please Create the learning problem for the dataset {kg}"
+            )
+            continue  # Skip this dataset/model combination
 
         with open(json_file_path, "r", encoding="utf-8") as json_file:
             settings = json.load(json_file)
@@ -62,9 +68,6 @@ def train_evo(file_path=None, kgs=None):
         # Define the filename where you want to save the JSON
         file_path = f"results/predictions/EVO/{kg}.json"
         # Check if the file exists
-        if os.path.exists(file_path):
-            # Remove the file
-            os.remove(file_path)
 
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:
@@ -85,6 +88,11 @@ def train_evo_fid(file_path=None, kgs=None):
         json_file_path = (
             f"configs/{kg}_gnn_preds.json"  # Replace with your JSON file path
         )
+        if not os.path.exists(json_file_path):
+            print(
+                f"JSON file not found: {json_file_path}. Please Create the learning problem for the dataset {kg}"
+            )
+            continue  # Skip this dataset/model combination
 
         with open(json_file_path, "r", encoding="utf-8") as json_file:
             settings = json.load(json_file)
@@ -127,13 +135,8 @@ def train_evo_fid(file_path=None, kgs=None):
                 "positive_examples": list(positive_examples_test),
                 "negative_examples": list(negative_examples_test),
             }
-            # print(target_dict)
         # Define the filename where you want to save the JSON
         file_path = f"results/predictions/EVO/{kg}_gnn_preds.json"
-        # Check if the file exists
-        if os.path.exists(file_path):
-            # Remove the file
-            os.remove(file_path)
 
         # Save the dictionary to a JSON file with indentation
         with open(file_path, "w") as json_file:

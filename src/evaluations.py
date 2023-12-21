@@ -114,9 +114,7 @@ def calculate_metrics(y_true, y_pred):
     return precision, recall, f1_score, jaccard_similarity
 
 
-def evaluate_gnn_explainers(
-    datasets=["aifb", "mutag"], explainers=["PGExplainer", "SubGraphX"]
-):
+def evaluate_gnn_explainers(datasets=None, explainers=None):
     if explainers is None:
         explainers = ["PGExplainer", "SubGraphX"]
     for explainer in explainers:
