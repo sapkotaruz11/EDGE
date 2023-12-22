@@ -4,10 +4,10 @@
       "Model": "CELOE",
       "Metric": "Fidelity",
       "evaluations": "micro",
-      "precision": 0.6911764705872189,
-      "recall": 0.6911764705872189,
-      "f1_score": 0.6911764705372189,
-      "jaccard_similarity": 0.5280898876398561
+      "precision": 0.7205882352930579,
+      "recall": 0.7205882352930579,
+      "f1_score": 0.7205882352430579,
+      "jaccard_similarity": 0.5632183908039503
     },
     "eval_expl_acc": {
       "Model": "CELOE",
