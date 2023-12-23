@@ -6,7 +6,7 @@ from rdflib import RDF, XSD, Graph, Literal, URIRef
 
 def pre_process_mutag():
     raw_path = "data/mutag-hetero_faec5b61/mutag_stripped.nt"
-    processed_path = "data/mutag-hetero_faec5b61/mutag_stripped_processed.nt"
+    processed_path = "data/KGs/mutag_stripped_processed.nt"
 
     if os.path.isfile(raw_path):
         g_mutag = Graph().parse(raw_path)
@@ -33,7 +33,7 @@ def pre_process_mutag():
 
 def pre_process_aifb():
     raw_path = "data/aifb-hetero_82d021d8/aifbfixed_complete.n3"
-    processed_path = "data/aifb-hetero_82d021d8/aifbfixed_complete_processed.n3"
+    processed_path = "data/KGs/aifbfixed_complete_processed.n3"
 
     if os.path.isfile(raw_path):
         g_aifb = Graph().parse(raw_path)
