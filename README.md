@@ -72,6 +72,19 @@ After completing these steps, your EDGE environment should be set up with all th
 
 # Preprocessing Datasets and Training GNN Model
 
+## Note for Using Existing Resources
+
+If you wish to use the existing learning problems and datasets that are available with the EDGE framework, this preprocessing step can be skipped.
+
+## Important Note
+
+Please do not delete any directories from the original setup of the EDGE framework. If you wish to create new files or start with a fresh setup, it is recommended to remove the old files manually. Deleting directories may result in the loss of some `scripts` and data analysis tools.
+
+However, if you accidentally delete any directories, you can recreate all the necessary directories for "results" and "data" using the "create_edge_directories" function provided in the preprocessor. Please note that by doing this, you may lose some `scripts` and tools for data analysis that were originally included in the directories.
+
+
+## Step-by-Step Instructions
+
 Before running evaluations or training with the EDGE framework, it's essential to preprocess the datasets and train the Graph Neural Network (GNN) model. This process also includes creating learning problems for the logical approaches. Follow the steps below to execute these tasks:
 
 ## Running the Preprocessor Script
@@ -141,7 +154,7 @@ By following these steps, you'll make the AIFB dataset compatible with EvoLearne
 
 - **Train GNN Model:** The script trains the GNN model on the specified datasets, ensuring that the model is ready for evaluation or further training.
   
-- **Create Learning Problems:** It also generates learning problems required for the logical approaches like EvoLearner and CELOE, setting the stage for a comprehensive evaluation.
+- **Create Learning Problems:** It also generates learning problems required for the logical approaches like EvoLearner and CELOE, setting the stage for evaluation.
 
 ### When to Run This Script
 
