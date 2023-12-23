@@ -1,8 +1,8 @@
-from src.utils.preprocess_kgs import pre_process_aifb, pre_process_mutag
+import os
+
 from src.gnn_explainers.trainer import train_gnn
 from src.utils.create_lp import create_lp_aifb, create_lp_mutag
-
-import os
+from src.utils.preprocess_kgs import pre_process_aifb, pre_process_mutag
 
 
 def create_edge_directories():

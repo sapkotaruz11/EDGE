@@ -1,5 +1,6 @@
 import argparse
 import os
+
 from src.gnn_explainers.trainer import train_gnn
 from src.utils.create_lp import create_lp_aifb, create_lp_mutag
 
@@ -87,25 +88,27 @@ if __name__ == "__main__":
             if model == "pgexplainer" or model == "subgraphx":
                 for dataset in datasets:
                     if model == "pgexplainer":
-                        from src.gnn_explainers.HeteroPG_explainer import explain_PG
+                        from src.gnn_explainers.HeteroPG_explainer import \
+                            explain_PG
 
                         explain_PG(dataset=dataset, print_explainer_loss=True)
 
                     if model == "subgraphx":
-                        from src.gnn_explainers.HeteroSubGraphX_explainer import (
-                            explain_SGX,
-                        )
+                        from src.gnn_explainers.HeteroSubGraphX_explainer import \
+                            explain_SGX
 
                         explain_SGX(dataset=dataset)
 
             if model == "evolearner" or model == "evo":
-                from src.logical_explainers.EvoLearner import train_evo, train_evo_fid
+                from src.logical_explainers.EvoLearner import (train_evo,
+                                                               train_evo_fid)
 
                 train_evo(kgs=datasets)
                 train_evo_fid(kgs=datasets)
 
             if model == "celoe":
-                from src.logical_explainers.CELOE import train_celoe, train_celoe_fid
+                from src.logical_explainers.CELOE import (train_celoe,
+                                                          train_celoe_fid)
 
                 train_celoe(kgs=datasets, use_heur=False)
                 train_celoe_fid(kgs=datasets, use_heur=False)
@@ -126,10 +129,8 @@ if __name__ == "__main__":
     # Call evaluation functions with the filtered model lists and datasets
     # Handling evaluation
     if args.evaluation_type == "macro":
-        from src.evaluations_macro import (
-            evaluate_gnn_explainers,
-            evaluate_logical_explainers,
-        )
+        from src.evaluations_macro import (evaluate_gnn_explainers,
+                                           evaluate_logical_explainers)
 
         if logical_models:
             evaluate_logical_explainers(explainers=logical_models, KGs=datasets)
@@ -137,7 +138,8 @@ if __name__ == "__main__":
             evaluate_gnn_explainers(explainers=gnn_models, datasets=datasets)
 
     else:  # Default to micro evaluation
-        from src.evaluations import evaluate_gnn_explainers, evaluate_logical_explainers
+        from src.evaluations import (evaluate_gnn_explainers,
+                                     evaluate_logical_explainers)
 
         if logical_models:
             evaluate_logical_explainers(explainers=logical_models, KGs=datasets)

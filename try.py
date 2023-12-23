@@ -31,7 +31,8 @@
 # # print_results()
 # # print("_____________________________")
 # # print("_____________________________")
-from src.evaluations import evaluate_gnn_explainers, evaluate_logical_explainers
+from src.evaluations import (evaluate_gnn_explainers,
+                             evaluate_logical_explainers)
 
 evaluate_logical_explainers()
 evaluate_gnn_explainers()
