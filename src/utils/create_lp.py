@@ -7,6 +7,11 @@ import pandas as pd
 
 
 def create_lp_aifb(train_file_path=None, test_file_path=None):
+    """Function to create learning problem for the AIFB dataset.
+    It the train/test file pathas are not provided, the default paths are selected.
+
+    Finally, saves the learning problems in the specified file locations.
+    """
     if train_file_path is None:
         train_file_path = "data/aifb-hetero_82d021d8/trainingSet.tsv"
     if test_file_path is None:
@@ -85,9 +90,12 @@ def create_lp_aifb(train_file_path=None, test_file_path=None):
     )
 
 
-
 def create_lp_mutag(train_file_path=None, test_file_path=None):
-    # Replace with the path to your CSV files
+    """Function to create learning problem for the Mutag dataset.
+    It the train/test file pathas are not provided, the default paths are selected.
+
+    Finally, saves the learning problems in the specified file locations.
+    """
     if train_file_path is None:
         train_file_path = "data/mutag-hetero_faec5b61/trainingSet.tsv"
     if test_file_path is None:

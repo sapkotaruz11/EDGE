@@ -1,3 +1,5 @@
+"""This script is not utilized in the EDGE framework. Its rahter a proof-of-concept for another approach tried while developing the framework."""
+
 import logging
 import os
 import os.path as osp
@@ -11,6 +13,8 @@ from torch_geometric.utils import index_sort
 
 
 class OWL(InMemoryDataset):
+    """FUnction to convert any OWL dataset that is converted to n3/nt objects along with training and testing sets provided beforehand"""
+
     def __init__(
         self,
         root: str,

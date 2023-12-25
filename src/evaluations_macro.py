@@ -3,6 +3,18 @@ from collections import defaultdict
 
 
 def calculate_macro_metrics(y_true, y_pred, no_result_value=-1, EPSILON=1e-10):
+    """
+    Calculate macro-average precision, recall, F1 score, and Jaccard similarity for classification results.
+
+    Parameters:
+    y_true (List[int]): List of true class labels.
+    y_pred (List[int]): List of predicted class labels.
+    no_result_value (int, optional): Value representing 'no result'. Defaults to -1.
+    EPSILON (float, optional): Small constant to avoid division by zero. Defaults to 1e-10.
+
+    Returns:
+    Tuple[float, float, float, float]: Tuple containing macro-average precision, recall, F1 score, and Jaccard similarity.
+    """
     class_metrics = defaultdict(lambda: {"tp": 0, "fp": 0, "fn": 0})
 
     # Calculate per-class metrics
@@ -65,6 +77,16 @@ def evaluate_gnn_explainers(
     datasets: Optional[List[str]] = None,
     explainers: Optional[List[str]] = None,
 ):
+    """
+    Evaluate GNN explainers over specified datasets and save the evaluation results in JSON format.
+
+    Parameters:
+    datasets (Optional[List[str]]): List of dataset names to evaluate. Defaults to ["aifb", "mutag"].
+    explainers (Optional[List[str]]): List of explainer names to evaluate. Defaults to ["PGExplainer", "SubGraphX"].
+
+    Returns:
+    None: Results are saved in JSON files and not returned by the function.
+    """
     # Default values if not provided
     if explainers is None:
         explainers = ["PGExplainer", "SubGraphX"]
@@ -157,6 +179,15 @@ def evaluate_gnn_explainers(
 
 
 def calculate_metrics_logical(predictions_data):
+    """
+    Calculate macro-average precision, recall, F1 score, and Jaccard similarity for logical reasoning problems.
+
+    Parameters:
+    predictions_data (dict): Data containing predicted and true labels for logical problems.
+
+    Returns:
+    Tuple[float, float, float, float]: Tuple containing macro-average precision, recall, F1 score, and Jaccard similarity.
+    """
     num_problems = len(predictions_data)
 
     if num_problems == 1:
@@ -240,6 +271,17 @@ def calculate_metrics_logical(predictions_data):
 
 
 def evaluate_logical_explainers(explainers=None, KGs=None):
+    """
+    Evaluate logical explainers over specified knowledge graphs (KGs) and save the evaluation results in JSON format.
+
+    Parameters:
+    explainers (Optional[List[str]]): List of explainer names to evaluate. Defaults to ["EVO", "CELOE"].
+    KGs (Optional[List[str]]): List of knowledge graph names to evaluate. Defaults to None, which will be set to ["mutag", "aifb"] in the function.
+
+    Returns:
+    None: Results are saved in JSON files and not returned by the function.
+    """
+
     if explainers is None:
         explainers = ["EVO", "CELOE"]
 
@@ -255,15 +297,15 @@ def evaluate_logical_explainers(explainers=None, KGs=None):
 
             with open(file_path, "r") as file:
                 predictions_data = json.load(file)
-            micro_metrics = calculate_metrics_logical(predictions_data)
+            macro_metrics = calculate_metrics_logical(predictions_data)
             eval_pred_acc = {
                 "Model": explainer,
                 "Metric": "Prediction Accuracy",
                 "evaluations": "macro",
-                "precision": micro_metrics[0],
-                "recall": micro_metrics[1],
-                "f1_score": micro_metrics[2],
-                "jaccard_similarity": micro_metrics[3],
+                "precision": macro_metrics[0],
+                "recall": macro_metrics[1],
+                "f1_score": macro_metrics[2],
+                "jaccard_similarity": macro_metrics[3],
             }
 
             # Evaluate fidelity
@@ -273,15 +315,15 @@ def evaluate_logical_explainers(explainers=None, KGs=None):
             with open(file_path_fid, "r") as file:
                 predictions_data_fid = json.load(file)
 
-            micro_metrics_gts = calculate_metrics_logical(predictions_data_fid)
+            macro_metrics_gts = calculate_metrics_logical(predictions_data_fid)
             eval_fid = {
                 "Model": explainer,
                 "Metric": "Fidelity",
                 "evaluations": "macro",
-                "precision": micro_metrics_gts[0],
-                "recall": micro_metrics_gts[1],
-                "f1_score": micro_metrics_gts[2],
-                "jaccard_similarity": micro_metrics_gts[3],
+                "precision": macro_metrics_gts[0],
+                "recall": macro_metrics_gts[1],
+                "f1_score": macro_metrics_gts[2],
+                "jaccard_similarity": macro_metrics_gts[3],
             }
 
             results[kg] = {

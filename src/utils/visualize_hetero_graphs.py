@@ -60,6 +60,26 @@ def visualize_hd(
     with_labels=True,
     edge_label_flag=False,
 ):
+    """
+    Visualizes a heterogenous graph using matplotlib and networkx.
+
+    This function takes a heterogenous graph (from DGL library), and optionally a target node id,
+    and produces a visualization of the graph. The visualization includes colored nodes and edges
+    representing different types, and can optionally include labels and a caption.
+
+    Parameters:
+    hd_graph (DGLGraph): The heterogenous graph to be visualized.
+    node_id (int, optional): The id of the target node to explain. Default is None.
+    file_name (str, optional): Name of the file to save the visualization. Default is None.
+    target_dir (str, optional): Directory where the visualization file will be saved. Default is None.
+    caption (str, optional): Caption to be added to the visualization. Default is None.
+    with_labels (bool, optional): Whether to include labels in the visualization. Default is True.
+    edge_label_flag (bool, optional): Whether to include edge labels. Default is False.
+
+    Returns:
+    None: The function does not return anything but saves the visualization as a file and shows it.
+
+    """
     try:
         plt.clf()
     except Exception as e:
