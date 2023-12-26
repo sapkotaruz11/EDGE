@@ -5,6 +5,18 @@ EPSILON = 1e-10  # Small constant to avoid division by zero
 
 
 def calculate_micro_metrics(y_true, y_pred, no_result_value=-1, EPSILON=1e-10):
+    """
+    Calculate micro-average precision, recall, F1 score, and Jaccard similarity for classification results.
+
+    Parameters:
+    y_true (List[int]): List of true class labels.
+    y_pred (List[int]): List of predicted class labels.
+    no_result_value (int, optional): Value representing 'no result'. Defaults to -1.
+    EPSILON (float, optional): Small constant to avoid division by zero. Defaults to 1e-10.
+
+    Returns:
+    Tuple[float, float, float, float]: Tuple containing micro-average precision, recall, F1 score, and Jaccard similarity.
+    """
     class_metrics = defaultdict(lambda: {"tp": 0, "fp": 0, "fn": 0})
 
     for true_class, predicted_class in zip(y_true, y_pred):
@@ -115,6 +127,16 @@ def calculate_metrics(y_true, y_pred):
 
 
 def evaluate_gnn_explainers(datasets=None, explainers=None):
+    """
+    Evaluate GNN explainers over specified datasets and save the evaluation results in JSON format.
+
+    Parameters:
+    datasets (Optional[List[str]]): List of dataset names to evaluate. Defaults to ["aifb", "mutag"].
+    explainers (Optional[List[str]]): List of explainer names to evaluate. Defaults to ["PGExplainer", "SubGraphX"].
+
+    Returns:
+    None: Results are saved in JSON files and not returned by the function.
+    """
     if explainers is None:
         explainers = ["PGExplainer", "SubGraphX"]
     for explainer in explainers:
@@ -133,7 +155,7 @@ def evaluate_gnn_explainers(datasets=None, explainers=None):
             gnn_pred_list = [value["gnn_pred"] for value in predictions_data.values()]
             gts_list = [value["gts"] for value in predictions_data.values()]
 
-            # Calculate macro scores for precision, recall, F1 score, and Jaccard similarity
+            # Calculate micro scores for precision, recall, F1 score, and Jaccard similarity
             if dataset == "aifb":
                 (
                     precision,
@@ -224,6 +246,15 @@ def evaluate_gnn_explainers(datasets=None, explainers=None):
 
 
 def calculate_metrics_logical(predictions_data):
+    """
+    Calculate micro-average precision, recall, F1 score, and Jaccard similarity for logical reasoning problems.
+
+    Parameters:
+    predictions_data (dict): Data containing predicted and true labels for logical problems.
+
+    Returns:
+    Tuple[float, float, float, float]: Tuple containing micro-average precision, recall, F1 score, and Jaccard similarity.
+    """
     num_problems = len(predictions_data)
 
     if num_problems == 1:
@@ -300,6 +331,16 @@ def calculate_metrics_logical(predictions_data):
 
 
 def evaluate_logical_explainers(explainers=None, KGs=None):
+    """
+    Evaluate logical explainers over specified knowledge graphs (KGs) and save the evaluation results in JSON format.
+
+    Parameters:
+    explainers (Optional[List[str]]): List of explainer names to evaluate. Defaults to ["EVO", "CELOE"].
+    KGs (Optional[List[str]]): List of knowledge graph names to evaluate. Defaults to None, which will be set to ["mutag", "aifb"] in the function.
+
+    Returns:
+    None: Results are saved in JSON files and not returned by the function.
+    """
     if explainers is None:
         explainers = ["EVO", "CELOE"]
 

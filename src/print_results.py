@@ -1,3 +1,5 @@
+# Script to print the results from the results/evaluations directory in the table format using Preety Table
+
 import json
 import os
 
