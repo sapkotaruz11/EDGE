@@ -18,15 +18,14 @@ def assert_within_tolerance(actual, expected, tolerance_pct):
     tolerance = expected * tolerance_pct / 100.0
     lower_bound = expected - tolerance
     upper_bound = expected + tolerance
-    assert lower_bound <= actual <= upper_bound, f"Value {actual} not within {tolerance_pct}% of {expected}"
-
+    assert (
+        lower_bound <= actual <= upper_bound
+    ), f"Value {actual} not within {tolerance_pct}% of {expected}"
 
 
 def test_aifb_graph_counts():
     """Tests if the AIFB graph count is within 0.1% tolerance of the expected count."""
-    nt_count = load_and_count_elements(
-        "data/aifb-hetero_82d021d8/aifbfixed_complete_processed.n3"
-    )
+    nt_count = load_and_count_elements("data/KGs/aifbfixed_complete_processed.n3")
     gt_count = load_and_count_elements("data/KGs/aifb.owl")
 
     assert_within_tolerance(nt_count, gt_count, 0.1)
@@ -34,9 +33,7 @@ def test_aifb_graph_counts():
 
 def test_mutag_graph_counts():
     """Tests if the MUTAG graph count is within 0.1% tolerance of the expected count."""
-    nt_count = load_and_count_elements(
-        "data/mutag-hetero_faec5b61/mutag_stripped_processed.nt"
-    )
+    nt_count = load_and_count_elements("data/KGs/mutag_stripped_processed.nt")
     gt_count = load_and_count_elements("data/KGs/mutag.owl")
 
     assert_within_tolerance(nt_count, gt_count, 0.1)

@@ -10,6 +10,40 @@ from src.dglnn_local.RDFDataset import (AIFBDataset, AMDataset, BGSDataset,
 
 
 class RDFDatasets:
+    """
+    A class for handling RDF datasets, specifically designed for graph-based machine learning models.
+
+    This class is responsible for loading and preparing RDF datasets, such as AIFB, MUTAG, BGS, and AM, for use in graph neural network (GNN) models.
+    It supports various dataset operations, including loading graphs, handling labels, and creating train/test/validation splits.
+
+    Attributes:
+        g (DGLGraph): A DGL graph object.
+        category (str): The target category for prediction in the dataset.
+        num_classes (int): The number of classes in the dataset.
+        has_feature (bool): Indicates whether the nodes in the graph have features.
+        multi_label (bool): Indicates whether the dataset is a multi-label classification problem.
+        meta_paths_dict (dict): A dictionary containing meta-paths for the graph (if applicable).
+        idx_map (dict): A mapping from node indices to their corresponding labels.
+        labels (Tensor): The labels for the nodes in the graph.
+        train_idx (Tensor): Indices of the training set nodes.
+        valid_idx (Tensor): Indices of the validation set nodes.
+        test_idx (Tensor): Indices of the test set nodes.
+
+    Parameters:
+        dataset (str): The name of the dataset to load. Supported datasets are 'aifb', 'mutag', 'bgs', and 'am'.
+        root (str, optional): The root directory where the dataset is stored. Defaults to None.
+        validation (bool, optional): Indicates whether a validation set should be created. Defaults to True.
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
+
+    Raises:
+        ValueError: If the specified dataset is not supported or if required data (like labels) is missing in the dataset.
+
+    Example:
+        >>> rdf_dataset = RDFDatasets(dataset="aifb", root="/path/to/dataset", validation=True)
+        >>> print(rdf_dataset.g) # prints the DGLGraph object
+    """
+
     def __init__(self, dataset, root=None, validation=True, *args, **kwargs):
         self.g = None
         self.category = None

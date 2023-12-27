@@ -20,9 +20,38 @@ from src.gnn_explainers.utils import get_nodes_dict
 
 
 def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=False):
+    """
+    Trains and explains a graph neural network (GNN) model using the PGExplainer on the specified RDF dataset.
+
+    This function loads or trains a GNN model and then applies the PGExplainer to understand the model's predictions.
+    It handles the entire process of model training, explainer training, and generating explanations. The results are saved in a JSON file.
+
+    Parameters:
+        dataset (str, optional): The name of the RDF dataset to be used. Defaults to 'mutag'.
+        explainer_train_epoch (int, optional): The number of training epochs for the PGExplainer. Defaults to 30.
+        print_explainer_loss (bool, optional): Flag to print the loss of the explainer during training. Defaults to False.
+
+    Returns:
+        None. The function saves the explanation results in a JSON file within the 'results/predictions/PGExplainer' directory.
+
+    Raises:
+        FileNotFoundError: If the trained GNN model or the PGExplainer checkpoint file is not found.
+
+    Example:
+        >>> explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=True)
+        # This will train or load the GNN model for the MUTAG dataset, train the PGExplainer,
+        # and save the explanations in a JSON file.
+
+    Notes:
+        - The function checks for pre-trained models and explainers and loads them if available.
+        - It supports GPU acceleration if CUDA is available.
+        - The results include predicted labels, ground truth, and entity information from the dataset.
+    """
+    # set device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataset = str.lower(dataset)
 
+    # load training configs for the dataset
     configs = get_configs(dataset)
     hidden_dim = configs["hidden_dim"]
     num_bases = configs["n_bases"]
@@ -33,12 +62,14 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
     hidden_layers = configs["num_layers"] - 1
     act = None
 
+    # build dataset
     my_dataset = RDFDatasets(dataset, root="data/", validation=validation)
     g = my_dataset.g.to(device)
     out_dim = my_dataset.num_classes
     e_types = g.etypes
     category = my_dataset.category
 
+    # build model with dataset specific configs
     idx_map = my_dataset.idx_map
     input_feature = HeteroFeature({}, get_nodes_dict(g), hidden_dim, act=act).to(device)
     model = RGCN(
@@ -62,7 +93,7 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
     if not os.path.isfile(PATH):
         print("Trained GNN Model not  found. Training GNN Model")
         train_gnn(dataset=dataset, PATH=PATH)
-    
+
     print("Trained GNN Model found. Loading from Checkpoints")
     checkpoint = torch.load(PATH, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
@@ -71,12 +102,14 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
     loss = checkpoint["loss"]
     feat = model.input_feature()
 
+    # load training and testing data into the device
     test_idx = my_dataset.test_idx.to(device)
     labels = my_dataset.labels.to(device)
     gt = labels[test_idx].tolist()
     pred_logit = model(g, feat)[category]
     gnn_preds = pred_logit[test_idx].argmax(dim=1).tolist()
 
+    # check if the re-trained explainer exists
     explainer_path = f"trained_explainers/{dataset}_PGExplainer.pkl"
     if os.path.isfile(explainer_path):
         t0 = time.time()
@@ -87,7 +120,9 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
     else:
         t0 = time.time()
         print("Starting PGExplainer")
-        print(f"Trained PG Explainer on {dataset} Not found. Training Hetero PG Explainer")
+        print(
+            f"Trained PG Explainer on {dataset} Not found. Training Hetero PG Explainer"
+        )
         explainer = HeteroPGExplainer(
             model, hidden_dim, num_hops=1, explain_graph=False
         )
