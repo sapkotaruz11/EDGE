@@ -145,16 +145,16 @@ When using the AIFB dataset with EvoLearner, you need to remove a specific line 
    After removing the line, save the changes to `aifb.owl`.
 
 5. **Verify the Changes:**
-   Ensure that the modification is correct and the file is saved properly. This step is crucial for the successful use of the AIFB dataset with EvoLearner.
+   Ensure that the modification is correct and the file is saved properly. This step is crucial for successfully using the AIFB dataset with EvoLearner.
 
-By following these steps, you'll make the AIFB dataset compatible with EvoLearner, thereby avoiding potential errors during processing.
+By following these steps, you'll make the AIFB dataset compatible with EvoLearner, avoiding potential processing errors.
 
 
 ### What Does `preprocessor.py` Do?
 
 - **Train GNN Model:** The script trains the GNN model on the specified datasets, ensuring that the model is ready for evaluation or further training.
   
-- **Create Learning Problems:** It also generates learning problems required for the logical approaches like EvoLearner and CELOE, setting the stage for evaluation.
+- **Create Learning Problems:** It also generates learning problems required for logical approaches like EvoLearner and CELOE, setting the stage for evaluation.
 
 ### When to Run This Script
 
@@ -163,10 +163,13 @@ By following these steps, you'll make the AIFB dataset compatible with EvoLearne
 
 Running the `preprocessor.py` script ensures that your EDGE framework is fully prepared with trained models and set learning problems, providing a  foundation for your evaluation tasks.
 
+# Important Information
+The results for the explainers change on each run. Also, if you'd like to re-train the GNN model, please delete the previous checkpoints for the PGExplainer, as the checkpoints were created based on particular trained models.
+
 
 # Example Commands for Using the EDGE Framework
 
-Below are some example commands to illustrate how to use the EDGE framework. These examples assume that you have already set up the environment as per the installation guide.
+Below are some example commands to illustrate how to use the EDGE framework. These examples assume you have already set up the environment per the installation guide.
 
 ## Evaluating with Existing Prediction Data
 By default, the script evaluates using existing prediction data:
@@ -211,7 +214,7 @@ Choose between micro and macro evaluations:
 Use these commands as a guide to operate the EDGE framework according to your specific needs.
 
 ## Explanation Visualization
-To visualize the explanations, you can run. To select the node id, dataset and explainer, you have to set them  manually in the python script.
+To visualize the explanations, you can run. To select the node id, dataset and explainer, you have to set them  manually in the Python script.
 
 ```shell 
 python exp_visualize.py

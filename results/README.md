@@ -8,6 +8,7 @@ This  note outlines the structure and contents of the Results folder, which incl
 - **Prediction**
 - **Visualization**
 - **Explanation Visualization**
+- **User Study**
 
 
 ### Dataframes
@@ -31,5 +32,9 @@ This folder contains predictions from all explainers, organized in separate subf
 ### Visualization
 It consists of plots for training and validation loss during the training of GNN model for each dataset.
 
+
 ### Explanation Visualization
 This diretory consists of Jupyter notebook to show examples on how to visualize explanations.
+
+### User Study
+The User Study  directory consists of questions and responses from the user study.
