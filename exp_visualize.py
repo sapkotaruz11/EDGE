@@ -22,7 +22,7 @@ from src.utils.visualize_hetero_graphs import visualize_hd
 
 
 def viz_pg(dataset="aifb", node_idx=6):
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataset = "aifb"
 
     dataset = str.lower(dataset)
@@ -89,7 +89,7 @@ def viz_pg(dataset="aifb", node_idx=6):
 
 
 def viz_subgx(dataset="aifb", node_idx=6):
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataset = "aifb"
 
     dataset = str.lower(dataset)
