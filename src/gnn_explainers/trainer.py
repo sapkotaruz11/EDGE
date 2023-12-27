@@ -296,7 +296,9 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
     if validation:
         train_idx = torch.cat([train_idx, valid_idx], dim=0)
     gnn_preds_train = pred_logit[train_idx].argmax(dim=1).tolist()
-    print(f"Final validation accuracy of the model R-GCN on dataset: {val_acc_final}")
+    print(
+        f"Final validation accuracy of the model R-GCN on unseen dataset: {val_acc_final}"
+    )
     gnn_pred_dt_train = {
         tensor.item(): pred for tensor, pred in zip(train_idx, gnn_preds_train)
     }
