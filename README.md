@@ -163,6 +163,9 @@ By following these steps, you'll make the AIFB dataset compatible with EvoLearne
 
 Running the `preprocessor.py` script ensures that your EDGE framework is fully prepared with trained models and set learning problems, providing a  foundation for your evaluation tasks.
 
+# Important Information
+The results for the explainers changes on each run. Also, if you wish to re-train the GNN model, also delete the previous checkpoints for the PGExplainer, as the checkpoints were created based on particular trained models.
+
 
 # Example Commands for Using the EDGE Framework
 
