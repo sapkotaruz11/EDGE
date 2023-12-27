@@ -19,6 +19,31 @@ from src.gnn_explainers.utils import get_nodes_dict
 
 
 def explain_SGX(dataset="mutag"):
+    """
+    Trains and explains a graph neural network (GNN) model using SubGraphX (SGX) on the specified RDF dataset.
+
+    This function loads a pre-trained GNN model or trains one if not already available.
+    It then applies the SubGraphX explainer to generate explanations for the model's predictions on the test dataset. The results are saved in a JSON file for further analysis.
+
+    Parameters:
+        dataset (str, optional): The name of the RDF dataset to be used. Defaults to 'mutag'.
+
+    Returns:
+        None. The function writes the explanation results to a JSON file in the 'results/predictions/SubGraphX' directory.
+
+    Raises:
+        FileNotFoundError: If the trained GNN model file is not found.
+
+    Example:
+        >>> explain_SGX(dataset="mutag")
+        # This will load or train the GNN model for the MUTAG dataset and save the SubGraphX explanations in a JSON file.
+
+    Notes:
+        - The function uses CUDA for acceleration if available.
+        - It includes the model's predictions, ground truth labels, and entity information for each test node.
+        - The SubGraphX explainer is used to interpret the GNN model's decisions for each node in the test set.
+    """
+    # set device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataset = str.lower(dataset)
 
@@ -32,6 +57,7 @@ def explain_SGX(dataset="mutag"):
     hidden_layers = configs["num_layers"] - 1
     act = None
 
+    # build dataset
     my_dataset = RDFDatasets(dataset, root="data/", validation=validation)
     g = my_dataset.g.to(device)
     out_dim = my_dataset.num_classes
@@ -39,6 +65,7 @@ def explain_SGX(dataset="mutag"):
     category = my_dataset.category
 
     idx_map = my_dataset.idx_map
+    # build model with dataset specific configs
     input_feature = HeteroFeature({}, get_nodes_dict(g), hidden_dim, act=act).to(device)
     model = RGCN(
         hidden_dim,

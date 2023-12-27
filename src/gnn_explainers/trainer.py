@@ -19,6 +19,39 @@ from src.gnn_explainers.utils import get_nodes_dict
 
 
 class EarlyStopping:
+    """
+    A utility class for early stopping during the training of machine learning models.
+
+    This class is designed to monitor a model's loss during training and trigger an early stop if the loss does not decrease significantly over a specified number of epochs.
+    It helps prevent overfitting by stopping the training process when the model's performance on the validation set starts degrading.
+
+    Attributes:
+        patience_decrease (int): The number of epochs with decreased loss to wait before resetting the counter. Defaults to 5.
+        patience_increase (int): The number of epochs with increased loss to wait before triggering early stopping. Defaults to 10.
+        delta (float): The minimum change in the monitored loss to qualify as an improvement or degradation. Defaults to 0.001.
+        prev_score (float or None): The loss from the previous epoch. Initially None and updated during training.
+        counter_decrease (int): Counts the number of epochs where loss has decreased. Resets if loss increases.
+        counter_increase (int): Counts the number of epochs where loss has increased. Triggers early stopping if it reaches the patience threshold.
+        early_stop (bool): Flag indicating whether early stopping has been triggered.
+
+    Methods:
+        __call__(loss): Updates the counters and early stopping flag based on the new loss value.
+
+    Example:
+        >>> early_stopping = EarlyStopping(patience_decrease=5, patience_increase=10, delta=0.001)
+        >>> for epoch in range(epochs):
+        >>>     train()  # Your training process here
+        >>>     val_loss = validate()  # Your validation process here
+        >>>     early_stopping(val_loss)
+        >>>     if early_stopping.early_stop:
+        >>>         print("Early stopping triggered")
+        >>>         break
+
+    Note:
+        - This class should be instantiated and used as part of a training loop.
+        - It is used in conjunction with a validation loss metric.
+    """
+
     def __init__(self, patience_decrease=5, patience_increase=10, delta=0.001):
         self.patience_decrease = patience_decrease
         self.patience_increase = patience_increase
@@ -47,7 +80,7 @@ class EarlyStopping:
 
 
 def get_lp_mutag_fid(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
-    # Positive and negative examples for training set
+    # function tro create learning problems for the Mutag dataset for fidelity evaluations based on GNN model predictions.
     train_positive_examples = [
         idx_map[item]["IRI"]
         for item in gnn_pred_dt_train
@@ -83,6 +116,7 @@ def get_lp_mutag_fid(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
 
 
 def get_lp_aifb_fid(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
+    # function tro create learning problems for the AIFB dataset for fidelity evaluations based on GNN model predictions.
     class_to_pred_train = {}
     class_to_pred_test = {}
 
@@ -134,6 +168,32 @@ def get_lp_aifb_fid(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
 
 
 def train_gnn(dataset="mutag", device=None, PATH=None):
+    """
+    Trains a Graph Neural Network (GNN) model using the specified RDF dataset.
+
+    This function sets up and trains a Relational Graph Convolutional Network (RGCN) model on the provided dataset. It handles the entire training process, including loss calculation, optimizer updates, and early stopping. The function also generates and saves accuracy and loss plots, as well as the trained model.
+
+    Parameters:
+        dataset (str, optional): The name of the dataset to train the model on. Defaults to 'mutag'.
+        device (torch.device, optional): The device to train the model on (CPU or GPU). Defaults to None, which means the function will automatically choose the device.
+        PATH (str, optional): Path to save the trained model. If not specified, the model is saved in the 'trained_models' directory.
+
+    Returns:
+        None. The trained model is saved to the specified path, and various plots and JSON data related to the training process are also saved.
+
+    Raises:
+        FileNotFoundError: If the configuration file for the specified dataset is not found.
+
+    Example:
+        >>> train_gnn(dataset="mutag", device=torch.device("cuda"), PATH="path/to/save/model.pt")
+        # This will train an RGCN model on the MUTAG dataset, save the model, accuracy and loss plots, and JSON data.
+
+    Notes:
+        - The function includes validation accuracy and loss calculations.
+        - Early stopping is implemented to prevent overfitting.
+        - The function saves the trained model, accuracy and loss plots, and a JSON file containing logical explainer data.
+        - The function supports training on both CPU and GPU, depending on the availability and specification.
+    """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataset = str.lower(dataset)
 

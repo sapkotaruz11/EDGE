@@ -678,100 +678,41 @@ class HeteroSubgraphX(nn.Module):
         return most_frequent
 
     def explain_node(self, graph, feat, node_idx, category, **kwargs):
-        r"""Find the most important subgraph from the original graph for the
-        model to classify the graph into the target class.
-
-        Parameters
-        ----------
-        graph : DGLGraph
-            A heterogeneous graph
-        feat : dict[str, Tensor]
-            The dictionary that associates input node features (values) with
-            the respective node types (keys) present in the graph.
-            The input features are of shape :math:`(N_t, D_t)`. :math:`N_t` is the
-            number of nodes for node type :math:`t`, and :math:`D_t` is the feature size for
-            node type :math:`t`
-        target_class : int
-            The target class to explain
-        kwargs : dict
-            Additional arguments passed to the GNN model
-
-        Returns
-        -------
-        dict[str, Tensor]
-            The dictionary associating tensor node ids (values) to
-            node types (keys) that represents the most important subgraph
-
-        Examples
-        --------
-
-        >>> import dgl
-        >>> import dgl.function as fn
-        >>> import torch as th
-        >>> import torch.nn as nn
-        >>> import torch.nn.functional as F
-        >>> from dgl.nn import HeteroSubgraphX
-
-        >>> class Model(nn.Module):
-        ...     def __init__(self, in_dim, num_classes, canonical_etypes):
-        ...         super(Model, self).__init__()
-        ...         self.etype_weights = nn.ModuleDict(
-        ...             {
-        ...                 "_".join(c_etype): nn.Linear(in_dim, num_classes)
-        ...                 for c_etype in canonical_etypes
-        ...             }
-        ...         )
-        ...
-        ...     def forward(self, graph, feat):
-        ...         with graph.local_scope():
-        ...             c_etype_func_dict = {}
-        ...             for c_etype in graph.canonical_etypes:
-        ...                 src_type, etype, dst_type = c_etype
-        ...                 wh = self.etype_weights["_".join(c_etype)](feat[src_type])
-        ...                 graph.nodes[src_type].data[f"h_{c_etype}"] = wh
-        ...                 c_etype_func_dict[c_etype] = (
-        ...                     fn.copy_u(f"h_{c_etype}", "m"),
-        ...                     fn.mean("m", "h"),
-        ...                 )
-        ...             graph.multi_update_all(c_etype_func_dict, "sum")
-        ...             hg = 0
-        ...             for ntype in graph.ntypes:
-        ...                 if graph.num_nodes(ntype):
-        ...                     hg = hg + dgl.mean_nodes(graph, "h", ntype=ntype)
-        ...             return hg
-
-        >>> input_dim = 5
-        >>> num_classes = 2
-        >>> g = dgl.heterograph({("user", "plays", "game"): ([0, 1, 1, 2], [0, 0, 1, 1])})
-        >>> g.nodes["user"].data["h"] = th.randn(g.num_nodes("user"), input_dim)
-        >>> g.nodes["game"].data["h"] = th.randn(g.num_nodes("game"), input_dim)
-
-        >>> transform = dgl.transforms.AddReverse()
-        >>> g = transform(g)
-
-        >>> # define and train the model
-        >>> model = Model(input_dim, num_classes, g.canonical_etypes)
-        >>> feat = g.ndata["h"]
-        >>> optimizer = th.optim.Adam(model.parameters())
-        >>> for epoch in range(10):
-        ...     logits = model(g, feat)
-        ...     loss = F.cross_entropy(logits, th.tensor([1]))
-        ...     optimizer.zero_grad()
-        ...     loss.backward()
-        ...     optimizer.step()
-
-        >>> # Explain for the graph
-        >>> explainer = HeteroSubgraphX(model, num_hops=1)
-        >>> explainer.explain_graph(g, feat, target_class=1)
-        {'game': tensor([0, 1]), 'user': tensor([1, 2])}
         """
+        Executes an explanation process on a given node of a graph using Monte Carlo Tree Search (MCTS).
+
+        This method takes a graph and a specific node index, and it applies MCTS to identify a subgraph that contributes to the model's prediction for that node.
+        The method evaluates the model, extracts a k-hop subgraph around the target node, and iteratively explores subgraphs using MCTS to find the most explanatory subgraph.
+
+        Parameters:
+            category (str): The category of the node to be explained.
+            node_idx (int): The index of the node in the graph for which the explanation is generated.
+            graph (DGLGraph): The entire graph on which the model is trained.
+            feat (dict): A dictionary containing features for each node type in the graph.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            exp_as_graph (DGLGraph): The explanatory subgraph identified by the method.
+            predictions (int or list or -1): The predicted label(s) for the target node based on the explanatory subgraph. Returns -1 if no valid prediction could be made.
+
+        Raises:
+            AssertionError: If the number of nodes in the subgraph is smaller than a predefined minimum.
+
+        Note:
+            - The method uses the provided graph neural network model for predictions.
+            - It operates under the assumption that the model and the necessary components (like MCTSNode) are already defined in the class.
+
+        Example:
+            >>> explainer = SomeExplainerClass(model)
+            >>> explanatory_subgraph, prediction = explainer.some_method('category', node_index, graph, features)
+            # This will generate an explanation for the specified node in the form of a subgraph and its prediction.
+        """
+
         self.model.eval()
         self.category = category
         self.node_idx = node_idx
         self.comp_graph = graph
-        exp_graph,_ = khop_in_subgraph(
-            graph, {self.category: self.node_idx}, 1
-        )
+        exp_graph, _ = khop_in_subgraph(graph, {self.category: self.node_idx}, 1)
         assert (
             exp_graph.num_nodes() > self.node_min
         ), f"The number of nodes in the\

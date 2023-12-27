@@ -209,3 +209,11 @@ Choose between micro and macro evaluations:
   ```
 
 Use these commands as a guide to operate the EDGE framework according to your specific needs.
+
+## Explanation Visualization
+To visualize the explanations, you can run. To select the node id, dataset and explainer, you have to set them  manually in the python script.
+
+```shell 
+python exp_visualize.py
+```
+The visualization results will be saved at 'results/exp_visualizations/'
