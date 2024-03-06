@@ -121,14 +121,14 @@ def evaluate_gnn_explainers(
                 recall_exp,
                 f1_score_exp,
                 jaccard_similarity_exp,
-            ) = calculate_macro_metrics(gnn_pred_list, exp_preds_list)
+            ) = calculate_macro_metrics(gts_list, exp_preds_list)
 
             (
                 precision_fid,
                 recall_fid,
                 f1_score_fid,
                 jaccard_similarity_fid,
-            ) = calculate_macro_metrics(gts_list, exp_preds_list)
+            ) = calculate_macro_metrics(gnn_pred_list, exp_preds_list)
 
             # Evaluation metrics for Prediction Accuracy
             eval_preds = {
@@ -270,7 +270,7 @@ def calculate_metrics_logical(predictions_data):
     return macro_precision, macro_recall, macro_f1_score, macro_jaccard_similarity
 
 
-def evaluate_logical_explainers(explainers=None, KGs=None):
+def evaluate_logical_explainers(explainers=None, KGs="aifb"):
     """
     Evaluate logical explainers over specified knowledge graphs (KGs) and save the evaluation results in JSON format.
 
