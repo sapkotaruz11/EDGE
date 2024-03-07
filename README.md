@@ -179,7 +179,7 @@ python main.py
 ```
 
 ## Training Models with Specific Specifications
-To train models with specific models and/or datasets, use the `--retrain_models` flag along with `--models` and `--datasets` flags as needed:
+To train models with specific models and/or datasets, use the `--retrain-models` flag along with `--models` and `--datasets` flags as needed:
 
 - Training specific models:
   ```shell

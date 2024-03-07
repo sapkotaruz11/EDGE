@@ -299,11 +299,13 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
     print(
         f"Final validation accuracy of the model R-GCN on unseen dataset: {val_acc_final}"
     )
+    train_idx_list = train_idx.tolist()
+    test_idx_list = test_idx.tolist()
     gnn_pred_dt_train = {
-        tensor.item(): pred for tensor, pred in zip(train_idx, gnn_preds_train)
+        tensor: pred for tensor, pred in zip(train_idx_list, gnn_preds_train)
     }
     gnn_pred_dt_test = {
-        tensor.item(): pred for tensor, pred in zip(train_idx, gnn_preds_test)
+        tensor: pred for tensor, pred in zip(test_idx_list, gnn_preds_test)
     }
     if dataset == "mutag":
         lp_data_train_test = get_lp_mutag_fid(
