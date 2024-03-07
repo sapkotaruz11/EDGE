@@ -182,21 +182,21 @@ python main.py
 ```
 
 ## Training Models with Specific Specifications
-To train models with specific models and/or datasets, use the `--retrain_models` flag along with `--models` and `--datasets` flags as needed:
+To train models with specific models and/or datasets, use the `--retrain-models` flag along with `--models` and `--datasets` flags as needed:
 
 - Training specific models:
   ```shell
-  python main.py --retrain_models --models PGExplainer EvoLearner
+  python main.py --retrain-models --models PGExplainer EvoLearner
   ```
 
 - Training models on specific datasets:
   ```shell
-  python main.py --retrain_models --datasets Mutag
+  python main.py --retrain-models --datasets Mutag
   ```
 
 - Combining specific models and datasets:
   ```shell
-  python main.py --retrain_models --models SubGraphX CELOE --datasets AIFB
+  python main.py --retrain-models --models SubGraphX CELOE --datasets AIFB
   ```
 
 ## Selecting Evaluation Type
