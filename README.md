@@ -183,17 +183,17 @@ To train models with specific models and/or datasets, use the `--retrain-models`
 
 - Training specific models:
   ```shell
-  python main.py --retrain_models --models PGExplainer EvoLearner
+  python main.py --retrain-models --models PGExplainer EvoLearner
   ```
 
 - Training models on specific datasets:
   ```shell
-  python main.py --retrain_models --datasets Mutag
+  python main.py --retrain-models --datasets Mutag
   ```
 
 - Combining specific models and datasets:
   ```shell
-  python main.py --retrain_models --models SubGraphX CELOE --datasets AIFB
+  python main.py --retrain-models --models SubGraphX CELOE --datasets AIFB
   ```
 
 ## Selecting Evaluation Type
