@@ -3,6 +3,7 @@ Datasets from "A Collection of Benchmark Datasets for
 Systematic Evaluations of Machine Learning on
 the Semantic Web"
 """
+
 import abc
 import itertools
 import os
@@ -14,8 +15,15 @@ import dgl.backend as F
 import networkx as nx
 import numpy as np
 from dgl.data.dgl_dataset import DGLBuiltinDataset
-from dgl.data.utils import (_get_dgl_url, generate_mask_tensor, idx2mask,
-                            load_graphs, load_info, save_graphs, save_info)
+from dgl.data.utils import (
+    _get_dgl_url,
+    generate_mask_tensor,
+    idx2mask,
+    load_graphs,
+    load_info,
+    save_graphs,
+    save_info,
+)
 
 __all__ = ["AIFBDataset", "MUTAGDataset", "BGSDataset", "AMDataset"]
 
@@ -688,9 +696,17 @@ class AIFBDataset(RDFGraphDataset):
             return None
         return (sbj, rel, obj)
 
+    # RS : Modified to make the AIFB dataset binary classification dataset
     def process_idx_file_line(self, line):
         person, _, label = line.strip().split("\t")
-        return person, label
+        if (
+            label
+            == "http://www.aifb.uni-karlsruhe.de/Forschungsgruppen/viewForschungsgruppeOWL/id1instance"
+        ):
+            return person, label
+        else:
+            label = "http://www.aifb.uni-karlsruhe.de/Forschungsgruppen/viewForschungsgruppeOWL/id2instance"
+            return person, label
 
 
 class MUTAGDataset(RDFGraphDataset):

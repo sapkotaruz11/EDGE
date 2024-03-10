@@ -4,7 +4,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<file:///pc2/users/r/rupezzz/EDGE/data/aifb-hetero_82d021d8/aifbfixed_complete.n3> a owl:Ontology .
+<file:///D:/EDGE/data/aifb-hetero_82d021d8/aifbfixed_complete.n3> a owl:Ontology .
 
 ns1:AdministrativeStaff a owl:Class ;
     rdfs:subClassOf ns1:Employee .
