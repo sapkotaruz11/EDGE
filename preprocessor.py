@@ -40,13 +40,10 @@ def create_edge_directories():
     create_directories(sub_dirs)
 
 
-create_edge_directories()
+# create_edge_directories()
 
-train_gnn(dataset="mutag")
-train_gnn(dataset="aifb")
-
-pre_process_aifb()
-pre_process_mutag()
+# pre_process_aifb()
+# pre_process_mutag()
 
 create_lp_aifb()
 create_lp_mutag()

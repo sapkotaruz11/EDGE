@@ -116,55 +116,39 @@ def get_lp_mutag_fid(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
 
 
 def get_lp_aifb_fid(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
-    # function tro create learning problems for the AIFB dataset for fidelity evaluations based on GNN model predictions.
-    class_to_pred_train = {}
-    class_to_pred_test = {}
+    # function tro create learning problems for the Mutag dataset for fidelity evaluations based on GNN model predictions.
+    train_positive_examples = [
+        idx_map[item]["IRI"]
+        for item in gnn_pred_dt_train
+        if gnn_pred_dt_train[item] == 0
+    ]
+    train_negative_examples = [
+        idx_map[item]["IRI"]
+        for item in gnn_pred_dt_train
+        if gnn_pred_dt_train[item] == 1
+    ]
 
-    # Creating new_dict for training set
-    for key, value in gnn_pred_dt_train.items():
-        class_to_pred_train.setdefault(value, []).append(key)
+    # Positive and negative examples for test set
+    test_positive_examples = [
+        idx_map[item]["IRI"] for item in gnn_pred_dt_test if gnn_pred_dt_test[item] == 0
+    ]
+    test_negative_examples = [
+        idx_map[item]["IRI"] for item in gnn_pred_dt_test if gnn_pred_dt_test[item] == 1
+    ]
+    assert (
+        len(set(train_positive_examples).intersection(set(train_negative_examples)))
+        == 0
+    )
 
-    # Creating new_dict for test set
-    for key, value in gnn_pred_dt_test.items():
-        class_to_pred_test.setdefault(value, []).append(key)
-
-    # Merge training and test dictionaries
-    all_class_to_pred = {**class_to_pred_train, **class_to_pred_test}
-
-    multi_lp_dict = {
-        f"id{key+1}instance": {
-            "positive_examples_train": [
-                idx_map[val]["IRI"] for val in class_to_pred_train.get(key, [])
-            ],
-            "negative_examples_train": [
-                idx_map[val]["IRI"]
-                for k, v in class_to_pred_train.items()
-                if k != key
-                for val in v
-            ],
-            "positive_examples_test": [
-                idx_map[val]["IRI"] for val in class_to_pred_test.get(key, [])
-            ],
-            "negative_examples_test": [
-                idx_map[val]["IRI"]
-                for k, v in class_to_pred_test.items()
-                if k != key
-                for val in v
-            ],
+    lp_dict_test_train = {
+        "id1instance": {
+            "positive_examples_train": train_positive_examples,
+            "negative_examples_train": train_negative_examples,
+            "positive_examples_test": test_positive_examples,
+            "negative_examples_test": test_negative_examples,
         }
-        for key in all_class_to_pred.keys()
     }
-    for _, data in multi_lp_dict.items():
-        positive_train_set = set(data["positive_examples_train"])
-        negative_train_set = set(data["negative_examples_train"])
-        positive_test_set = set(data["positive_examples_test"])
-        negative_test_set = set(data["negative_examples_test"])
-
-        # Assert no common elements between positive and negative sets for training and test set
-        assert len(positive_train_set.intersection(negative_train_set)) == 0
-        assert len(positive_test_set.intersection(negative_test_set)) == 0
-
-    return multi_lp_dict
+    return lp_dict_test_train
 
 
 def train_gnn(dataset="mutag", device=None, PATH=None):
