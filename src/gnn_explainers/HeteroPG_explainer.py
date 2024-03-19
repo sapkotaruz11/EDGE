@@ -17,6 +17,8 @@ from src.gnn_explainers.hetro_features import HeteroFeature
 from src.gnn_explainers.model import RGCN
 from src.gnn_explainers.trainer import train_gnn
 from src.gnn_explainers.utils import get_nodes_dict
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_recall_fscore_support
 
 
 def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=False):
@@ -155,11 +157,38 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
         {category: test_idx}, g, feat, training=True
     )
     exp_pred = probs[category][inverse_indices[category]].argmax(dim=1).tolist()
+    t1 = time.time()
     exp_preds = dict(zip(test_idx.tolist(), exp_pred))
     gnn_pred = dict(zip(exp_preds.keys(), gnn_preds))
     gts = dict(zip(exp_preds.keys(), gt))
     for idx in test_idx.tolist():
         entity[idx] = idx_map[idx]["IRI"]
+
+    pred_accuracy = accuracy_score(gt, exp_pred)
+
+    # Calculate precision, recall, f1-score, and support for binary class
+    pred_precision, pred_recall, pred_f1_score, _ = precision_recall_fscore_support(
+        gt, exp_pred, average="binary"
+    )
+
+    prediction_perfromances = {
+        "pred_accuracy": pred_accuracy,
+        "pred_precision": pred_precision,
+        "pred_recall": pred_recall,
+        "pred_f1_score": pred_f1_score,
+    }
+    exp_accuracy = accuracy_score(gt, exp_pred)
+
+    # Calculate precision, recall, f1-score, and support for binary class
+    exp_precision, exp_recall, exp_f1_score, _ = precision_recall_fscore_support(
+        gt, exp_pred, average="binary"
+    )
+    explanation_performances = {
+        "exp_accuracy": exp_accuracy,
+        "exp_precision": exp_precision,
+        "exp_recall": exp_recall,
+        "exp_f1_score": exp_f1_score,
+    }
 
     dict_names = ["exp_preds", "gnn_pred", "gts", "entity"]
     list_of_dicts = [exp_preds, gnn_pred, gts, entity]
@@ -176,6 +205,6 @@ def explain_PG(dataset="mutag", explainer_train_epoch=30, print_explainer_loss=F
 
     print(f"Data has been written to {file_path}")
     print("Ending PG_Explainer")
-    t1 = time.time()
+
     dur = t1 - t0
     print(f"Total time taken for Hetero-PG Explainer on {dataset} : {dur:.2f}")

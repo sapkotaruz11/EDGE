@@ -41,25 +41,22 @@ def calcuate_metrics(predictions_data):
     return metrics_dict
 
 
-def train_evo(learning_problems, kgs=None):
+def train_evo(learning_problems, kg=None):
 
     if learning_problems is None:
         print("No Learning problems provided. stopping training EvoLearner")
         return
 
-    if kgs is None:
-        kgs = ["mutag", "aifb"]
+    kg_path = f"data/KGs/{kg}.owl"
+    target_dict = {}
 
-    for kg in kgs:
-
-        kg_path = f"data/KGs/{kg}.owl"
-        target_dict = {}
-
-        if not os.path.exists(kg_path):
-            print(
-                f"Dataset not found at: {kg_path}. Please  Provide dataset  {kg} at the designated location"
-            )
-            continue  # Skip this dataset/model combination
+    if not os.path.exists(kg_path):
+        print(
+            f"Dataset not found at: {kg_path}. Please  Provide dataset  {kg} at the designated location"
+        )
+        return None
+    else:  # Skip this dataset/model combination
+        print(f"Training EvoLearner on {kg}")
         t0 = time.time()
         target_kb = KnowledgeBase(path=kg_path)
         for str_target_concept, examples in learning_problems.items():

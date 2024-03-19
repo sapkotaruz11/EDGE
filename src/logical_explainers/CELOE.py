@@ -16,8 +16,8 @@ from sklearn.metrics import precision_recall_fscore_support
 def calcuate_metrics(predictions_data):
     for _, examples in predictions_data.items():
         concept_individuals = set(examples["concept_individuals"])
-        positive_examples_test = set(examples["positive_examples_test"])
-        negative_examples_test = set(examples["negative_examples_test"])
+        positive_examples_test = set(examples["positive_examples"])
+        negative_examples_test = set(examples["negative_examples"])
 
         all_examples = positive_examples_test.union(negative_examples_test)
 
@@ -45,23 +45,22 @@ def calcuate_metrics(predictions_data):
     return metrics_dict
 
 
-def train_celoe(learning_problems, kgs=None, use_heur=False):
+def train_celoe(learning_problems, kg=None, use_heur=False):
 
     if learning_problems is None:
         print("No Learning problems provided. stopping training CELOE")
         return
 
-    if kgs is None:
-        kgs = ["mutag", "aifb"]
-
-    for kg in kgs:
-        target_dict = {}
-        kg_path = f"data/KGs/{kg}.owl"
-        if not os.path.exists(kg_path):
-            print(
-                f"Dataset not found at: {kg_path}. Please  Provide dataset  {kg} at the designated location"
-            )
-            continue  # Skip this dataset/model combination
+    target_dict = {}
+    kg_path = f"data/KGs/{kg}.owl"
+    if not os.path.exists(kg_path):
+        print(
+            f"Dataset not found at: {kg_path}. Please  Provide dataset  {kg} at the designated location"
+        )
+        return None
+    else:
+        # Skip this dataset/model combination
+        print(f"Training CELOE on {kg}")
         t0 = time.time()
         target_kb = KnowledgeBase(path=kg_path)
         for str_target_concept, examples in learning_problems.items():

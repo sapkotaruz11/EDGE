@@ -300,36 +300,37 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
             gnn_pred_dt_train, gnn_pred_dt_test, idx_map
         )
 
-    plt.plot(train_accs, label="Training Accuracy")
-    plt.plot(val_accs, label="Validation Accuracy")
-    plt.xlabel("Epoch")
-    plt.ylabel("Accuracy")
-    plt.legend()
-    plt.savefig(f"results/visualizations/training_validation_plot_{dataset}.png")
+    # plt.plot(train_accs, label="Training Accuracy")
+    # plt.plot(val_accs, label="Validation Accuracy")
+    # plt.xlabel("Epoch")
+    # plt.ylabel("Accuracy")
+    # plt.legend()
+    # plt.savefig(f"results/visualizations/training_validation_plot_{dataset}.png")
 
-    # # File path where you want to store the JSON data
-    file_path = f"configs/{dataset}_gnn_preds.json"
+    # # # File path where you want to store the JSON data
+    # file_path = f"configs/{dataset}_gnn_preds.json"
 
     # # Writing the dictionary to a JSON file with indentation
-    with open(file_path, "w") as json_file:
-        json.dump(lp_data_train_test, json_file, indent=4)
+    # with open(file_path, "w") as json_file:
+    #     json.dump(lp_data_train_test, json_file, indent=4)
 
-    print("Saving Trained Model ....!!!!")
+    # print("Saving Trained Model ....!!!!")
 
-    save_PATH = f"trained_models/{dataset}_trained.pt"
-    torch.save(
-        {
-            "epoch": epoch,
-            "model_state_dict": model.state_dict(),
-            "optimizer_state_dict": optimizer.state_dict(),
-            "loss": loss,
-        },
-        save_PATH,
-    )
-    print(f"Model RGCN trained with {dataset} Dataset and Stored at {save_PATH}.")
-    plt.clf()
-    plt.plot(vald_loss, label="Validation Loss")
-    plt.xlabel("Epoch")
-    plt.ylabel("Loss")
-    plt.legend()
-    plt.savefig(f"results/visualizations/training_validation_loss_{dataset}.png")
+    # save_PATH = f"trained_models/{dataset}_trained.pt"
+    # torch.save(
+    #     {
+    #         "epoch": epoch,
+    #         "model_state_dict": model.state_dict(),
+    #         "optimizer_state_dict": optimizer.state_dict(),
+    #         "loss": loss,
+    #     },
+    #     save_PATH,
+    # )
+    # print(f"Model RGCN trained with {dataset} Dataset and Stored at {save_PATH}.")
+    # plt.clf()
+    # plt.plot(vald_loss, label="Validation Loss")
+    # plt.xlabel("Epoch")
+    # plt.ylabel("Loss")
+    # plt.legend()
+    # plt.savefig(f"results/visualizations/training_validation_loss_{dataset}.png")
+    return model, my_dataset, lp_data_train_test, configs
