@@ -18,13 +18,15 @@ def create_edge_directories():
         "results/evaluations",
         "results/exp_visualizations",
         "results/predictions",
-        "results/visualizations",
-        "results/dataframes/eval_macro_micro",
-        "results/dataframes/eval_micro",
         "results/predictions/CELOE",
         "results/predictions/EVO",
         "results/predictions/PGExplainer",
         "results/predictions/SubGraphX",
+        "results/evaluations/CELOE",
+        "results/evaluations/EVO",
+        "results/evaluations/PGExplainer",
+        "results/evaluations/SubGraphX",
+        
     ]
 
     # Function to create directories if they don't exist
@@ -44,6 +46,5 @@ def create_edge_directories():
 
 # pre_process_aifb()
 # pre_process_mutag()
-
 create_lp_aifb()
 create_lp_mutag()

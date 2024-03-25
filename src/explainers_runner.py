@@ -34,8 +34,8 @@ def gen_evaluations(prediction_perfromance, explanation_perfromance):
         "pred_f1_score": prediction_perfromance["f1-score"],
         "exp_accuracy": explanation_perfromance["accuracy"],
         "exp_precision": explanation_perfromance["precision"],
-        "exp_recall": explanation_perfromance["precision"],
-        "exp_f1_score": explanation_perfromance["precision"],
+        "exp_recall": explanation_perfromance["recall"],
+        "exp_f1_score": explanation_perfromance["f1-score"],
     }
 
     return perfromances_evauations
@@ -105,6 +105,7 @@ def process_logical_approaches(dataset, learning_problem_fid):
 
 
 def run_explainers(dataset, print_explainer_loss=True, no_of_runs=5):
+    print(f"Running explainers  for {no_of_runs} runs. for dataset {dataset} ")
     pg_performance = {}
     sgx_performance = {}
     evo_performance = {}
@@ -132,7 +133,7 @@ def run_explainers(dataset, print_explainer_loss=True, no_of_runs=5):
         hidden_dim = configs["hidden_dim"]
         idx_map = my_dataset.idx_map
         gt = labels[test_idx].tolist()
-
+        print(f"Training on device {device}")
         feat = model.input_feature()
         feat_1 = {item: feat[item].data for item in feat}
         pred_logit = model(g, feat)[category]
@@ -183,8 +184,8 @@ def run_explainers(dataset, print_explainer_loss=True, no_of_runs=5):
         }
         dur_pg = t1 - t0
         nested_dict_pg["duration"] = dur_pg
-        print(f"Total time taken for PGExplainer  on {dataset}: {dur_sg:.2f}")
-        pg_performances = calcuate_metrics(gt, gnn_preds, exp_preds_pg)
+        print(f"Total time taken for PGExplainer  on {dataset}: {dur_pg:.2f}")
+        pg_performances = calcuate_metrics(gt, gnn_preds, exp_pred_pg)
         pg_performance[i] = pg_performances
         pg_preds[i] = nested_dict_pg
 
@@ -192,7 +193,7 @@ def run_explainers(dataset, print_explainer_loss=True, no_of_runs=5):
         print("Starting SubGraphX")
         t2 = time.time()
         explainer_sgx = HeteroSubgraphX(
-            model, num_hops=1, num_rollouts=3, shapley_steps=10
+            model, num_hops=1, num_rollouts=3, shapley_steps=5
         )
         exp_preds_sgx = {}
         entity_sgx = {}
@@ -211,10 +212,12 @@ def run_explainers(dataset, print_explainer_loss=True, no_of_runs=5):
             for key in exp_preds_sgx
         }
         nested_dict_sgx["duration"] = dur_sg
-        exp_pred_sgx = list(exp_preds_sgx.values())
-        sgx_performances = calcuate_metrics(gt, gnn_pred, exp_pred_sgx)
+        exp_preds_sgx_values = [value for value in exp_preds_sgx.values()]
+        print(exp_preds_sgx_values)
+        sgx_performances = calcuate_metrics(ground_truths = gt, gnn_preds = gnn_preds, explainer_preds= exp_preds_sgx_values)
         sgx_performance[i] = sgx_performances
         sgx_preds[i] = nested_dict_sgx
+        print(f"Total time taken for PGExplainer  on {dataset}: {dur_sg:.2f}")
         print("-" * 25)
 
         target_dict_evo, target_dict_celoe, evo_metrics, celoe_metrics = (

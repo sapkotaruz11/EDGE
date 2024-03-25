@@ -35,7 +35,7 @@ def calcuate_metrics(predictions_data):
         "accuracy": accuracy,
         "precision": precision,
         "recall": recall,
-        "f1_score": f1_score,
+        "f1-score": f1_score,
     }
 
     return metrics_dict

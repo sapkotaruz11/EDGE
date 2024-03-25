@@ -39,7 +39,7 @@ def calcuate_metrics(predictions_data):
         "accuracy": accuracy,
         "precision": precision,
         "recall": recall,
-        "f1_score": f1_score,
+        "f1-score": f1_score,
     }
 
     return metrics_dict
@@ -129,4 +129,4 @@ def train_celoe(learning_problems, kg=None, use_heur=False):
         t1 = time.time()
         duration = t1 - t0
         metrics = calcuate_metrics(target_dict)
-        return metrics, duration
+        return target_dict, metrics, duration

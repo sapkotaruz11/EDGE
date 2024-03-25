@@ -2,7 +2,7 @@ import json
 import os
 import time
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch as th
@@ -180,7 +180,7 @@ def train_gnn(dataset="mutag", device=None, PATH=None):
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataset = str.lower(dataset)
-
+    print(device)
     configs = get_configs(dataset)
     hidden_dim = configs["hidden_dim"]
     num_bases = configs["n_bases"]
