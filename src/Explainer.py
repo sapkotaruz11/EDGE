@@ -101,9 +101,6 @@ class Explainer:
         self.dataset = dataset
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model_name = model_name
-        self.my_dataset = RDFDatasets(
-            self.dataset, root="data/", validation=self.validation
-        )
 
         self.configs = get_configs(self.dataset)
         self.hidden_dim = self.configs["hidden_dim"]
@@ -114,6 +111,9 @@ class Explainer:
         self.validation = self.configs["validation"]
         self.hidden_layers = self.configs["num_layers"] - 1
         self.act = None
+        self.my_dataset = RDFDatasets(
+            self.dataset, root="data/", validation=self.validation
+        )
 
         self.g = self.my_dataset.g.to(self.device)
         self.out_dim = self.my_dataset.num_classes

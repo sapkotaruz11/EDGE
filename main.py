@@ -75,8 +75,8 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    print(args.datasets)
-    print(args.explainers)
+    print("Datasets:", args.datasets)
+    print("Explainers", args.explainers)
     if args.train:
         from src.explainers_runner import run_explainers
 
