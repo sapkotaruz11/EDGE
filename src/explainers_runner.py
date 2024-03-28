@@ -11,6 +11,7 @@ def run_explainers(dataset, explainers, print_explainer_loss=True, no_of_runs=5)
     predictions_data = {}
 
     for i in range(no_of_runs):
+        print(f"Starting the  Run", i + 1)
         performances[i] = {}
         preds[i] = {}
         my_explainer = Explainer(explainers=explainers, dataset=dataset)
@@ -19,7 +20,7 @@ def run_explainers(dataset, explainers, print_explainer_loss=True, no_of_runs=5)
                 performances[i][explainer] = my_explainer.evaluations.get(explainer, {})
             elif explainer == "SubGraphX":
                 performances[i][explainer] = my_explainer.evaluations.get(explainer, {})
-            elif explainer == "EVO":
+            elif explainer == "EvoLearner":
                 performances[i][explainer] = my_explainer.evaluations.get(explainer, {})
                 preds[i][explainer] = my_explainer.explanations.get(explainer, {})
             elif explainer == "CELOE":
@@ -31,12 +32,20 @@ def run_explainers(dataset, explainers, print_explainer_loss=True, no_of_runs=5)
     for explainer in explainers:
         file_path_evaluations = f"results/evaluations/{explainer}/{dataset}.json"
         with open(file_path_evaluations, "w") as json_file:
-            json.dump(performances, json_file, indent=2)
+            json.dump(
+                {f"Run_{i + 1}": performances[i][explainer] for i in range(no_of_runs)},
+                json_file,
+                indent=2,
+            )
 
         if explainer not in ["PGExplainer", "SubGraphX"]:
             file_path_predictions = f"results/predictions/{explainer}/{dataset}.json"
             with open(file_path_predictions, "w") as json_file:
-                json.dump(preds, json_file, indent=2)
+                json.dump(
+                    {f"Run_{i + 1}": preds[i][explainer] for i in range(no_of_runs)},
+                    json_file,
+                    indent=2,
+                )
 
     file_path_predictions = f"results/predictions/{dataset}.json"
     with open(file_path_predictions, "w") as json_file:
