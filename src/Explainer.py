@@ -104,6 +104,17 @@ class Explainer:
         self.my_dataset = RDFDatasets(
             self.dataset, root="data/", validation=self.validation
         )
+
+        self.configs = get_configs(self.dataset)
+        self.hidden_dim = self.configs["hidden_dim"]
+        self.num_bases = self.configs["n_bases"]
+        self.lr = self.configs["lr"]
+        self.weight_decay = self.configs["weight_decay"]
+        self.epochs = self.configs["max_epoch"]
+        self.validation = self.configs["validation"]
+        self.hidden_layers = self.configs["num_layers"] - 1
+        self.act = None
+
         self.g = self.my_dataset.g.to(self.device)
         self.out_dim = self.my_dataset.num_classes
         self.e_types = self.g.etypes
@@ -140,15 +151,7 @@ class Explainer:
         ).to(self.device)
 
         if self.model_name == "RGCN":
-            self.configs = get_configs(self.dataset)
-            self.hidden_dim = self.configs["hidden_dim"]
-            self.num_bases = self.configs["n_bases"]
-            self.lr = self.configs["lr"]
-            self.weight_decay = self.configs["weight_decay"]
-            self.epochs = self.configs["max_epoch"]
-            self.validation = self.configs["validation"]
-            self.hidden_layers = self.configs["num_layers"] - 1
-            self.act = None
+
             self.model = RGCN(
                 self.hidden_dim,
                 self.hidden_dim,
