@@ -1,6 +1,4 @@
 import os
-
-from src.gnn_explainers.trainer import train_gnn
 from src.utils.create_lp import create_lp_aifb, create_lp_mutag
 from src.utils.preprocess_kgs import pre_process_aifb, pre_process_mutag
 
@@ -26,7 +24,6 @@ def create_edge_directories():
         "results/evaluations/EVO",
         "results/evaluations/PGExplainer",
         "results/evaluations/SubGraphX",
-        
     ]
 
     # Function to create directories if they don't exist

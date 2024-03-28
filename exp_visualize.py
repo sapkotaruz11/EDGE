@@ -12,12 +12,12 @@ from torch import nn
 
 from src.dglnn_local.pgexplainer import HeteroPGExplainer
 from src.dglnn_local.subgraphx import HeteroSubgraphX
-from src.gnn_explainers.configs import get_configs
-from src.gnn_explainers.dataset import RDFDatasets
-from src.gnn_explainers.hetro_features import HeteroFeature
-from src.gnn_explainers.model import RGCN
-from src.gnn_explainers.trainer import train_gnn
-from src.gnn_explainers.utils import get_nodes_dict
+from src.gnn_model.configs import get_configs
+from src.gnn_model.dataset import RDFDatasets
+from src.gnn_model.hetro_features import HeteroFeature
+from src.gnn_model.model import RGCN
+from src.gnn_model.trainer import train_gnn
+from src.gnn_model.utils import get_nodes_dict
 from src.utils.visualize_hetero_graphs import visualize_hd
 
 

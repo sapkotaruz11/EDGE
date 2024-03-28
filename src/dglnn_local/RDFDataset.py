@@ -404,7 +404,10 @@ class RDFGraphDataset(DGLBuiltinDataset):
                     )
                 else:
                     idx.append(entid)
-                    lblid = _get_id(label_dict, label)
+                    if "aifb" in label:
+                        lblid = _get_id_aifb(label_dict, label)
+                    else:
+                        lblid = _get_id(label_dict, label)
                     labels[entid] = lblid
                     idx_to_ent[entid] = {"id": ent.id, "cls": ent.cls, "IRI": sample}
         return idx, idx_to_ent
@@ -547,6 +550,23 @@ def _get_id(dict, key):
     if id is None:
         id = len(dict)
         dict[key] = id
+    return id
+
+
+def _get_id_aifb(dict, key):
+    id = dict.get(key, None)
+
+    if id is None:
+        if (
+            key
+            == "http://www.aifb.uni-karlsruhe.de/Forschungsgruppen/viewForschungsgruppeOWL/id1instance"
+        ):
+            id = int(1)
+            dict[key] = id  # Set the value to 1 for the given key
+
+        else:
+            id = int(0)
+            dict[key] = id
     return id
 
 

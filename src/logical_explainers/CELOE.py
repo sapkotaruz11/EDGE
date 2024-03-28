@@ -51,7 +51,7 @@ def train_celoe(learning_problems, kg=None, use_heur=False):
         print("No Learning problems provided. stopping training CELOE")
         return
 
-    target_dict = {}
+    explanation_dict = {}
     kg_path = f"data/KGs/{kg}.owl"
     if not os.path.exists(kg_path):
         print(
@@ -60,7 +60,6 @@ def train_celoe(learning_problems, kg=None, use_heur=False):
         return None
     else:
         # Skip this dataset/model combination
-        print(f"Training CELOE on {kg}")
         t0 = time.time()
         target_kb = KnowledgeBase(path=kg_path)
         for str_target_concept, examples in learning_problems.items():
@@ -117,16 +116,15 @@ def train_celoe(learning_problems, kg=None, use_heur=False):
             concept_inds = concept_ind.intersection(
                 positive_examples_test | negative_examples_test
             )
-
-            target_dict[str_target_concept] = {
+            all_examples = positive_examples_test.union(negative_examples_test)
+            predicitons_dict = {
+                item: 1 if item in concept_inds else 0 for item in all_examples
+            }
+            explanation_dict[str_target_concept] = {
                 "best_concept": str(best_concept),
                 "concept_length": concept_length,
-                "concept_individuals": list(concept_inds),
-                "positive_examples": list(positive_examples_test),
-                "negative_examples": list(negative_examples_test),
             }
 
         t1 = time.time()
         duration = t1 - t0
-        metrics = calcuate_metrics(target_dict)
-        return target_dict, metrics, duration
+        return predicitons_dict, duration, explanation_dict
