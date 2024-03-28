@@ -410,7 +410,7 @@ class Explainer:
 
         t1 = time.time()
         self.pred_df["SubGraphX"] = self.pred_df["idx"].map(exp_preds_sgx)
-        dur_sgx = t0 - t1
+        dur_sgx = t1 - t0
         self.time_traker["SubGraphX"] = dur_sgx
 
         prediction_prefromance = calculate_metrics(

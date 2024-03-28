@@ -1,4 +1,5 @@
 dgl -f https://data.dgl.ai/wheels/cu121/repo.html
+torch==2.2.1
 tqdm==4.66.1
 networkx==3.2.1
 matplotlib==3.8.2
