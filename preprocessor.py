@@ -1,6 +1,4 @@
 import os
-from src.utils.create_lp import create_lp_aifb, create_lp_mutag
-from src.utils.preprocess_kgs import pre_process_aifb, pre_process_mutag
 
 
 def create_edge_directories():
@@ -17,11 +15,11 @@ def create_edge_directories():
         "results/exp_visualizations",
         "results/predictions",
         "results/predictions/CELOE",
-        "results/predictions/EVO",
+        "results/predictions/EvoLearner",
         "results/predictions/PGExplainer",
         "results/predictions/SubGraphX",
         "results/evaluations/CELOE",
-        "results/evaluations/EVO",
+        "results/evaluations/EvoLearner",
         "results/evaluations/PGExplainer",
         "results/evaluations/SubGraphX",
     ]
@@ -39,9 +37,5 @@ def create_edge_directories():
     create_directories(sub_dirs)
 
 
-# create_edge_directories()
+create_edge_directories()
 
-# pre_process_aifb()
-# pre_process_mutag()
-create_lp_aifb()
-create_lp_mutag()
