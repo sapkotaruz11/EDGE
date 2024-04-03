@@ -4,7 +4,7 @@ import os
 
 # Custom validation function for datasets argument
 def validate_datasets(value):
-    valid_datasets = ["Mutag", "AIFB"]  # Add more valid datasets as needed
+    valid_datasets = ["mutag", "aifb"]  # Add more valid datasets as needed
     datasets = value.split()
     for dataset in datasets:
         if dataset not in valid_datasets:
@@ -18,6 +18,18 @@ default_datasets = ["mutag", "aifb"]
 
 # Default list of explainers
 default_explainers = ["EvoLearner", "SubGraphX", "PGExplainer", "CELOE"]
+
+# Default value for the model argument
+default_model = "RGCN"
+
+
+def validate_model(value):
+    valid_models = ["RGCN", "GIN"]
+    if value not in valid_models:
+        raise argparse.ArgumentTypeError(
+            f"Invalid model '{value}'. Must be one of: {', '.join(valid_models)}"
+        )
+    return value
 
 
 def validate_explainers(values):
@@ -60,6 +72,12 @@ if __name__ == "__main__":
         default=default_explainers,
         help=f"Specify the explainers to use, separated by spaces (default: {', '.join(default_explainers)})",
     )
+    parser.add_argument(
+        "--model",
+        type=validate_model,
+        default=default_model,
+        help=f"Specify the model to use (default: {default_model})",
+    )
 
     parser.add_argument(
         "--num_runs",
@@ -77,12 +95,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print("Datasets:", args.datasets)
     print("Explainers", args.explainers)
+    print("Model name:", args.model)
     if args.train:
         from src.explainers_runner import run_explainers
 
         for dataset in args.datasets:
             run_explainers(
-                explainers=args.explainers, dataset=dataset, no_of_runs=args.num_runs
+                explainers=args.explainers,
+                dataset=dataset,
+                no_of_runs=args.num_runs,
+                model=args.model,
             )
 
     if args.print_results:
