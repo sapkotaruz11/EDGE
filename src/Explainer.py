@@ -16,7 +16,8 @@ torch.cuda.empty_cache()
 from src.gnn_model.configs import get_configs
 from src.gnn_model.dataset import RDFDatasets
 from src.gnn_model.hetro_features import HeteroFeature
-from src.gnn_model.model import RGCN
+from src.gnn_model.RGCN import RGCN
+from src.gnn_model.GIN import GIN
 from src.gnn_model.utils import get_nodes_dict
 from src.gnn_model.utils import get_lp_aifb_fid
 from src.gnn_model.utils import get_lp_mutag_fid
@@ -102,7 +103,7 @@ class Explainer:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model_name = model_name
 
-        self.configs = get_configs(self.dataset)
+        self.configs = get_configs(self.dataset, model=self.model_name)
         self.hidden_dim = self.configs["hidden_dim"]
         self.num_bases = self.configs["n_bases"]
         self.lr = self.configs["lr"]
@@ -111,6 +112,7 @@ class Explainer:
         self.validation = self.configs["validation"]
         self.hidden_layers = self.configs["num_layers"] - 1
         self.act = None
+
         self.my_dataset = RDFDatasets(
             self.dataset, root="data/", validation=self.validation
         )
@@ -122,6 +124,7 @@ class Explainer:
         self.train_idx = self.my_dataset.train_idx.to(self.device)
         self.test_idx = self.my_dataset.test_idx.to(self.device)
         self.labels = self.my_dataset.labels.to(self.device)
+        self.rel_names = list(set(self.e_types))
 
         if self.validation:
             self.valid_idx = self.my_dataset.valid_idx.to(self.device)
@@ -151,7 +154,7 @@ class Explainer:
         ).to(self.device)
 
         if self.model_name == "RGCN":
-
+            print("Initializing RGCN  model")
             self.model = RGCN(
                 self.hidden_dim,
                 self.hidden_dim,
@@ -162,16 +165,22 @@ class Explainer:
                 num_hidden_layers=self.hidden_layers,
             ).to(self.device)
 
-            self.optimizer = th.optim.Adam(
-                self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay
-            )
-            self.loss_fn = F.cross_entropy
-            self.model.add_module("input_feature", self.input_feature)
-            self.optimizer.add_param_group({"params": self.input_feature.parameters()})
-            self.early_stopping = EarlyStopping(
-                patience_decrease=5, patience_increase=10, delta=0.001
-            )
-            self.feat = self.model.input_feature()
+        if self.model_name == "GIN":
+            print("Initializing GIN  model")
+            self.model = GIN(
+                self.hidden_dim, self.hidden_dim, self.out_dim, self.rel_names
+            ).to(self.device)
+
+        self.optimizer = th.optim.Adam(
+            self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay
+        )
+        self.loss_fn = F.cross_entropy
+        self.model.add_module("input_feature", self.input_feature)
+        self.optimizer.add_param_group({"params": self.input_feature.parameters()})
+        self.early_stopping = EarlyStopping(
+            patience_decrease=5, patience_increase=10, delta=0.001
+        )
+        self.feat = self.model.input_feature()
 
         self.train()
         self.run_explainers()
@@ -228,7 +237,7 @@ class Explainer:
             pred_logit[self.test_idx].argmax(dim=1) == self.labels[self.test_idx]
         ).item() / len(self.test_idx)
         print(
-            f"Final validation accuracy of the model R-GCN on unseen dataset: {val_acc_final}"
+            f"Final validation accuracy of the model {self.model_name} on unseen dataset: {val_acc_final}"
         )
 
         if self.validation:
