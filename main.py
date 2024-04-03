@@ -110,4 +110,4 @@ if __name__ == "__main__":
     if args.print_results:
         from src.utils.print_results import print_results
 
-        print_results()
+        print_results(model_name=args.model)
