@@ -36,7 +36,7 @@ BEST_CONFIGS = {
                 "batch_size": 126,
                 "fanout": 4,
                 "dropout": 0.1,
-                "mini_batch_flag": True,
+                "mini_batch_flag": False,
                 "validation": True,
             },
         },
