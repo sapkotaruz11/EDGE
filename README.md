@@ -178,7 +178,7 @@ If you wisth to train for all the explainers and datasets, you can simply omit t
   ```
 There is also support for prining results, in which you can specify the model you want to print results for, defaults to "RGCN"
 
-- Print Results for RGCN model
+- Print Results for GIN model
   ```shell
   python main.py --print_results --model GIN
   ```
