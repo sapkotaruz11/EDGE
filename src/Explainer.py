@@ -21,6 +21,7 @@ from src.gnn_model.GIN import GIN
 from src.gnn_model.utils import get_nodes_dict
 from src.gnn_model.utils import get_lp_aifb_fid
 from src.gnn_model.utils import get_lp_mutag_fid
+from src.gnn_model.utils import get_lp_bgs_fid
 from src.logical_explainers.EvoLearner import train_evo
 from src.logical_explainers.CELOE import train_celoe
 from src.gnn_model.utils import gen_evaluations
@@ -142,6 +143,7 @@ class Explainer:
         self.dataset_function_mapping = {
             "mutag": get_lp_mutag_fid,
             "aifb": get_lp_aifb_fid,
+            "bgs": get_lp_bgs_fid,
             # Add more dataset-function mappings as needed
         }
 
