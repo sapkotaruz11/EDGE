@@ -3,31 +3,54 @@ import torch.nn.functional as F
 import dgl.nn as dglnn
 from dgl.nn.pytorch.conv import GINConv
 
+
 class GIN(nn.Module):
 
-    def __init__(self, input_dim, hidden_dim, output_dim , rel_names, learn_eps = False, aggregate = "sum", num_hidden_layers = 2):
+    def __init__(
+        self,
+        input_dim,
+        hidden_dim,
+        output_dim,
+        rel_names,
+        learn_eps=False,
+        aggregate="sum",
+        num_hidden_layers=2,
+    ):
         super(GIN, self).__init__()
         self.rel_names = rel_names
         self.learn_eps = learn_eps
         self.aggregate = aggregate
         self.layers = nn.ModuleList()
         # input 2 hidden
-        self.layers.append(GINLayer(
-            input_dim, hidden_dim, self.rel_names, self.learn_eps, self.aggregate))
+        self.layers.append(
+            GINLayer(
+                input_dim, hidden_dim, self.rel_names, self.learn_eps, self.aggregate
+            )
+        )
         for i in range(num_hidden_layers):
-            self.layers.append(GINLayer(
-                hidden_dim, hidden_dim, self.rel_names, self.learn_eps, self.aggregate
-            ))
+            self.layers.append(
+                GINLayer(
+                    hidden_dim,
+                    hidden_dim,
+                    self.rel_names,
+                    self.learn_eps,
+                    self.aggregate,
+                )
+            )
         self.linear_prediction = nn.ModuleList()
         for _ in range(num_hidden_layers + 1):
             self.linear_prediction.append(nn.Linear(hidden_dim, output_dim))
         self.drop = nn.Dropout(0.5)
 
-    def forward(self, hg, h_dict):
+    def forward(self, hg, h_dict, embed=False, eweight=None, **kwargs):
         output_dict = dict()
         logits = dict()
-        
-        if hasattr(hg, 'ntypes'):
+
+        if embed:
+            feat = self.layers[0](hg, h_dict)
+            return feat
+
+        if hasattr(hg, "ntypes"):
             # full graph training,
             for ntype in hg.ntypes:
                 output_dict[ntype] = []
@@ -40,9 +63,11 @@ class GIN(nn.Module):
             # perform graph sum pooling over all nodes in each layer
             for ntype in hg.ntypes:
                 for i, h in enumerate(output_dict[ntype]):
-                    logits[ntype] = logits[ntype] + self.drop(self.linear_prediction[i](h))
+                    logits[ntype] = logits[ntype] + self.drop(
+                        self.linear_prediction[i](h)
+                    )
                 logits[ntype] = F.softmax(logits[ntype], dim=-1)
-                
+
         else:
             # minibatch training, block
             for layer, block in zip(self.layers, hg):
@@ -56,18 +81,21 @@ class GIN(nn.Module):
             # perform graph sum pooling over all nodes in each layer
             for ntype in block.ntypes:
                 for i, h in enumerate(output_dict[ntype]):
-                    logits[ntype] = logits[ntype] + self.drop(self.linear_prediction[i](h))
+                    logits[ntype] = logits[ntype] + self.drop(
+                        self.linear_prediction[i](h)
+                    )
                 logits[ntype] = F.softmax(logits[ntype], dim=-1)
-        
+
         return logits
+
 
 class GINLayer(nn.Module):
     def __init__(self, input_dim, output_dim, rel_names, learn_eps, aggregate):
         super(GINLayer, self).__init__()
-        self.conv = dglnn.HeteroGraphConv({
-            rel: GINBase(input_dim, output_dim, learn_eps)
-            for rel in rel_names
-        }, aggregate)
+        self.conv = dglnn.HeteroGraphConv(
+            {rel: GINBase(input_dim, output_dim, learn_eps) for rel in rel_names},
+            aggregate,
+        )
 
     def forward(self, g, h_dict):
         h_dict = self.conv(g, h_dict)
@@ -76,12 +104,15 @@ class GINLayer(nn.Module):
             out_put[n_type] = h.squeeze()
         return out_put
 
+
 class GINBase(nn.Module):
     def __init__(self, input_dim, output_dim, learn_eps):
         super(GINBase, self).__init__()
 
         mlp = MLP(input_dim, output_dim)
-        self.ginlayer = GINConv(mlp, learn_eps=learn_eps) # set to True if learning epsilon
+        self.ginlayer = GINConv(
+            mlp, learn_eps=learn_eps
+        )  # set to True if learning epsilon
         self.batch_norm = nn.BatchNorm1d(output_dim)
 
     def forward(self, g, h):
@@ -89,6 +120,7 @@ class GINBase(nn.Module):
         h = self.batch_norm(h)
         h = F.relu(h)
         return h
+
 
 class MLP(nn.Module):
     """Construct two-layer MLP-type aggreator for GIN model"""
