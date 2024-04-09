@@ -21,7 +21,7 @@ def print_results(model_name="RGCN"):
     ]
 
     models = ["CELOE", "EvoLearner", "PGExplainer", "SubGraphX"]
-    datasets = ["aifb", "mutag"]
+    datasets = ["aifb", "mutag", "bgs"]
     for model in models:
         for dataset in datasets:
             file_path = f"results/evaluations/{model_name}/{model}/{dataset}.json"

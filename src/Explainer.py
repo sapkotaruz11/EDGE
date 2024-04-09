@@ -10,6 +10,7 @@ import torch as th
 import torch.nn.functional as F
 from torch import nn
 import pandas as pd
+import yaml
 
 torch.cuda.empty_cache()
 
@@ -17,7 +18,7 @@ from src.gnn_model.configs import get_configs
 from src.gnn_model.dataset import RDFDatasets
 from src.gnn_model.hetro_features import HeteroFeature
 from src.gnn_model.RGCN import RGCN
-from src.gnn_model.GIN import GIN
+from src.gnn_model.GAT import RGAT
 from src.gnn_model.utils import get_nodes_dict
 from src.gnn_model.utils import get_lp_aifb_fid
 from src.gnn_model.utils import get_lp_mutag_fid
@@ -167,10 +168,14 @@ class Explainer:
                 num_hidden_layers=self.hidden_layers,
             ).to(self.device)
 
-        if self.model_name == "GIN":
-            print("Initializing GIN  model")
-            self.model = GIN(
-                self.hidden_dim, self.hidden_dim, self.out_dim, self.rel_names
+        if self.model_name == "RGAT":
+            print("Initializing R-GAT  model")
+            self.model = RGAT(
+                self.hidden_dim,
+                self.out_dim,
+                self.hidden_dim,
+                self.e_types,
+                num_heads=3,
             ).to(self.device)
 
         self.optimizer = th.optim.Adam(
@@ -351,15 +356,25 @@ class Explainer:
     def _run_pgexplainer(self, print_explainer_loss=True):
         from src.dglnn_local.pgexplainer import HeteroPGExplainer
 
+        # Load configurations from the YAML file
+        config_path = "configs/pgexplainer.yaml"
+        with open(config_path, "r") as f:
+            config_data = yaml.safe_load(f)
+        pg_config = config_data[self.dataset]
+        init_tmp = pg_config["initial_temp"]
+        final_tmp = pg_config["final_temp"]
+
         print("Starting PGExplainer")
         t0 = time.time()
         explainer_pg = HeteroPGExplainer(
             self.model, self.hidden_dim, num_hops=1, explain_graph=False
         )
         feat_pg = {item: self.feat[item].data for item in self.feat}
-        init_tmp, final_tmp = 5.0, 1.0
-        optimizer_exp = th.optim.Adam(explainer_pg.parameters(), lr=0.01)
-        for epoch in range(20):
+
+        optimizer_exp = th.optim.Adam(
+            explainer_pg.parameters(), lr=pg_config["learning_rate"]
+        )
+        for epoch in range(pg_config["num_epochs"]):
             tmp = float(init_tmp * np.power(final_tmp / init_tmp, epoch / 20))
             loss = explainer_pg.train_step_node(
                 {
@@ -375,7 +390,7 @@ class Explainer:
             loss.backward()
             optimizer_exp.step()
             if print_explainer_loss:
-                print(f"Explainer trained for {epoch} epochs with loss {loss :3f}")
+                print(f"Explainer trained for {epoch+1} epochs with loss {loss :3f}")
         self.entity_pg = {}
         probs, edge_mask, bg, inverse_indices = explainer_pg.explain_node(
             {self.category: self.test_idx}, self.g, self.feat, training=True

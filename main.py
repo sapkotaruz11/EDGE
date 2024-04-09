@@ -24,7 +24,7 @@ default_model = "RGCN"
 
 
 def validate_model(value):
-    valid_models = ["RGCN", "GIN"]
+    valid_models = ["RGCN", "RGAT"]
     if value not in valid_models:
         raise argparse.ArgumentTypeError(
             f"Invalid model '{value}'. Must be one of: {', '.join(valid_models)}"
