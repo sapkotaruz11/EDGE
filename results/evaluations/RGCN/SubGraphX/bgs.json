@@ -1,0 +1,52 @@
+{
+  "Run_1": {
+    "pred_accuracy": 0.6206896551724138,
+    "pred_precision": 0.4666666666666667,
+    "pred_recall": 0.7,
+    "pred_f1_score": 0.56,
+    "exp_accuracy": 0.6896551724137931,
+    "exp_precision": 0.5333333333333333,
+    "exp_recall": 0.8,
+    "exp_f1_score": 0.64
+  },
+  "Run_2": {
+    "pred_accuracy": 0.5862068965517241,
+    "pred_precision": 0.4,
+    "pred_recall": 0.4,
+    "pred_f1_score": 0.4000000000000001,
+    "exp_accuracy": 0.5517241379310345,
+    "exp_precision": 0.4,
+    "exp_recall": 0.36363636363636365,
+    "exp_f1_score": 0.380952380952381
+  },
+  "Run_3": {
+    "pred_accuracy": 0.5862068965517241,
+    "pred_precision": 0.3333333333333333,
+    "pred_recall": 0.2,
+    "pred_f1_score": 0.25,
+    "exp_accuracy": 0.6896551724137931,
+    "exp_precision": 0.5,
+    "exp_recall": 0.3333333333333333,
+    "exp_f1_score": 0.4
+  },
+  "Run_4": {
+    "pred_accuracy": 0.4827586206896552,
+    "pred_precision": 0.3333333333333333,
+    "pred_recall": 0.5,
+    "pred_f1_score": 0.4,
+    "exp_accuracy": 0.5172413793103449,
+    "exp_precision": 0.4,
+    "exp_recall": 0.5454545454545454,
+    "exp_f1_score": 0.4615384615384615
+  },
+  "Run_5": {
+    "pred_accuracy": 0.5517241379310345,
+    "pred_precision": 0.2,
+    "pred_recall": 0.1,
+    "pred_f1_score": 0.13333333333333333,
+    "exp_accuracy": 0.6206896551724138,
+    "exp_precision": 0.4,
+    "exp_recall": 0.2,
+    "exp_f1_score": 0.26666666666666666
+  }
+}
