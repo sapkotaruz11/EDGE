@@ -176,7 +176,7 @@ class Explainer:
                 self.hidden_dim,
                 self.e_types,
                 num_heads=3,
-                num_hidden_layers=1,
+                num_hidden_layers=self.hidden_layers,
             ).to(self.device)
         self.model.name = self.model_name
         self.optimizer = th.optim.Adam(
