@@ -785,5 +785,12 @@ class HeteroSubgraphX(nn.Module):
             pred_logits = self.model(exp_as_graph, sg_feat)
             node_mapping = exp_as_graph.ndata[NID][category]
             index = (node_mapping == self.node_idx).nonzero().item()
-            predictions = pred_logits[category][index].argmax(dim=0).item()
+            if self.model.name == "RGAT":
+                pred_logits = pred_logits[category]
+                if len(pred_logits.shape) == 1:
+                    predictions = pred_logits.argmax().tolist()
+                else:
+                    predictions = pred_logits.argmax(dim=0).tolist()[index]
+            else:
+                predictions = pred_logits[category][index].argmax(dim=0).item()
         return exp_as_graph, predictions

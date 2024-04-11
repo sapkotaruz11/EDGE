@@ -177,7 +177,7 @@ class Explainer:
                 self.e_types,
                 num_heads=3,
             ).to(self.device)
-
+        self.model.name = self.model_name
         self.optimizer = th.optim.Adam(
             self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay
         )
@@ -424,7 +424,7 @@ class Explainer:
         print("Starting SubGraphX")
         t0 = time.time()
         explainer_sgx = HeteroSubgraphX(
-            self.model, num_hops=1, num_rollouts=3, shapley_steps=5
+            self.model, num_hops=1, num_rollouts=3, shapley_steps=10
         )
         exp_preds_sgx = {}
         for idx in self.test_idx.tolist():
