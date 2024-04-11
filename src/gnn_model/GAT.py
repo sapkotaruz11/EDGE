@@ -18,14 +18,6 @@ class RGAT(nn.Module):
     ):
         super(RGAT, self).__init__()
         self.rel_names = etypes
-        self.conv = dglnn.HeteroGraphConv(
-            {
-                rel: dglnn.GraphConv(
-                    in_dim, h_dim, norm="right", weight=False, bias=False
-                )
-                for rel in etypes
-            }
-        )
         self.layers = nn.ModuleList()
         # input 2 hidden
         self.layers.append(
@@ -34,7 +26,7 @@ class RGAT(nn.Module):
                 h_dim,
                 num_heads,
                 self.rel_names,
-                activation=F.relu,
+                activation=F.elu,
                 dropout=dropout,
                 last_layer_flag=False,
             )
@@ -46,7 +38,7 @@ class RGAT(nn.Module):
                     h_dim,
                     num_heads,
                     self.rel_names,
-                    activation=F.relu,
+                    activation=F.elu,
                     dropout=dropout,
                     last_layer_flag=False,
                 )
@@ -65,11 +57,8 @@ class RGAT(nn.Module):
 
     def forward(self, hg, h_dict=None, embed=False, eweight=None, **kwargs):
         if embed:
-            h_dict = self.conv(hg, h_dict)
-            out_put = {}
-            for n_type, h in h_dict.items():
-                out_put[n_type] = h.flatten(1)
-            return out_put
+            h_dict = self.layers[0](hg, h_dict, embed=True)
+            return h_dict
         if hasattr(hg, "ntypes"):
             # full graph training,
             for layer in self.layers:
@@ -114,13 +103,15 @@ class RGATLayer(nn.Module):
             }
         )
 
-    def forward(self, g, h_dict):
+    def forward(self, g, h_dict, embed=False):
         h_dict = self.conv(g, h_dict)
         out_put = {}
         for n_type, h in h_dict.items():
-            if self.last_layer_flag:
+            if self.last_layer_flag or embed:
                 h = h.mean(1)
             else:
                 h = h.flatten(1)
-            out_put[n_type] = h.squeeze()
+            if not embed:
+                h = h.squeeze()
+            out_put[n_type] = h
         return out_put

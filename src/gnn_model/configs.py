@@ -47,7 +47,7 @@ BEST_CONFIGS = {
                 "max_epoch": 50,
                 "hidden_dim": 32,
                 "n_bases": -1,
-                "num_layers": 2,
+                "num_layers": 3,
                 "batch_size": 126,
                 "dropout": 0,
                 "mini_batch_flag": False,

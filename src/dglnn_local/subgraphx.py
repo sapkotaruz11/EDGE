@@ -1,4 +1,5 @@
 """Torch Module for SubgraphX"""
+
 import math
 from collections import Counter
 
@@ -782,15 +783,10 @@ class HeteroSubgraphX(nn.Module):
             sg_feat = {}
             for node_type in sg_nodes.keys():
                 sg_feat[node_type] = feat[node_type][sg_nodes[node_type].long()]
-            pred_logits = self.model(exp_as_graph, sg_feat)
+            pred_logits = self.model(exp_as_graph, sg_feat)[category]
             node_mapping = exp_as_graph.ndata[NID][category]
             index = (node_mapping == self.node_idx).nonzero().item()
-            if self.model.name == "RGAT":
-                pred_logits = pred_logits[category]
-                if len(pred_logits.shape) == 1:
-                    predictions = pred_logits.argmax().tolist()
-                else:
-                    predictions = pred_logits.argmax(dim=0).tolist()[index]
-            else:
-                predictions = pred_logits[category][index].argmax(dim=0).item()
+            if len(pred_logits.shape) == 1:
+                pred_logits = pred_logits.unsqueeze(0)
+            predictions = pred_logits.argmax(dim=1).tolist()[index]
         return exp_as_graph, predictions

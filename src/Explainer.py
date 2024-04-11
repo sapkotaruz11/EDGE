@@ -176,6 +176,7 @@ class Explainer:
                 self.hidden_dim,
                 self.e_types,
                 num_heads=3,
+                num_hidden_layers=1,
             ).to(self.device)
         self.model.name = self.model_name
         self.optimizer = th.optim.Adam(
@@ -185,7 +186,7 @@ class Explainer:
         self.model.add_module("input_feature", self.input_feature)
         self.optimizer.add_param_group({"params": self.input_feature.parameters()})
         self.early_stopping = EarlyStopping(
-            patience_decrease=5, patience_increase=10, delta=0.001
+            patience_decrease=5, patience_increase=10, delta=0.01
         )
         self.feat = self.model.input_feature()
 
@@ -461,11 +462,11 @@ class Explainer:
             "SubGraphX": self._run_subgraphx,
             # Add more explainer-method mappings as needed
         }
-
-        for explainer in self.explainers:
-            explainer_method = explainer_methods.get(explainer)
-            if explainer_method:
-                explainer_method()
+        if self.explainers is not None:
+            for explainer in self.explainers:
+                explainer_method = explainer_methods.get(explainer)
+                if explainer_method:
+                    explainer_method()
 
     def create_lp(self):
         self.lp_function = self.dataset_function_mapping.get(self.dataset)
