@@ -1,0 +1,32 @@
+{
+  "Run_1": {
+    "carcino": {
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),7,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Ring')))",
+      "concept_length": 4
+    }
+  },
+  "Run_2": {
+    "carcino": {
+      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),filler=OWLObjectComplementOf(OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Di227'))))",
+      "concept_length": 4
+    }
+  },
+  "Run_3": {
+    "carcino": {
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),3,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Six_ring')))",
+      "concept_length": 4
+    }
+  },
+  "Run_4": {
+    "carcino": {
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),6,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Ring')))",
+      "concept_length": 4
+    }
+  },
+  "Run_5": {
+    "carcino": {
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),7,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Ring')))",
+      "concept_length": 4
+    }
+  }
+}
