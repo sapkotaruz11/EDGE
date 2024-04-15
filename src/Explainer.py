@@ -425,7 +425,7 @@ class Explainer:
         print("Starting SubGraphX")
         t0 = time.time()
         explainer_sgx = HeteroSubgraphX(
-            self.model, num_hops=1, num_rollouts=3, shapley_steps=10
+            self.model, num_hops=1, num_rollouts=3, shapley_steps=5
         )
         exp_preds_sgx = {}
         for idx in self.test_idx.tolist():
