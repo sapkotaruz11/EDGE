@@ -12,6 +12,7 @@ BEST_CONFIGS = {
                 "dropout": 0,
                 "mini_batch_flag": False,
                 "validation": True,
+                "patience": 10,
             },
             "mutag": {
                 "lr": 0.005,
@@ -25,6 +26,7 @@ BEST_CONFIGS = {
                 "dropout": 0.5,
                 "mini_batch_flag": False,
                 "validation": True,
+                "patience": 20,
             },
             "bgs": {
                 "lr": 0.005,
@@ -38,6 +40,7 @@ BEST_CONFIGS = {
                 "dropout": 0.1,
                 "mini_batch_flag": False,
                 "validation": True,
+                "patience": 20,
             },
         },
         "RGAT": {
@@ -52,6 +55,7 @@ BEST_CONFIGS = {
                 "dropout": 0,
                 "mini_batch_flag": False,
                 "validation": True,
+                "patience": 10,
             },
             "mutag": {
                 "lr": 0.005,
@@ -65,6 +69,7 @@ BEST_CONFIGS = {
                 "dropout": 0.5,
                 "mini_batch_flag": False,
                 "validation": True,
+                "patience": 20,
             },
             "bgs": {
                 "lr": 0.005,
@@ -78,6 +83,7 @@ BEST_CONFIGS = {
                 "dropout": 0.1,
                 "mini_batch_flag": False,
                 "validation": True,
+                "patience": 20,
             },
         },
         "GIN": {

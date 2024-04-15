@@ -13,6 +13,7 @@ class RGAT(nn.Module):
         h_dim,
         etypes,
         num_heads,
+        activation=None,
         num_hidden_layers=1,
         dropout=0,
     ):
@@ -26,7 +27,7 @@ class RGAT(nn.Module):
                 h_dim,
                 num_heads,
                 self.rel_names,
-                activation=F.elu,
+                activation=activation,
                 dropout=dropout,
                 last_layer_flag=False,
             )
@@ -38,7 +39,7 @@ class RGAT(nn.Module):
                     h_dim,
                     num_heads,
                     self.rel_names,
-                    activation=F.elu,
+                    activation=activation,
                     dropout=dropout,
                     last_layer_flag=False,
                 )

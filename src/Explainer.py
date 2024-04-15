@@ -30,67 +30,27 @@ from src.gnn_model.utils import calculate_metrics
 
 
 class EarlyStopping:
-    """
-    A utility class for early stopping during the training of machine learning models.
-
-    This class is designed to monitor a model's loss during training and trigger an early stop
-    if the loss does not decrease significantly over a specified number of epochs.
-    It helps prevent overfitting by stopping the training process when the model's performance
-    on the validation set starts degrading.
-
-    Attributes:
-        patience_decrease (int): The number of epochs with decreased loss to wait before resetting the counter. Defaults to 5.
-        patience_increase (int): The number of epochs with increased loss to wait before triggering early stopping. Defaults to 10.
-        delta (float): The minimum change in the monitored loss to qualify as an improvement or degradation. Defaults to 0.001.
-        prev_score (float or None): The loss from the previous epoch. Initially None and updated during training.
-        counter_decrease (int): Counts the number of epochs where loss has decreased. Resets if loss increases.
-        counter_increase (int): Counts the number of epochs where loss has increased. Triggers early stopping
-        if it reaches the patience threshold.
-        early_stop (bool): Flag indicating whether early stopping has been triggered.
-
-    Methods:
-        __call__(loss): Updates the counters and early stopping flag based on the new loss value.
-
-    Example:
-        >>> early_stopping = EarlyStopping(patience_decrease=5, patience_increase=10, delta=0.001)
-        >>> for epoch in range(epochs):
-        >>>     train()  # Your training process here
-        >>>     val_loss = validate()  # Your validation process here
-        >>>     early_stopping(val_loss)
-        >>>     if early_stopping.early_stop:
-        >>>         print("Early stopping triggered")
-        >>>         break
-
-    Note:
-        - This class should be instantiated and used as part of a training loop.
-        - It is used in conjunction with a validation loss metric.
-    """
-
-    def __init__(self, patience_decrease=5, patience_increase=10, delta=0.001):
-        self.patience_decrease = patience_decrease
-        self.patience_increase = patience_increase
-        self.delta = delta
-        self.prev_score = None
-        self.counter_decrease = 0
-        self.counter_increase = 0
+    def __init__(self, patience=10):
+        self.patience = patience
+        self.counter = 0
+        self.best_score = None
         self.early_stop = False
+        self.best_model = None
 
-    def __call__(self, loss):
-        if self.prev_score is not None:
-            if loss < self.prev_score - self.delta:
-                # Loss decreased
-                self.counter_decrease += 0
-            elif loss > self.prev_score + self.delta:
-                # Loss increased
-                self.counter_increase += 1
-                if self.counter_increase >= self.patience_increase:
-                    self.early_stop = True
-            else:
-                # Loss didn't decrease or increase significantly
-                self.counter_decrease = 0
-                self.counter_increase = 0
-
-        self.prev_score = loss
+    def step(self, acc, model):
+        score = acc
+        if self.best_score is None:
+            self.best_score = score
+            self.best_model = model
+        elif score < self.best_score:
+            self.counter += 1
+            if self.counter >= self.patience:
+                self.early_stop = True
+        else:
+            self.best_score = score
+            self.counter = 0
+            self.best_model = model
+        return self.early_stop
 
 
 class Explainer:
@@ -114,6 +74,7 @@ class Explainer:
         self.validation = self.configs["validation"]
         self.hidden_layers = self.configs["num_layers"] - 1
         self.act = None
+        self.patience = self.configs["patience"]
 
         self.my_dataset = RDFDatasets(
             self.dataset, root="data/", validation=self.validation
@@ -169,6 +130,8 @@ class Explainer:
             ).to(self.device)
 
         if self.model_name == "RGAT":
+            if self.dataset == "mutag":
+                self.act = F.elu
             print("Initializing R-GAT  model")
             self.model = RGAT(
                 self.hidden_dim,
@@ -178,16 +141,13 @@ class Explainer:
                 num_heads=3,
                 num_hidden_layers=self.hidden_layers,
             ).to(self.device)
-        self.model.name = self.model_name
         self.optimizer = th.optim.Adam(
             self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay
         )
         self.loss_fn = F.cross_entropy
         self.model.add_module("input_feature", self.input_feature)
         self.optimizer.add_param_group({"params": self.input_feature.parameters()})
-        self.early_stopping = EarlyStopping(
-            patience_decrease=5, patience_increase=10, delta=0.01
-        )
+        self.early_stopping = EarlyStopping(patience=self.patience)
         self.feat = self.model.input_feature()
 
         self.train()
@@ -233,12 +193,12 @@ class Explainer:
                     np.average(dur),
                 )
             )
-            self.early_stopping(val_loss)
-            if self.early_stopping.early_stop:
+            if self.early_stopping.step(val_acc, self.model):
                 print("Early stopping")
+
                 break
         print("End Training")
-
+        self.model = self.early_stopping.best_model
         pred_logit = self.model(self.g, self.feat)[self.category]
 
         val_acc_final = th.sum(
@@ -425,7 +385,7 @@ class Explainer:
         print("Starting SubGraphX")
         t0 = time.time()
         explainer_sgx = HeteroSubgraphX(
-            self.model, num_hops=1, num_rollouts=3, shapley_steps=10
+            self.model, num_hops=1, num_rollouts=3, shapley_steps=5
         )
         exp_preds_sgx = {}
         for idx in self.test_idx.tolist():
