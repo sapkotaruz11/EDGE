@@ -7,25 +7,25 @@
   },
   "Run_2": {
     "carcino": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),filler=OWLObjectComplementOf(OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Ester'))))",
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),0,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Ester')))",
       "concept_length": 4
     }
   },
   "Run_3": {
     "carcino": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),filler=OWLObjectComplementOf(OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Ester'))))",
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),0,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Ester')))",
       "concept_length": 4
     }
   },
   "Run_4": {
     "carcino": {
-      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),2,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Methyl')))",
+      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),filler=OWLObjectComplementOf(OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Ester'))))",
       "concept_length": 4
     }
   },
   "Run_5": {
     "carcino": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),filler=OWLObjectComplementOf(OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Ester'))))",
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),0,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Five_ring')))",
       "concept_length": 4
     }
   }

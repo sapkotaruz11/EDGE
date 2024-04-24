@@ -4,49 +4,49 @@
     "pred_precision": 0.7049180327868853,
     "pred_recall": 0.9555555555555556,
     "pred_f1_score": 0.8113207547169811,
-    "exp_accuracy": 0.75,
-    "exp_precision": 0.7741935483870968,
-    "exp_recall": 0.9411764705882353,
-    "exp_f1_score": 0.8495575221238938
+    "exp_accuracy": 0.6764705882352942,
+    "exp_precision": 0.6885245901639344,
+    "exp_recall": 0.9333333333333333,
+    "exp_f1_score": 0.7924528301886792
   },
   "Run_2": {
     "pred_accuracy": 0.7058823529411765,
     "pred_precision": 0.7049180327868853,
     "pred_recall": 0.9555555555555556,
     "pred_f1_score": 0.8113207547169811,
-    "exp_accuracy": 0.7205882352941176,
-    "exp_precision": 0.7384615384615385,
-    "exp_recall": 0.96,
-    "exp_f1_score": 0.8347826086956522
+    "exp_accuracy": 0.5,
+    "exp_precision": 0.37777777777777777,
+    "exp_recall": 0.7391304347826086,
+    "exp_f1_score": 0.5
   },
   "Run_3": {
     "pred_accuracy": 0.7058823529411765,
     "pred_precision": 0.7049180327868853,
     "pred_recall": 0.9555555555555556,
     "pred_f1_score": 0.8113207547169811,
-    "exp_accuracy": 0.6176470588235294,
-    "exp_precision": 0.6031746031746031,
+    "exp_accuracy": 0.6470588235294118,
+    "exp_precision": 0.6229508196721312,
     "exp_recall": 0.9743589743589743,
-    "exp_f1_score": 0.7450980392156863
+    "exp_f1_score": 0.76
   },
   "Run_4": {
     "pred_accuracy": 0.7058823529411765,
     "pred_precision": 0.7049180327868853,
     "pred_recall": 0.9555555555555556,
     "pred_f1_score": 0.8113207547169811,
-    "exp_accuracy": 0.7352941176470589,
-    "exp_precision": 0.7377049180327869,
-    "exp_recall": 0.9574468085106383,
-    "exp_f1_score": 0.8333333333333334
+    "exp_accuracy": 0.6176470588235294,
+    "exp_precision": 0.6065573770491803,
+    "exp_recall": 0.9487179487179487,
+    "exp_f1_score": 0.74
   },
   "Run_5": {
     "pred_accuracy": 0.7058823529411765,
     "pred_precision": 0.7049180327868853,
     "pred_recall": 0.9555555555555556,
     "pred_f1_score": 0.8113207547169811,
-    "exp_accuracy": 0.6911764705882353,
-    "exp_precision": 0.7096774193548387,
-    "exp_recall": 0.9361702127659575,
-    "exp_f1_score": 0.8073394495412844
+    "exp_accuracy": 0.7205882352941176,
+    "exp_precision": 0.7903225806451613,
+    "exp_recall": 0.8909090909090909,
+    "exp_f1_score": 0.8376068376068375
   }
 }

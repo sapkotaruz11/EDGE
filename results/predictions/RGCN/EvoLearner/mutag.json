@@ -1,32 +1,32 @@
 {
   "Run_1": {
     "carcino": {
-      "best_concept": "OWLObjectUnionOf((OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasAtom')),3,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Carbon-10'))), OWLDataHasValue(property=OWLDataProperty(IRI('http://dl-learner.org/carcinogenesis#','cytogen_ca')),value=OWLLiteral(True))))",
-      "concept_length": 8
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),6,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Ring')))",
+      "concept_length": 4
     }
   },
   "Run_2": {
     "carcino": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','inBond')),filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Compound')))",
-      "concept_length": 3
+      "best_concept": "OWLObjectIntersectionOf((OWLClass(IRI('http://www.w3.org/2002/07/owl#','Thing')), OWLObjectUnionOf((OWLObjectSomeValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasBond')),filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Bond-7'))), OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasAtom')),4,filler=OWLDataSomeValuesFrom(property=OWLDataProperty(IRI('http://dl-learner.org/carcinogenesis#','charge')),filler=OWLDatatypeRestriction(OWLDatatype(IRI('http://www.w3.org/2001/XMLSchema#','double')), (OWLFacetRestriction(OWLFacet.MAX_INCLUSIVE, OWLLiteral(-0.04)),)))), OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasAtom')),3,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Hydrogen-3')))))))",
+      "concept_length": 17
     }
   },
   "Run_3": {
     "carcino": {
-      "best_concept": "OWLObjectUnionOf((OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Halide'))), OWLDataHasValue(property=OWLDataProperty(IRI('http://dl-learner.org/carcinogenesis#','drosophila_slrl')),value=OWLLiteral(True)), OWLObjectSomeValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasAtom')),filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Carbon-22')))))",
-      "concept_length": 11
+      "best_concept": "OWLObjectIntersectionOf((OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),5,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Methoxy'))), OWLObjectUnionOf((OWLObjectSomeValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasBond')),filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Bond-7'))), OWLDataHasValue(property=OWLDataProperty(IRI('http://dl-learner.org/carcinogenesis#','drosophila_rt')),value=OWLLiteral(False)), OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasAtom')),5,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Carbon')))))))",
+      "concept_length": 17
     }
   },
   "Run_4": {
     "carcino": {
-      "best_concept": "OWLObjectUnionOf((OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),8,filler=OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','inBond')),filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Bond-7')))), OWLObjectSomeValuesFrom(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasBond')),filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Bond-7'))), OWLDataHasValue(property=OWLDataProperty(IRI('http://dl-learner.org/carcinogenesis#','drosophila_slrl')),value=OWLLiteral(True))))",
-      "concept_length": 14
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),10,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Halide')))",
+      "concept_length": 4
     }
   },
   "Run_5": {
     "carcino": {
-      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasAtom')),3,filler=OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Carbon-10')))",
-      "concept_length": 4
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://dl-learner.org/carcinogenesis#','hasStructure')),9,filler=OWLObjectComplementOf(OWLClass(IRI('http://dl-learner.org/carcinogenesis#','Non_ar_6c_ring'))))",
+      "concept_length": 5
     }
   }
 }

@@ -4,8 +4,8 @@ mutag:
   final_temp: 1.0
   num_epochs: 20
 bgs:
-  learning_rate: 0.1
-  initial_temp: 10
+  learning_rate: 0.01
+  initial_temp: 5.0
   final_temp: 1.0
   num_epochs: 30
 aifb:
