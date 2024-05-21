@@ -347,6 +347,9 @@ class Explainer:
                 feat_pg,
                 tmp,
             )
+            if loss < 0.5:
+                print("Stopping Explainer due to very small loss")
+                break
             optimizer_exp.zero_grad()
             loss.backward()
             optimizer_exp.step()
