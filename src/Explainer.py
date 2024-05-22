@@ -315,7 +315,7 @@ class Explainer:
         self.evaluations["CELOE"] = celoe_perfromance
 
     def _run_pgexplainer(self, print_explainer_loss=True):
-        from src.dglnn_local.pgexplainer import HeteroPGExplainer
+        from dgl.nn.pytorch.explain import HeteroPGExplainer
 
         # Load configurations from the YAML file
         config_path = "configs/pgexplainer.yaml"
@@ -383,11 +383,11 @@ class Explainer:
         print(f"Total time taken for PGExplainer  on {self.dataset}: {dur_pg:.2f}")
 
     def _run_subgraphx(self):
-        from src.dglnn_local.subgraphx import HeteroSubgraphX
+        from src.dglnn_local.subgraphx import NodeSubgraphX
 
         print("Starting SubGraphX")
         t0 = time.time()
-        explainer_sgx = HeteroSubgraphX(
+        explainer_sgx = NodeSubgraphX(
             self.model, num_hops=1, num_rollouts=3, shapley_steps=5
         )
         exp_preds_sgx = {}
