@@ -35,7 +35,7 @@ Follow these steps to set up the EDGE environment on your system:
 First, clone the EDGE repository from GitHub using the following command:
 
 ```shell
-git clone https://github.com/ds-jrg/EDGE.git
+git clone https://github.com/rupezzz/EDGE.git
 ```
 
 ### Step 2: Install Conda
