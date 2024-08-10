@@ -1,5 +1,7 @@
 """Torch Module for SubgraphX"""
 
+""" Adapted from DGL Library"""
+
 import math
 from collections import Counter
 
@@ -181,6 +183,10 @@ class NodeSubgraphX(nn.Module):
             for ntype, subgn in subgraph_nodes.items():
                 exclude_mask[ntype][subgn] = 1.0
 
+            ################################
+            ################################
+            # modified from DGL implementation
+            # begin
             exclude_feat = {
                 ntype: self.feat[ntype]
                 * exclude_mask[ntype].unsqueeze(1).to(self.feat[ntype].device)
@@ -202,6 +208,9 @@ class NodeSubgraphX(nn.Module):
             marginal_contributions.append(include_probs - exclude_probs)
 
         return torch.cat(marginal_contributions).mean().item()
+        # modify end
+        ################################
+        ################################
 
     def get_mcts_children(self, mcts_node):
         r"""Get the children of the MCTS node for the search.
@@ -359,6 +368,7 @@ class NodeSubgraphX(nn.Module):
         most_frequent = sorted_list[0]
         return most_frequent
 
+    # Newly defined function
     def explain_node(self, graph, feat, node_idx, category, **kwargs):
         """
         Executes an explanation process on a given node of a graph using Monte Carlo Tree Search (MCTS).

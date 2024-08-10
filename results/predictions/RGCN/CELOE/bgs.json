@@ -1,7 +1,7 @@
 {
   "Run_1": {
     "lithogenesis": {
-      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://data.bgs.ac.uk/ref/Lexicon/','hasObsoleteEquivalent')),2,filler=OWLClass(IRI('http://www.w3.org/2002/07/owl#','Thing')))",
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://data.bgs.ac.uk/ref/Lexicon/','hasObsoleteEquivalent')),3,filler=OWLClass(IRI('http://www.w3.org/2002/07/owl#','Thing')))",
       "concept_length": 4
     }
   },
@@ -19,7 +19,7 @@
   },
   "Run_4": {
     "lithogenesis": {
-      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://data.bgs.ac.uk/ref/Lexicon/','hasObsoleteEquivalent')),3,filler=OWLClass(IRI('http://www.w3.org/2002/07/owl#','Thing')))",
+      "best_concept": "OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://data.bgs.ac.uk/ref/Lexicon/','hasObsoleteEquivalent')),2,filler=OWLClass(IRI('http://www.w3.org/2002/07/owl#','Thing')))",
       "concept_length": 4
     }
   },

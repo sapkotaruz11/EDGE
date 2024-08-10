@@ -1,5 +1,4 @@
 import argparse
-import os
 
 
 # Custom validation function for datasets argument
@@ -97,7 +96,7 @@ if __name__ == "__main__":
     print("Explainers", args.explainers)
     print("Model name:", args.model)
     if args.train:
-        from src.explainers_runner import run_explainers
+        from src.explainer_runner import run_explainers
 
         for dataset in args.datasets:
             run_explainers(

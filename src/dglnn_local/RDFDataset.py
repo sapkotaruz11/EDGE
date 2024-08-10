@@ -15,15 +15,8 @@ import dgl.backend as F
 import networkx as nx
 import numpy as np
 from dgl.data.dgl_dataset import DGLBuiltinDataset
-from dgl.data.utils import (
-    _get_dgl_url,
-    generate_mask_tensor,
-    idx2mask,
-    load_graphs,
-    load_info,
-    save_graphs,
-    save_info,
-)
+from dgl.data.utils import (_get_dgl_url, generate_mask_tensor, idx2mask,
+                            load_graphs, load_info, save_graphs, save_info)
 
 __all__ = ["AIFBDataset", "MUTAGDataset", "BGSDataset", "AMDataset"]
 
@@ -553,6 +546,8 @@ def _get_id(dict, key):
     return id
 
 
+# New code
+# COnverting AIFB to Binray with fixed id1instance to class 1
 def _get_id_aifb(dict, key):
     id = dict.get(key, None)
 
@@ -716,7 +711,7 @@ class AIFBDataset(RDFGraphDataset):
             return None
         return (sbj, rel, obj)
 
-    # RS : Modified to make the AIFB dataset binary classification dataset
+    # Modified to make the AIFB dataset binary classification dataset
     def process_idx_file_line(self, line):
         person, _, label = line.strip().split("\t")
         if (

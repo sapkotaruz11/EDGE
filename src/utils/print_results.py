@@ -1,6 +1,7 @@
-import os
 import json
+import os
 from statistics import mean
+
 from prettytable import PrettyTable
 
 
@@ -74,5 +75,5 @@ def print_results(model_name="RGCN"):
                     exp_f1_score,
                 ]
             )
-
+    table.sortby = "Dataset"
     print(table)

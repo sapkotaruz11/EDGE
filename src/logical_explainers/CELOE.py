@@ -9,8 +9,7 @@ from ontolearn.learning_problem import PosNegLPStandard
 from ontolearn.metrics import F1, Accuracy
 from ontolearn.refinement_operators import ModifiedCELOERefinement
 from owlapy.model import IRI, OWLNamedIndividual
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
 
 def calcuate_metrics(predictions_data):

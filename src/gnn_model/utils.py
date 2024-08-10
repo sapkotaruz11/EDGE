@@ -114,8 +114,7 @@ def get_lp_aifb_fid(gnn_pred_dt_train, gnn_pred_dt_test, idx_map):
 
 
 def calculate_metrics(true_labels, pred_labels):
-    from sklearn.metrics import accuracy_score
-    from sklearn.metrics import precision_recall_fscore_support
+    from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
     # Calculate accuracy
     accuracy = accuracy_score(true_labels, pred_labels)
@@ -136,17 +135,17 @@ def calculate_metrics(true_labels, pred_labels):
     return metrics_dict
 
 
-def gen_evaluations(prediction_perfromance, explanation_perfromance):
+def gen_evaluations(prediction_performance, explanation_performance):
 
-    perfromances_evauations = {
-        "pred_accuracy": prediction_perfromance["accuracy"],
-        "pred_precision": prediction_perfromance["precision"],
-        "pred_recall": prediction_perfromance["recall"],
-        "pred_f1_score": prediction_perfromance["f1-score"],
-        "exp_accuracy": explanation_perfromance["accuracy"],
-        "exp_precision": explanation_perfromance["precision"],
-        "exp_recall": explanation_perfromance["recall"],
-        "exp_f1_score": explanation_perfromance["f1-score"],
+    performances_evauations = {
+        "pred_accuracy": prediction_performance["accuracy"],
+        "pred_precision": prediction_performance["precision"],
+        "pred_recall": prediction_performance["recall"],
+        "pred_f1_score": prediction_performance["f1-score"],
+        "exp_accuracy": explanation_performance["accuracy"],
+        "exp_precision": explanation_performance["precision"],
+        "exp_recall": explanation_performance["recall"],
+        "exp_f1_score": explanation_performance["f1-score"],
     }
 
-    return perfromances_evauations
+    return performances_evauations
