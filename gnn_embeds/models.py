@@ -34,8 +34,11 @@ class RGCN(torch.nn.Module):
             ent_df = pd.read_csv(ent_path)
             rel_df = pd.read_csv(rel_path)
 
-            self.entity_embedding = torch.tensor(
+            entity_embedding_weight = torch.tensor(
                 ent_df.iloc[:, 1:].to_numpy(dtype=np.float32)
+            )
+            self.entity_embedding = nn.Embedding.from_pretrained(
+                entity_embedding_weight, freeze=False
             )
 
             self.relation_embedding = nn.Parameter(
@@ -61,7 +64,7 @@ class RGCN(torch.nn.Module):
         self.dropout_ratio = dropout
 
     def forward(self, entity, edge_index, edge_type, edge_norm):
-        x = self.entity_embedding[entity]
+        x = self.entity_embedding(entity)
         x = F.relu(self.conv1(x, edge_index, edge_type, edge_norm))
         x = F.dropout(x, p=self.dropout_ratio, training=self.training)
         x = self.conv2(x, edge_index, edge_type, edge_norm)
@@ -69,6 +72,8 @@ class RGCN(torch.nn.Module):
         return x
 
     def distmult(self, embedding, triplets):
+        a = triplets[:, 0]
+        b = embedding.shape
         s = embedding[triplets[:, 0]]
         r = self.relation_embedding[triplets[:, 1]]
         o = embedding[triplets[:, 2]]
