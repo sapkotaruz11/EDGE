@@ -40,6 +40,7 @@ def main(args):
     dataset_root = os.path.join("KGs", args.dataset_name)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataset = RGDataset(root=dataset_root)
+    print(f"Training {args.dataset_name } on device {device} ")
     train_data = dataset.train_data
     train_data.to(device)
     train_triples = dataset.triple_splits["train"]
@@ -47,7 +48,6 @@ def main(args):
     test_triples = torch.LongTensor(dataset.triple_splits["test"])
     all_triples = dataset.all_triples
 
-    train_triples = dataset.triple_splits["train"]
     grad_norm = 1.0
     model = RGCN(
         256,
@@ -86,7 +86,9 @@ def main(args):
             optimizer.step()
             pbar.set_postfix({"Loss": f"{loss:.3f}"})
             if (eval_count % 25) == 0:
-
+                if device.type == "cuda":
+                    model.cpu()
+                    entity_embedding = entity_embedding.to("cpu")
                 model.eval()
                 mrr = calc_mrr(
                     entity_embedding,
@@ -95,44 +97,55 @@ def main(args):
                     all_triples,
                     hits=[1, 3, 10],
                 )
+                model.to(device)
     else:
         triple_chunks = np.array_split(train_triples, 15)
         for epoch in pbar:
+            full_entity_embedding = torch.zeros(
+                (dataset.num_entites, 256), device=device
+            )
             epoch_loss = 0
             eval_count += 1
             for chunk in triple_chunks:
-                train_data = generate_train_data(chunk)
-                train_data.to(device)
+                training_data = generate_train_data(chunk)
+                training_data.to(device)
                 model.train()
                 optimizer.zero_grad()
                 entity_embedding = model(
-                    train_data.entity,
-                    train_data.edge_index,
-                    train_data.edge_type,
-                    train_data.edge_norm,
+                    training_data.entity,
+                    training_data.edge_index,
+                    training_data.edge_type,
+                    training_data.edge_norm,
                 )
                 loss = model.score_loss(
-                    entity_embedding, train_data.samples, train_data.labels
+                    entity_embedding, training_data.samples, training_data.labels
                 ) + 1e-2 * model.reg_loss(entity_embedding)
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(model.parameters(), grad_norm)
                 optimizer.step()
+                full_entity_embedding[training_data.entity] = entity_embedding
             epoch_loss += loss
             pbar.set_postfix({"Loss": f"{epoch_loss:.3f}"})
             if (eval_count % 25) == 0:
-
+                if device.type == "cuda":
+                    model.cpu()
+                    full_entity_embedding = full_entity_embedding.to("cpu")
                 model.eval()
                 mrr = calc_mrr(
-                    entity_embedding,
+                    full_entity_embedding,
                     model.relation_embedding,
                     valid_triples,
                     all_triples,
                     hits=[1, 3, 10],
                 )
+                model.to(device)
 
     model.eval()
+    if device.type == "cuda":
+        model.cpu()
+        full_entity_embedding = full_entity_embedding.to("cpu")
     metrics = calc_mrr(
-        entity_embedding,
+        full_entity_embedding,
         model.relation_embedding,
         test_triples,
         all_triples,
