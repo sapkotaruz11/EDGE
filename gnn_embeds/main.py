@@ -35,12 +35,12 @@ def save_results(results_dict):
 
 def main(args):
     small_dataset = True
-    if args.dataset_name == "FB15k-237":
+    if args.dataset == "FB15k-237":
         small_dataset = False
-    dataset_root = os.path.join("KGs", args.dataset_name)
+    dataset_root = os.path.join("KGs", args.dataset)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataset = RGDataset(root=dataset_root)
-    print(f"Training {args.dataset_name } on device {device} ")
+    print(f"Training {args.dataset} on device {device} ")
     train_data = dataset.train_data
     train_data.to(device)
     train_triples = dataset.triple_splits["train"]
@@ -143,6 +143,8 @@ def main(args):
     model.eval()
     if device.type == "cuda":
         model.cpu()
+        if small_dataset:
+            full_entity_embedding = entity_embedding
         full_entity_embedding = full_entity_embedding.to("cpu")
     metrics = calc_mrr(
         full_entity_embedding,
@@ -163,7 +165,7 @@ if __name__ == "__main__":
 
     # Adding optional arguments with default values
     parser.add_argument(
-        "--dataset_name",
+        "--dataset",
         type=str,
         default="UMLS",
         help="Name of the dataset to use",
@@ -173,8 +175,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--pre_trained",
-        type=bool,
-        default=True,
+        action='store_true',
         help="True to use pre-trained embeddings",
     )
 
