@@ -24,12 +24,15 @@ class RGCN(torch.nn.Module):
         dropout,
         embeds_path=None,
         pre_trained_embeds=True,
+        embed_model= "Keci",
     ):
         super(RGCN, self).__init__()
 
         if pre_trained_embeds:
-            ent_path = os.path.join(embeds_path, "Keci_entity_embeddings.csv")
-            rel_path = os.path.join(embeds_path, "Keci_relation_embeddings.csv")
+            entity_embeds_file_name = embed_model + "_entity_embeddings.csv"
+            relational_embeds_file_name = embed_model + "_relation_embeddings.csv"
+            ent_path = os.path.join(embeds_path, entity_embeds_file_name)
+            rel_path = os.path.join(embeds_path, relational_embeds_file_name)
 
             ent_df = pd.read_csv(ent_path)
             rel_df = pd.read_csv(rel_path)
