@@ -5,6 +5,7 @@ import numpy as np
 
 
 def sort_and_rank(score, target):
+    target = target.to(score.device)
     _, indices = torch.sort(score, dim=1, descending=True)
     indices = torch.nonzero(indices == target.view(-1, 1))
     indices = indices[:, 1].view(-1)

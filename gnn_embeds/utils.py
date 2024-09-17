@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from tqdm import tqdm
 from torch_scatter import scatter_add
 from collections import defaultdict
-
+from negative_sampling import negative_sampling_pk
 
 def edge_normalization(edge_type, edge_index, num_entity, num_relation):
     """
@@ -89,7 +89,7 @@ def generate_samples_and_labels(data, negative_rate=2):
     num_entity = data.num_nodes
 
     # Generate negative samples and labels
-    samples, labels = negative_sampling(pos_samples, num_entity, negative_rate)
+    samples, labels = negative_sampling_pk(pos_samples, num_entity, negative_rate)
 
     # Convert samples and labels to PyTorch tensors
     return torch.tensor(samples, dtype=torch.long), torch.tensor(
@@ -117,9 +117,7 @@ def generate_train_data(triples, negative_rate=2):
 
     num_rels = len(np.unique(rel))
     relabeled_edges = np.stack((src, rel, dst)).transpose()
-    samples, labels = negative_sampling(
-        relabeled_edges, len(uniq_entity), negative_rate
-    )
+    
 
     split_size = int(len(rel) * 0.5)
     graph_split_ids = np.random.choice(
@@ -141,6 +139,5 @@ def generate_train_data(triples, negative_rate=2):
     data.edge_norm = edge_normalization(
         edge_type, edge_index, len(data.entity), len(rel)
     )
-    data.samples = torch.from_numpy(samples)
-    data.labels = torch.from_numpy(labels)
+    data.samples, data.labels = negative_sampling_pk(data)
     return data

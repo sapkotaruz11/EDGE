@@ -42,8 +42,6 @@ def main(args):
     dataset = RGDataset(root=dataset_root)
     print(f"Training {args.dataset} on device {device} ")
 
-    train_data = dataset.train_data
-    train_data.to(device)
     train_triples = dataset.triple_splits["train"]
     valid_triples = torch.LongTensor(dataset.triple_splits["valid"])
     test_triples = torch.LongTensor(dataset.triple_splits["test"])
@@ -82,17 +80,20 @@ def main(args):
 
         if small_dataset:
             for epoch in pbar:
+                training_data = generate_train_data(train_triples)
+                # training_data = dataset.train_data
+                training_data.to(device)
                 eval_count += 1
                 model.train()
                 optimizer.zero_grad()
                 entity_embedding = model(
-                    train_data.entity,
-                    train_data.edge_index,
-                    train_data.edge_type,
-                    train_data.edge_norm,
-                )
+                        training_data.entity,
+                        training_data.edge_index,
+                        training_data.edge_type,
+                        training_data.edge_norm,
+                    )
                 loss = model.score_loss(
-                    entity_embedding, train_data.samples, train_data.labels
+                    entity_embedding, training_data.samples, training_data.labels
                 ) + 1e-2 * model.reg_loss(entity_embedding)
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(model.parameters(), grad_norm)
@@ -141,9 +142,6 @@ def main(args):
                 epoch_loss += loss
                 pbar.set_postfix({"Loss": f"{epoch_loss:.3f}"})
                 if (eval_count % 25) == 0:
-                    if device.type == "cuda":
-                        model.cpu()
-                        full_entity_embedding = full_entity_embedding.to("cpu")
                     model.eval()
                     mrr = calc_mrr(
                         full_entity_embedding,
@@ -154,13 +152,10 @@ def main(args):
                     )
                     print(f"MRR at epoch {epoch}: {mrr}")
                     model.to(device)
-
+        if small_dataset:
+            full_entity_embedding = entity_embedding
         model.eval()
-        if device.type == "cuda":
-            model.cpu()
-            if small_dataset:
-                full_entity_embedding = entity_embedding
-            full_entity_embedding = full_entity_embedding.to("cpu")
+       
         
         # Calculate final MRR on the test set
         metrics = calc_mrr(
