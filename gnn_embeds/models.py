@@ -58,10 +58,10 @@ class RGCN(torch.nn.Module):
             )
 
         self.conv1 = RGCNConv(
-            hidden_dims, hidden_dims, num_relations * 2, num_bases=num_bases
+            hidden_dims, hidden_dims, num_relations, num_bases=num_bases
         )
         self.conv2 = RGCNConv(
-            hidden_dims, hidden_dims, num_relations * 2, num_bases=num_bases
+            hidden_dims, hidden_dims, num_relations, num_bases=num_bases
         )
 
         self.dropout_ratio = dropout
@@ -75,8 +75,6 @@ class RGCN(torch.nn.Module):
         return x
 
     def distmult(self, embedding, triplets):
-        a = triplets[:, 0]
-        b = embedding.shape
         s = embedding[triplets[:, 0]]
         r = self.relation_embedding[triplets[:, 1]]
         o = embedding[triplets[:, 2]]

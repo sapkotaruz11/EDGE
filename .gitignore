@@ -171,3 +171,6 @@ cython_debug/
 try.py
 try.ipynb
 *.pt
+
+gnn_embeds/results
+gnn_embeds/KGs

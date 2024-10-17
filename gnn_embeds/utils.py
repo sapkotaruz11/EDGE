@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from tqdm import tqdm
 from torch_scatter import scatter_add
 from collections import defaultdict
-from negative_sampling import negative_sampling_pk
+from negative_sampling import negative_sampling_pk, negative_sampling_de
 
 def edge_normalization(edge_type, edge_index, num_entity, num_relation):
     """
@@ -27,7 +27,7 @@ def edge_normalization(edge_type, edge_index, num_entity, num_relation):
     return edge_norm
 
 
-def negative_sampling(pos_samples, num_entity, negative_rate):
+def negative_sampling(pos_samples, negative_rate):
     """
     Generate negative samples by corrupting subjects or objects in positive samples.
 
@@ -50,6 +50,7 @@ def negative_sampling(pos_samples, num_entity, negative_rate):
     labels = np.zeros(size_of_batch * (negative_rate + 1), dtype=np.float32)
     labels[:size_of_batch] = 1
 
+    num_entity = np.unique(pos_samples[:, [0, 2]])
     # Generate random entity indices to corrupt the samples
     random_entities = np.random.choice(num_entity, size=num_to_generate)
     # Randomly choose to corrupt either the subject or object in the triples
@@ -60,7 +61,7 @@ def negative_sampling(pos_samples, num_entity, negative_rate):
     neg_samples[corrupt_subj, 0] = random_entities[corrupt_subj]
     neg_samples[corrupt_obj, 2] = random_entities[corrupt_obj]
 
-    return np.concatenate((pos_samples, neg_samples)), labels
+    return torch.tensor(np.concatenate((pos_samples, neg_samples)), dtype=torch.long), torch.tensor(labels, dtype= torch.long)
 
 
 def generate_samples_and_labels(data, negative_rate=2):

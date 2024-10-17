@@ -1,4 +1,5 @@
 import torch
+from torch_geometric.data import Data
 
 def random_replacement_(batch, index, selection, size, max_index):
     """
@@ -71,3 +72,59 @@ def negative_sampling_pk(data, negative_rate=10):
     all_labels = torch.cat([pos_labels, neg_labels], dim=0)
 
     return all_samples, all_labels
+
+
+def negative_sampling_de(data: Data, num_neg_samples: int = 1):
+    """
+    Generate negative samples for graph data in PyTorch Geometric format.
+    
+    Args:
+        data (Data): PyTorch Geometric Data object containing graph information.
+        num_neg_samples (int): Number of negative samples to generate for each positive edge.
+        
+    Returns:
+        Tuple[torch.Tensor, torch.Tensor]: 
+            - edge_index: Tensor of shape (2, num_edges + num_neg_samples * num_edges) with positive and negative edges.
+            - labels: Tensor of shape (num_edges + num_neg_samples * num_edges,) with labels for positive (1) and negative (0) edges.
+    """
+    # Extract positive edges
+    edge_index = data.edge_index
+    num_edges = edge_index.size(1)
+    
+    # Extract number of nodes
+    num_nodes = data.num_nodes
+    
+    # Generate negative samples
+    neg_edge_index = []
+    neg_labels = []
+    
+    for _ in range(num_neg_samples):
+        # Randomly sample node pairs to create negative edges
+        sampled_edges = torch.randint(0, num_nodes, (2, num_edges), dtype=torch.long)
+        
+        # Ensure that no positive edges are included in negative edges
+        sampled_edges_set = set(map(tuple, sampled_edges.t().tolist()))
+        existing_edges_set = set(map(tuple, edge_index.t().tolist()))
+        
+        # Remove edges that are already positive
+        neg_edges = [edge for edge in sampled_edges_set if edge not in existing_edges_set]
+        
+        if len(neg_edges) < num_edges:
+            # If not enough negative samples were generated, repeat until we get enough
+            while len(neg_edges) < num_edges:
+                sampled_edges = torch.randint(0, num_nodes, (2, num_edges), dtype=torch.long)
+                sampled_edges_set = set(map(tuple, sampled_edges.t().tolist()))
+                neg_edges = [edge for edge in sampled_edges_set if edge not in existing_edges_set]
+        
+        neg_edge_index.append(torch.tensor(neg_edges).t().long())
+        neg_labels.extend([0] * len(neg_edges))
+    
+    neg_edge_index = torch.cat(neg_edge_index, dim=1)
+    pos_labels = [1] * num_edges
+    labels = torch.tensor(pos_labels + neg_labels)
+    
+    # Combine positive and negative edges
+    combined_edge_index = torch.cat([edge_index, neg_edge_index], dim=1)
+    
+    return combined_edge_index, labels
+

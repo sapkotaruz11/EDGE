@@ -14,6 +14,7 @@ class RGDataset:
     def __init__(
         self,
         root: str,
+        embed_model :str,
         transform=None,
         pre_transform=None,
         pre_filter=None,
@@ -21,11 +22,13 @@ class RGDataset:
     ):
         # Define the common base path for embedding files
         self.embeds_base_path = os.path.join(root, "embeds")
+        entity_embeds_file_name = embed_model + "_entity_embeddings.csv"
+        relational_embeds_file_name = embed_model + "_relation_embeddings.csv"
         self.node_embeds_path = os.path.join(
-            self.embeds_base_path, "Keci_entity_embeddings.csv"
+            self.embeds_base_path, entity_embeds_file_name
         )
         self.rel_embeds_path = os.path.join(
-            self.embeds_base_path, "Keci_relation_embeddings.csv"
+            self.embeds_base_path, relational_embeds_file_name
         )
         self.url = url
         self.raw_paths = [
@@ -53,6 +56,7 @@ class RGDataset:
     def load_features(self, path: str) -> Dict[str, np.ndarray]:
         df = pd.read_csv(path)
         entitiedf = pd.read_csv(path)
+        self.embeds_dim = entitiedf.shape[1] -1
         entities = df.iloc[:, 0].to_numpy()
         entity_to_id = defaultdict(lambda: len(entity_to_id))
         # Populate the dictionary
@@ -73,5 +77,10 @@ class RGDataset:
                     [self.entity2id[src], self.relation2id[rel], self.entity2id[dst]]
                 )
             self.triple_splits[split_name] = np.array(triples)
+    
+    def raw_file_names(self):
+        return ["train.txt", "test.txt", "valid.txt"]
 
+    def processed_file_names(self):
+        return ["data.pt", "split.pt"]
 

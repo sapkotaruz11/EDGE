@@ -12,12 +12,13 @@ from torch_geometric.data import Data
 from utils import generate_train_data
 from dataset import RGDataset
 from models import RGCN
+from SAGEModel import SAGE
 
 import json
 from datetime import datetime
 
 
-def save_results(results_dict):
+def save_results(results_dict, epoch_dict):
 
     now = datetime.now()
     timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")
@@ -26,20 +27,24 @@ def save_results(results_dict):
     os.makedirs(results_dir, exist_ok=True)
 
     file_path = os.path.join(results_dir, "results.json")
+    file_path_loss = os.path.join(results_dir, "loss.json")
 
     with open(file_path, "w") as file:
         json.dump(results_dict, file, indent=4)
+
+    with open(file_path_loss, "w") as file:
+        json.dump(epoch_dict, file, indent=4)
 
     print(f"Results saved to {file_path}")
 
 
 def main(args):
     small_dataset = True
-    if args.dataset == "FB15k-237":
+    if args.dataset == "FB15k-237" or "NELL-995-h50":
         small_dataset = False
     dataset_root = os.path.join("KGs", args.dataset)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    dataset = RGDataset(root=dataset_root)
+    dataset = RGDataset(root=dataset_root, embed_model= args.embed_model)
     print(f"Training {args.dataset} on device {device} ")
 
     train_triples = dataset.triple_splits["train"]
@@ -52,34 +57,52 @@ def main(args):
     results = {
         "dataset": args.dataset,
         "epochs": args.num_epochs,
+        "embeds_dim" : dataset.embeds_dim
         
     }
-
+    losses = {}
     # Loop over both with and without pre-trained embeddings
-    for pre_trained in [True, False]:
+    for pre_trained in [False,True ]:
+        loss_key = "True" if pre_trained else "False"
         embed_type = "pre_trained_embeds" if pre_trained else "random_embeds"
         print(f"Running experiment with pre_trained={pre_trained}")
         if pre_trained :
             results['embedding_model'] = args.embed_model
-        model = RGCN(
-            256,
-            dataset.num_entites,
-            dataset.num_relations,
-            4,
-            0.2,
-            embeds_path=dataset.embeds_base_path,
-            pre_trained_embeds=pre_trained,
-            embed_model = args.embed_model
-        )
+        
+        if args.nn_model == "RGCN":
+            model = RGCN(
+                dataset.embeds_dim,
+                dataset.num_entites,
+                dataset.num_relations,
+                4,
+                0.2,
+                embeds_path=dataset.embeds_base_path,
+                pre_trained_embeds=pre_trained,
+                embed_model = args.embed_model
+            )
+        else:
+            model = SAGE(
+                dataset.embeds_dim,
+                dataset.num_entites,
+                dataset.num_relations,
+                4,
+                0.2,
+                embeds_path=dataset.embeds_base_path,
+                pre_trained_embeds=pre_trained,
+                embed_model = args.embed_model
+            )
+
         model.to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
         epochs = args.num_epochs
         eval_count = 0
         pbar = tqdm(range(epochs), ncols=100)
-
+        epoch_losss = {}
         if small_dataset:
+            
             for epoch in pbar:
+                
                 training_data = generate_train_data(train_triples)
                 # training_data = dataset.train_data
                 training_data.to(device)
@@ -99,10 +122,7 @@ def main(args):
                 torch.nn.utils.clip_grad_norm_(model.parameters(), grad_norm)
                 optimizer.step()
                 pbar.set_postfix({"Loss": f"{loss:.3f}"})
-                if (eval_count % 25) == 0:
-                    if device.type == "cuda":
-                        model.cpu()
-                        entity_embedding = entity_embedding.to("cpu")
+                if (eval_count % 50) == 0:
                     model.eval()
                     mrr = calc_mrr(
                         entity_embedding,
@@ -112,12 +132,13 @@ def main(args):
                         hits=[1, 3, 10],
                     )
                     print(f"MRR at epoch {epoch}: {mrr}")
-                    model.to(device)
+                epoch_losss[epoch] = round(loss.item(), 3)
+            losses[loss_key] = epoch_losss
         else:
-            triple_chunks = np.array_split(train_triples, 15)
+            triple_chunks = np.array_split(train_triples, 10)
             for epoch in pbar:
                 full_entity_embedding = torch.zeros(
-                    (dataset.num_entites, 256), device=device
+                    (dataset.num_entites, dataset.embeds_dim), device=device
                 )
                 epoch_loss = 0
                 eval_count += 1
@@ -136,12 +157,15 @@ def main(args):
                         entity_embedding, training_data.samples, training_data.labels
                     ) + 1e-2 * model.reg_loss(entity_embedding)
                     loss.backward()
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), grad_norm)
+                    
                     optimizer.step()
                     full_entity_embedding[training_data.entity] = entity_embedding
-                epoch_loss += loss
+                    epoch_loss += loss
+                torch.nn.utils.clip_grad_norm_(model.parameters(), grad_norm)
+                epoch_loss = epoch_loss / 10
+                
                 pbar.set_postfix({"Loss": f"{epoch_loss:.3f}"})
-                if (eval_count % 25) == 0:
+                if (eval_count % 50) == 0:
                     model.eval()
                     mrr = calc_mrr(
                         full_entity_embedding,
@@ -152,10 +176,12 @@ def main(args):
                     )
                     print(f"MRR at epoch {epoch}: {mrr}")
                     model.to(device)
+                epoch_losss[epoch] = round(loss.item(), 3)
+            losses[loss_key] = epoch_losss
         if small_dataset:
             full_entity_embedding = entity_embedding
         model.eval()
-       
+        
         
         # Calculate final MRR on the test set
         metrics = calc_mrr(
@@ -173,7 +199,7 @@ def main(args):
     
     
     
-    save_results(results)
+    save_results(results, losses)
 
 
 if __name__ == "__main__":
@@ -190,12 +216,17 @@ if __name__ == "__main__":
     parser.add_argument(
         "--num_epochs", type=int, default=30, help="Number of epochs for training"
     )
-
     parser.add_argument(
         "--embed_model",
         type=str,
         default="Keci",
-        help="Name of the dataset to use",
+        help="Name of the embedding to use",
+    )
+    parser.add_argument(
+        "--nn_model",
+        type=str,
+        default="RGCN",
+        help="Name of the ML model  to use",
     )
     # Parse the arguments
     args = parser.parse_args()
